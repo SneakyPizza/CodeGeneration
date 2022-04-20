@@ -1,4 +1,4 @@
-package nl.inholland.Backend;
+package nl.inholland.backend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
