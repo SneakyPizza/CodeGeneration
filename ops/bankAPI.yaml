@@ -1,0 +1,427 @@
+---
+# POST api/Accounts - creates a new bank account
+# GET api/Accounts - gets accounts (set up pagination using query parameters)
+# GET api/Accounts/{IBAN} - gets a specific bank account
+# POST api/Accounts/{IBAN}/Deposit – add money to the account
+# POST api/Accounts/{IBAN}/Withdraw – remove money from the account
+# POST api/Transactions – transfer money from account to account
+openapi: 3.0.0
+info:
+  title: BankAPI
+  description: a bank api
+  version: "1.0"
+servers:
+- url: https://virtserver.swaggerhub.com/Jaimy-monsuur/BankAPI/1.0
+  description: SwaggerHub API Auto Mocking
+
+
+paths:
+  # GET api/Users - gets users (set up pagination using query parameters)
+  /api/Users:
+    get:
+      summary: Returns a list of users.
+      description: Optional extended description in CommonMark or HTML.
+      responses:
+        '200':    # status code
+          description: A JSON array of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    password:
+                      type: string
+                    email:
+                      type: string
+                    firstName:
+                      type: string
+                    lastName:
+                      type: string
+                    street:
+                      type: string
+                    city:
+                      type: string
+                    zipcode:
+                      type: string
+                    userstatus:
+                      enum: [ active, disabled ]
+                  example:
+                    password: "75170fc230cd88f32e475ff4087f81d9"
+                    email: "user@email.nl"
+                    firstName: "John"
+                    lastName: "Doe"
+                    street: "examplestreet 1a"
+                    city: "Amsterdam"
+                    zipcode: "1234AB"
+                    userstatus: "active"
+  # POST api/Users/ - creates a new user
+  /api/Users/Create:
+    post:
+      summary: Creates a new user.
+      description: Optional extended description in CommonMark or HTML.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                email:
+                  type: string
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                street:
+                  type: string
+                city:
+                  type: string
+                zipcode:
+                  type: string
+      responses:
+        '200':    # status code
+          description: A JSON array of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    password:
+                      type: string
+                    email:
+                      type: string
+                    firstName:
+                      type: string
+                    lastName:
+                      type: string
+                    street:
+                      type: string
+                    city:
+                      type: string
+                    zipcode:
+                      type: string
+                    userstatus:
+                      enum: [ active, disabled ]
+                  example:
+                    password: "75170fc230cd88f32e475ff4087f81d9"
+                    email: "user@gmail.com"
+                    firstName: "John"
+                    lastName: "Doe"
+                    street: "examplestreet 1a"
+                    city: "Amsterdam"
+                    zipcode: "1234AB"
+                    userstatus: "active"
+  # PUT api/Users/ - updates a user
+  /api/Users/Update/{id}:
+    put:
+      summary: Updates a user.
+      description: Optional extended description in CommonMark or HTML.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                email:
+                  type: string
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                street:
+                  type: string
+                city:
+                  type: string
+                zipcode:
+                  type: string
+      responses:
+        '200':    # status code
+          description: A JSON array of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    password:
+                      type: string
+                    email:
+                      type: string
+                    firstName:
+                      type: string
+                    lastName:
+                      type: string
+                    street:
+                      type: string
+                    city:
+                      type: string
+                    zipcode:
+                      type: string
+                    userstatus:
+                      enum: [ active, disabled ]
+                  example:
+                    password: "75170fc230cd88f32e475ff4087f81d9"
+                    email: "user$gmail.com"
+                    firstName: "John"
+                    lastName: "Doe"
+                    street: "examplestreet 1a"
+                    city: "Amsterdam"
+                    zipcode: "1234AB"
+                    userstatus: "active"
+
+  # GET api/Accounts - gets accounts (set up pagination using query parameters)
+  /api/Accounts:
+    get:
+      summary: Returns a list of accounts.
+      description: Optional extended description in CommonMark or HTML.
+      responses:
+        '200':    # status code
+          description: A JSON array of accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    accountType:
+                      enum: [ savings, current ]
+                    userid:
+                      type: integer
+                    IBAN:
+                      type: string
+                    balance:
+                      type: number
+                    user:
+                      type: object
+                      properties:
+                        email:
+                          type: string
+                        firstName:
+                          type: string
+                        lastName:
+                          type: string
+                        street:
+                          type: string
+                        city:
+                          type: string
+                        zipcode:
+                          type: string
+                        userstatus:
+                          enum: [active, disabled]
+                  example:
+                    accountType: "savings"
+                    userid: 1
+                    IBAN: "NL91ABNA0417164300"
+                    balance: "100.00"
+                    user:
+                      email: "john@example.com"
+                      firstName: "John"
+                      lastName: "Doe"
+                      street: "examplestreet 1a"
+                      city: "Amsterdam"
+                      zipcode: "1234AB"
+                      userstatus: active
+  # GET api/Accounts/{IBAN} - gets a specific bank account
+  /api/Accounts/{IBAN}:
+    get:
+      parameters:
+        - in: path
+          name: IBAN
+          schema:
+            type: integer
+          required: true
+          description: Gets the account of the IBAN
+      summary: Returns a account with IBAN.
+      description: Optional extended description in CommonMark or HTML.
+      responses:
+        '200':    # status code
+          description: A JSON object of user.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accountType:
+                    enum: [ savings, current ]
+                  userid:
+                    type: integer
+                  IBAN:
+                    type: string
+                  balance:
+                    type: number
+                  user:
+                    type: object
+                    properties:
+                      email:
+                        type: string
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      street:
+                        type: string
+                      city:
+                        type: string
+                      zipcode:
+                        type: string
+                      userstatus:
+                        enum: [active, disabled]
+                example:
+                  accountType: "savings"
+                  userid: 1
+                  IBAN: "NL91ABNA0417164300"
+                  balance: "100.00"
+                  user:
+                    email: "john@example.com"
+                    firstName: "John"
+                    lastName: "Doe"
+                    street: "examplestreet 1a"
+                    city: "Amsterdam"
+                    zipcode: "1234AB"
+  # POST api/Accounts/ - creates a new bank account
+  /api/Accounts/:
+      post:
+        summary: creates a new bank account.
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accountType:
+                    enum: [savings, current]
+                  accountStatus:
+                    enum: [active, disabled]
+                  userid:
+                    type: integer
+                  IBAN: # iban?
+                    type: string
+                example:
+                  id: 10
+                  accountType: savings
+                  userid: 10
+                  IBAN: NL 0750 8900 0000 0175 7814
+        responses:
+          '201':
+            description: Created
+  # POST api/Accounts/{IBAN}/Deposit – add money to the account
+  /api/Accounts/{IBAN}/Deposit:
+      post:
+        parameters:
+          - in: path
+            name: IBAN
+            schema:
+              type: integer
+            required: true
+            description: Numeric IBAN of a user.
+        summary: Adds money to the account.
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  amount:
+                    type: integer
+                  IBAN:
+                    type: string
+                  pincode:
+                    type: string # hashed integer pincode
+                example:
+                  amount: 100
+                  IBAN: NL 0750 8900 0000 0175 7814
+        responses:
+          '202':
+            description: Accepted
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    IBAN:
+                      type: string
+                    balance:
+                      type: number
+  # POST api/Accounts/{IBAN}/Withdraw – remove money from the account
+  /api/Accounts/{IBAN}/Withdraw:
+      post:
+        parameters:
+          - in: path
+            name: IBAN
+            schema:
+              type: integer
+            required: true
+            description: IBAN of a user.
+        summary: Withdraws money from the account.
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  amount:
+                    type: integer
+                  IBAN:
+                    type: string
+                  pincode:
+                    type: string # hashed integer pincode
+                example:
+                  amount: 100
+                  IBAN: NLRABO8900000001757814
+        responses:
+          '202':
+            description: Accepted
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    IBAN:
+                      type: string
+                    balance:
+                      type: number
+  # POST api/Transactions – transfer money from account to account
+  /api/Transactions:
+      post:
+        summary: Transfer money from account to account.
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fromIBAN:
+                    type: string
+                  pincode:
+                    type: string # hashed integer pincode
+                  toIBAN:
+                    type: string
+                  amount:
+                    type: integer
+                example:
+                  fromIBAN: NL 0750 8900 0000 0175 7814
+                  toIBAN: NL 0750 8900 0000 0175 7814
+                  amount: 100
+        responses:
+          '202':
+            description: Accepted
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    fromIBAN:
+                      type: string
+                    balance:
+                      type: number
+components: {}
+
