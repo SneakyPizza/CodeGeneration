@@ -1,4 +1,4 @@
-package nl.inholland.Backend;
+package nl.inholland.backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
