@@ -116,8 +116,53 @@ paths:
                     city: "Amsterdam"
                     zipcode: "1234AB"
                     userstatus: "active"
-  # PUT api/Users/ - updates a user
-  /api/Users/Update/{id}:
+  # GET api/Users/ - get user by id
+  /api/Users/{id}:
+    get:
+      summary: Get user by id
+      description:
+      parameters:
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+        description: The user ID
+      responses:
+        '200':
+          description: JSON with 1 user
+          content:
+            application/JSON:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                  firstName:
+                    type: string
+                  lastName:
+                    type: string
+                  street:
+                    type: string
+                  city:
+                    type: string
+                  zipcode:
+                    type: string
+                  userstatus:
+                    enum: [ active, disabled ]
+                example:
+                  email: "user$gmail.com"
+                  firstName: "John"
+                  lastName: "Doe"
+                  street: "examplestreet 1a"
+                  city: "Amsterdam"
+                  zipcode: "1234AB"
+                  userstatus: "active"
+
+                      
+      
+ # PUT api/Users/ - updates a user
     put:
       summary: Updates a user.
       description: Optional extended description in CommonMark or HTML.
@@ -287,10 +332,19 @@ paths:
                     street: "examplestreet 1a"
                     city: "Amsterdam"
                     zipcode: "1234AB"
-  # POST api/Accounts/ - creates a new bank account
-  /api/Accounts/:
-      post:
-        summary: creates a new bank account.
+  # PUT api/Accounts/{IBAN} - updates a bank account from active - non-active
+    put: # NOT DONE
+      parameters:
+        - in: path
+          name: IBAN
+          schema:
+            type: integer
+          required: true
+          description: Gets the account of the IBAN
+        summary: Deletes a account with IBAN.
+    # POST api/Accounts/ - creates a new bank account
+    post:
+        summary: Creates a new bank account.
         requestBody:
           content:
             application/json:
@@ -313,6 +367,7 @@ paths:
         responses:
           '201':
             description: Created
+      
   # POST api/Accounts/{IBAN}/Deposit – add money to the account
   /api/Accounts/{IBAN}/Deposit:
       post:
@@ -407,10 +462,17 @@ paths:
                     type: string
                   amount:
                     type: integer
+                  timestamp:
+                    type: datetime
+                  userid:
+                    type: integer
                 example:
                   fromIBAN: NL 0750 8900 0000 0175 7814
+                  pincode: 1234 # is normally hashed
                   toIBAN: NL 0750 8900 0000 0175 7814
                   amount: 100
+                  timestamp: # format needs to be made
+                  userid: 1
         responses:
           '202':
             description: Accepted
