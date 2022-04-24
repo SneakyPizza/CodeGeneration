@@ -13,8 +13,6 @@ info:
 servers:
   - url: https://virtserver.swaggerhub.com/Jaimy-monsuur/BankAPI/1.0
     description: SwaggerHub API Auto Mocking
-
-
 paths:
   # GET api/Users - gets users (set up pagination using query parameters)
   /api/Users:
@@ -54,6 +52,10 @@ paths:
                       type: string
                     userstatus:
                       enum: [ active, disabled ]
+                    dayLimit:
+                      type: number
+                    transactionLimit:
+                      type: number
                   example:
                     password: "75170fc230cd88f32e475ff4087f81d9"
                     email: "user@email.nl"
@@ -63,6 +65,9 @@ paths:
                     city: "Amsterdam"
                     zipcode: "1234AB"
                     userstatus: "active"
+                    dayLimit: "1000"
+                    transactionLimit: "100"
+    # POST api/Users - creates a new user
     post:
       tags:
         - Users
@@ -88,6 +93,12 @@ paths:
                   type: string
                 zipcode:
                   type: string
+                userstatus:
+                  enum: [ active, disabled ]
+                dayLimit:
+                  type: number
+                transactionLimit:
+                  type: number
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -116,6 +127,10 @@ paths:
                       type: string
                     userstatus:
                       enum: [ active, disabled ]
+                    dayLimit:
+                      type: number
+                    transactionLimit:
+                      type: number
                   example:
                     password: "75170fc230cd88f32e475ff4087f81d9"
                     email: "user@gmail.com"
@@ -125,6 +140,8 @@ paths:
                     city: "Amsterdam"
                     zipcode: "1234AB"
                     userstatus: "active"
+                    dayLimit: "1000"
+                    transactionLimit: "100"
   # GET api/Users/{id} - get user by id
   /api/Users/{id}:
     get:
@@ -164,6 +181,10 @@ paths:
                     type: string
                   userstatus:
                     enum: [ active, disabled ]
+                  dayLimit:
+                    type: number
+                  transactionLimit:
+                    type: number
                 example:
                   email: "user$gmail.com"
                   firstName: "John"
@@ -172,6 +193,8 @@ paths:
                   city: "Amsterdam"
                   zipcode: "1234AB"
                   userstatus: "active"
+                  dayLimit: "1000"
+                  transactionLimit: "100"
     # PUT api/Users/ - updates a user
     put:
       tags:
@@ -206,6 +229,12 @@ paths:
                   type: string
                 zipcode:
                   type: string
+                userstatus:
+                  enum: [ active, disabled ]
+                dayLimit:
+                  type: number
+                transactionLimit:
+                  type: number
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -234,6 +263,10 @@ paths:
                       type: string
                     userstatus:
                       enum: [ active, disabled ]
+                    dayLimit:
+                      type: number
+                    transactionLimit:
+                      type: number
                   example:
                     password: "75170fc230cd88f32e475ff4087f81d9"
                     email: "user$gmail.com"
@@ -243,6 +276,8 @@ paths:
                     city: "Amsterdam"
                     zipcode: "1234AB"
                     userstatus: "active"
+                    sayLimit: "1000"
+                    transactionLimit: "100"
   # GET api/Accounts - gets accounts (set up pagination using query parameters)
   /api/Accounts:
     get:
@@ -275,6 +310,8 @@ paths:
                       type: number
                     active:
                       enum: [ active, disabled ]
+                    absoluteLimit:
+                      type: number
                     user:
                       type: object
                       properties:
@@ -292,11 +329,17 @@ paths:
                           type: string
                         userstatus:
                           enum: [active, disabled]
+                        dayLimit:
+                          type: number
+                        transactionLimit:
+                          type: number
                   example:
                     accountType: "savings"
                     userid: 1
                     IBAN: "NL91ABNA0417164300"
                     balance: "100.00"
+                    active: "active"
+                    absoluteLimit: "-1000.00"
                     user:
                       email: "john@example.com"
                       firstName: "John"
@@ -304,7 +347,45 @@ paths:
                       street: "examplestreet 1a"
                       city: "Amsterdam"
                       zipcode: "1234AB"
-                      userstatus: active
+                      userstatus: "active"
+                      dayLimit: "1000"
+                      transactionLimit: "100"
+    # POST api/Accounts/ - creates a new bank account
+    post:
+      tags:
+        - Accounts
+      summary: Creates a new bank account.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accountType:
+                  enum: [ savings, current ]
+                userid:
+                  type: integer
+                IBAN: # iban?
+                  type: string
+                  pattern: '^NL[0-9]{2}INHO0[0-9]{9}$' # don't know if format works
+                balance:
+                  type: number
+                active:
+                  enum: [ active, disabled ]
+                absoluteLimit:
+                  type: number
+              example:
+                accountType: current
+                userid: 10
+                IBAN: "NL00INHO0123456789"
+                balance: "0"
+                active: "active"
+                absoluteLimit: "-1000"
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '201':
+          description: Created
   # GET api/Accounts/{IBAN} - gets a specific bank account
   /api/Accounts/{IBAN}:
     parameters:
@@ -339,6 +420,8 @@ paths:
                     type: number
                   active:
                     enum: [ active, disabled ]
+                  absoluteLimit:
+                    type: number
                   user:
                     type: object
                     properties:
@@ -356,12 +439,17 @@ paths:
                         type: string
                       userstatus:
                         enum: [active, disabled]
+                      dayLimit:
+                        type: number
+                      transactionLimit:
+                        type: number
                 example:
                   accountType: "savings"
                   userid: 1
                   IBAN: "NL91ABNA0417164300"
                   balance: "100.00"
                   active: "active"
+                  absoluteLimit: "-1000.00"
                   user:
                     email: "john@example.com"
                     firstName: "John"
@@ -369,6 +457,9 @@ paths:
                     street: "examplestreet 1a"
                     city: "Amsterdam"
                     zipcode: "1234AB"
+                    userstatus: "active"
+                    dayLimit: "1000.00"
+                    transactionLimit: "100.00"
     # PUT api/Accounts/{IBAN} - updates a bank account from active - non-active
     put:
       tags:
@@ -391,6 +482,8 @@ paths:
                   type: number
                 active:
                   enum: [ active, disabled ]
+                absoluteLimit:
+                  type: number
                 user:
                   type: object
                   properties:
@@ -408,6 +501,10 @@ paths:
                       type: string
                     userstatus:
                       enum: [ active, disabled ]
+                    dayLimit:
+                      type: number
+                    transactionLimit:
+                      type: number
       responses:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
@@ -430,6 +527,8 @@ paths:
                       type: number
                     active:
                       enum: [ active, disabled ]
+                    absoluteLimit:
+                      type: number
                     user:
                       type: object
                       properties:
@@ -447,12 +546,17 @@ paths:
                           type: string
                         userstatus:
                           enum: [ active, disabled ]
+                        dayLimit:
+                          type: number
+                        transactionLimit:
+                          type: number
                   example:
                     accountType: "savings"
                     userid: 1
                     IBAN: "NL91ABNA0417164300"
                     balance: "100.00"
                     active: "disabled"
+                    absoluteLimit: "-1000.00"
                     user:
                       email: "john@example.com"
                       firstName: "John"
@@ -460,38 +564,9 @@ paths:
                       street: "examplestreet 1a"
                       city: "Amsterdam"
                       zipcode: "1234AB"
-    # POST api/Accounts/ - creates a new bank account
-    post:
-      tags:
-        - Accounts
-      summary: Creates a new bank account.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                accountType:
-                  enum: [ savings, current ]
-                userid:
-                  type: integer
-                IBAN: # iban?
-                  type: string
-                balance:
-                  type: number
-                active:
-                  enum: [ active, disabled ]
-              example:
-                accountType: savings
-                userid: 10
-                IBAN: "NL91ABNA0417164300"
-                balance: "00.00"
-                active: "active"
-      responses:
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '201':
-          description: Created
+                      userstatus: "active"
+                      dayLimit: "1000.00"
+                      transactionLimit: "100.00"
   # POST api/Accounts/{IBAN}/Deposit – add money to the account
   /api/Accounts/{IBAN}/Deposit:
     post:
@@ -699,5 +774,5 @@ components:
       bearerFormat: JWT    # optional, arbitrary value for documentation purposes
   # 2) Apply the security globally to all operations
 security:
-  - bearerAuth: [ ]         # use the same name as above
+  - bearerAuth: []         # use the same name as above
 
