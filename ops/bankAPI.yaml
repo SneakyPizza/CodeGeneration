@@ -11,17 +11,24 @@ info:
   description: a bank api
   version: "1.0"
 servers:
-- url: https://virtserver.swaggerhub.com/Jaimy-monsuur/BankAPI/1.0
-  description: SwaggerHub API Auto Mocking
+  - url: https://virtserver.swaggerhub.com/Jaimy-monsuur/BankAPI/1.0
+    description: SwaggerHub API Auto Mocking
 
 
 paths:
   # GET api/Users - gets users (set up pagination using query parameters)
   /api/Users:
     get:
+      tags:
+        - Users
       summary: Returns a list of users.
+      parameters:
+        - $ref: '#/components/parameters/offsetParam'
+        - $ref: '#/components/parameters/limitParam'
       description: Optional extended description in CommonMark or HTML.
       responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
         '200':    # status code
           description: A JSON array of users
           content:
@@ -56,9 +63,9 @@ paths:
                     city: "Amsterdam"
                     zipcode: "1234AB"
                     userstatus: "active"
-  # POST api/Users/ - creates a new user
-  /api/Users/Create:
     post:
+      tags:
+        - Users
       summary: Creates a new user.
       description: Optional extended description in CommonMark or HTML.
       requestBody:
@@ -82,6 +89,8 @@ paths:
                 zipcode:
                   type: string
       responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
         '200':    # status code
           description: A JSON array of users
           content:
@@ -116,20 +125,24 @@ paths:
                     city: "Amsterdam"
                     zipcode: "1234AB"
                     userstatus: "active"
-  # GET api/Users/ - get user by id
+  # GET api/Users/{id} - get user by id
   /api/Users/{id}:
     get:
-      summary: Get user by id
-      description:
+      tags:
+        - Users
       parameters:
-        in: path
-        name: id
-        required: true
-        schema:
-          type: integer
-          minimum: 1
-        description: The user ID
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            description: The user ID
+      summary: Get user by id
+      description: Optional extended description in CommonMark or HTML.
       responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
         '200':
           description: JSON with 1 user
           content:
@@ -159,11 +172,18 @@ paths:
                   city: "Amsterdam"
                   zipcode: "1234AB"
                   userstatus: "active"
-
-                      
-      
- # PUT api/Users/ - updates a user
+    # PUT api/Users/ - updates a user
     put:
+      tags:
+        - Users
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            description: The user ID
       summary: Updates a user.
       description: Optional extended description in CommonMark or HTML.
       requestBody:
@@ -187,6 +207,8 @@ paths:
                 zipcode:
                   type: string
       responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
         '200':    # status code
           description: A JSON array of users
           content:
@@ -221,13 +243,19 @@ paths:
                     city: "Amsterdam"
                     zipcode: "1234AB"
                     userstatus: "active"
-
   # GET api/Accounts - gets accounts (set up pagination using query parameters)
   /api/Accounts:
     get:
+      tags:
+        - Accounts
       summary: Returns a list of accounts.
+      parameters:
+        - $ref: '#/components/parameters/offsetParam'
+        - $ref: '#/components/parameters/limitParam'
       description: Optional extended description in CommonMark or HTML.
       responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
         '200':    # status code
           description: A JSON array of accounts
           content:
@@ -245,6 +273,8 @@ paths:
                       type: string
                     balance:
                       type: number
+                    active:
+                      enum: [ active, disabled ]
                     user:
                       type: object
                       properties:
@@ -277,17 +307,21 @@ paths:
                       userstatus: active
   # GET api/Accounts/{IBAN} - gets a specific bank account
   /api/Accounts/{IBAN}:
+    parameters:
+      - in: path
+        name: IBAN
+        schema:
+          type: string
+        required: true
+        description: Gets the account of the IBAN
     get:
-      parameters:
-        - in: path
-          name: IBAN
-          schema:
-            type: integer
-          required: true
-          description: Gets the account of the IBAN
+      tags:
+        - Accounts
       summary: Returns a account with IBAN.
       description: Optional extended description in CommonMark or HTML.
       responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
         '200':    # status code
           description: A JSON object of user.
           content:
@@ -303,6 +337,8 @@ paths:
                     type: string
                   balance:
                     type: number
+                  active:
+                    enum: [ active, disabled ]
                   user:
                     type: object
                     properties:
@@ -325,6 +361,7 @@ paths:
                   userid: 1
                   IBAN: "NL91ABNA0417164300"
                   balance: "100.00"
+                  active: "active"
                   user:
                     email: "john@example.com"
                     firstName: "John"
@@ -332,123 +369,252 @@ paths:
                     street: "examplestreet 1a"
                     city: "Amsterdam"
                     zipcode: "1234AB"
-  # PUT api/Accounts/{IBAN} - updates a bank account from active - non-active
-    put: # NOT DONE
+    # PUT api/Accounts/{IBAN} - updates a bank account from active - non-active
+    put:
+      tags:
+        - Accounts
+      summary: Updates an Account.
+      description: Optional extended description in CommonMark or HTML.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accountType:
+                  enum: [ savings, current ]
+                userid:
+                  type: integer
+                IBAN:
+                  type: string
+                balance:
+                  type: number
+                active:
+                  enum: [ active, disabled ]
+                user:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                    firstName:
+                      type: string
+                    lastName:
+                      type: string
+                    street:
+                      type: string
+                    city:
+                      type: string
+                    zipcode:
+                      type: string
+                    userstatus:
+                      enum: [ active, disabled ]
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200': # status code
+          description: A JSON array of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    accountType:
+                      enum: [ savings, current ]
+                    userid:
+                      type: integer
+                    IBAN:
+                      type: string
+                    balance:
+                      type: number
+                    active:
+                      enum: [ active, disabled ]
+                    user:
+                      type: object
+                      properties:
+                        email:
+                          type: string
+                        firstName:
+                          type: string
+                        lastName:
+                          type: string
+                        street:
+                          type: string
+                        city:
+                          type: string
+                        zipcode:
+                          type: string
+                        userstatus:
+                          enum: [ active, disabled ]
+                  example:
+                    accountType: "savings"
+                    userid: 1
+                    IBAN: "NL91ABNA0417164300"
+                    balance: "100.00"
+                    active: "disabled"
+                    user:
+                      email: "john@example.com"
+                      firstName: "John"
+                      lastName: "Doe"
+                      street: "examplestreet 1a"
+                      city: "Amsterdam"
+                      zipcode: "1234AB"
+    # POST api/Accounts/ - creates a new bank account
+    post:
+      tags:
+        - Accounts
+      summary: Creates a new bank account.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accountType:
+                  enum: [ savings, current ]
+                userid:
+                  type: integer
+                IBAN: # iban?
+                  type: string
+                balance:
+                  type: number
+                active:
+                  enum: [ active, disabled ]
+              example:
+                accountType: savings
+                userid: 10
+                IBAN: "NL91ABNA0417164300"
+                balance: "00.00"
+                active: "active"
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '201':
+          description: Created
+  # POST api/Accounts/{IBAN}/Deposit – add money to the account
+  /api/Accounts/{IBAN}/Deposit:
+    post:
+      tags:
+        - Accounts
       parameters:
         - in: path
           name: IBAN
           schema:
-            type: integer
+            type: string
           required: true
-          description: Gets the account of the IBAN
-        summary: Deletes a account with IBAN.
-    # POST api/Accounts/ - creates a new bank account
-    post:
-        summary: Creates a new bank account.
-        requestBody:
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  accountType:
-                    enum: [savings, current]
-                  accountStatus:
-                    enum: [active, disabled]
-                  userid:
-                    type: integer
-                  IBAN: # iban?
-                    type: string
-                example:
-                  id: 10
-                  accountType: savings
-                  userid: 10
-                  IBAN: NL 0750 8900 0000 0175 7814
-        responses:
-          '201':
-            description: Created
-      
-  # POST api/Accounts/{IBAN}/Deposit – add money to the account
-  /api/Accounts/{IBAN}/Deposit:
-      post:
-        parameters:
-          - in: path
-            name: IBAN
+          description: Numeric IBAN of a user.
+      summary: Adds money to the account.
+      requestBody:
+        content:
+          application/json:
             schema:
-              type: integer
-            required: true
-            description: Numeric IBAN of a user.
-        summary: Adds money to the account.
-        requestBody:
+              type: object
+              properties:
+                amount:
+                  type: integer
+                IBAN:
+                  type: string
+                pincode:
+                  type: string # hashed integer pincode
+              example:
+                amount: 100
+                IBAN: NL 0750 8900 0000 0175 7814
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '202':
+          description: Accepted
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  amount:
-                    type: integer
                   IBAN:
                     type: string
-                  pincode:
-                    type: string # hashed integer pincode
-                example:
-                  amount: 100
-                  IBAN: NL 0750 8900 0000 0175 7814
-        responses:
-          '202':
-            description: Accepted
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    IBAN:
-                      type: string
-                    balance:
-                      type: number
+                  balance:
+                    type: number
   # POST api/Accounts/{IBAN}/Withdraw – remove money from the account
   /api/Accounts/{IBAN}/Withdraw:
-      post:
-        parameters:
-          - in: path
-            name: IBAN
+    post:
+      tags:
+        - Accounts
+      parameters:
+        - in: path
+          name: IBAN
+          schema:
+            type: string
+          required: true
+          description: IBAN of a user.
+      summary: Withdraws money from the account.
+      requestBody:
+        content:
+          application/json:
             schema:
-              type: integer
-            required: true
-            description: IBAN of a user.
-        summary: Withdraws money from the account.
-        requestBody:
+              type: object
+              properties:
+                amount:
+                  type: integer
+                IBAN:
+                  type: string
+                pincode:
+                  type: string # hashed integer pincode
+              example:
+                amount: 100
+                IBAN: "NLRABO8900000001757814"
+                pincode: "1234"
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '202':
+          description: Accepted
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  amount:
-                    type: integer
                   IBAN:
                     type: string
+                  balance:
+                    type: number
                   pincode:
-                    type: string # hashed integer pincode
-                example:
-                  amount: 100
-                  IBAN: NLRABO8900000001757814
-        responses:
-          '202':
-            description: Accepted
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    IBAN:
-                      type: string
-                    balance:
-                      type: number
+                    type: string
   # POST api/Transactions – transfer money from account to account
   /api/Transactions:
-      post:
-        summary: Transfer money from account to account.
-        requestBody:
+    post:
+      tags:
+        - Transactions
+      summary: Transfer money from account to account.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fromIBAN:
+                  type: string
+                toIBAN:
+                  type: string
+                pincode:
+                  type: string # hashed integer pincode
+                amount:
+                  type: integer
+                timestamp:
+                  type: string
+                userid:
+                  type: integer
+              example:
+                fromIBAN: NL 0750 8900 0000
+                toIBAN: NL 0750 8900 0000 0175 7814
+                pincode: 1234 # is normally hashed
+                amount: 100
+                timestamp: timestamp
+                userid: 1
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '202':
+          description: Accepted
           content:
             application/json:
               schema:
@@ -456,34 +622,82 @@ paths:
                 properties:
                   fromIBAN:
                     type: string
-                  pincode:
-                    type: string # hashed integer pincode
-                  toIBAN:
-                    type: string
-                  amount:
-                    type: integer
-                  timestamp:
-                    type: datetime
-                  userid:
-                    type: integer
-                example:
-                  fromIBAN: NL 0750 8900 0000 0175 7814
-                  pincode: 1234 # is normally hashed
-                  toIBAN: NL 0750 8900 0000 0175 7814
-                  amount: 100
-                  timestamp: # format needs to be made
-                  userid: 1
-        responses:
-          '202':
-            description: Accepted
-            content:
-              application/json:
-                schema:
+                  balance:
+                    type: number
+  # GET api/Transactions/History/{IBAN} – get the transaction history from one account
+  /api/Transactions/History/{IBAN}:
+    get:
+      tags:
+        - Transactions
+      summary: Get the history of transactions for a specific account.
+      parameters:
+        - in: path
+          name: IBAN
+          schema:
+            type: string
+          required: true
+          description: IBAN of a user.
+      responses:
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
                   type: object
                   properties:
                     fromIBAN:
                       type: string
-                    balance:
-                      type: number
-components: {}
+                    toIBAN:
+                      type: string
+                    pincode:
+                      type: string # hashed integer pincode
+                    amount:
+                      type: integer
+                    timestamp:
+                      type: string
+                    userid:
+                      type: integer
+                  example:
+                    fromIBAN: NL 0750 8900 0000
+                    toIBAN: NL 0750 8900 0000 0175 7814
+                    pincode: 1234 # is normally hashed
+                    amount: 100
+                    timestamp: # format needs to be made
+                    userid: 1
+components:
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+  parameters:
+    offsetParam: # <-- Arbitrary name for the definition that will be used to refer to it.
+      # Not necessarily the same as the parameter name.
+      in: query
+      name: offset
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+      description: The number of items to skip before starting to collect the result set.
+    limitParam:
+      in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 50
+        default: 20
+      description: The numbers of items to return.
+  securitySchemes:
+    bearerAuth: # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT    # optional, arbitrary value for documentation purposes
+  # 2) Apply the security globally to all operations
+security:
+  - bearerAuth: [ ]         # use the same name as above
 
