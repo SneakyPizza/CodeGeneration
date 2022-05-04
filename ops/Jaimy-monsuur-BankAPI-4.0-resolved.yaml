@@ -1,45 +1,86 @@
 ---
-# POST api/Accounts - creates a new bank account
-# GET api/Accounts - gets accounts (set up pagination using query parameters)
-# GET api/Accounts/{IBAN} - gets a specific bank account
-# POST api/Accounts/{IBAN}/Deposit – add money to the account
-# POST api/Accounts/{IBAN}/Withdraw – remove money from the account
-# POST api/Transactions – transfer money from account to account
 openapi: 3.0.0
 info:
   title: BankAPI
   description: a bank api
-  version: "1.0"
+  version: "4.0"
 servers:
-  - url: https://virtserver.swaggerhub.com/Jaimy-monsuur/BankAPI/1.0
-    description: SwaggerHub API Auto Mocking
+- url: https://virtserver.swaggerhub.com/Jaimy-monsuur/BankAPI/1.0
+  description: SwaggerHub API Auto Mocking
+security:
+- bearerAuth: []
 paths:
-  # GET api/Users - gets users (set up pagination using query parameters)
   /api/Users:
     get:
       tags:
-        - Users
+      - Users
       summary: Returns a list of users.
-      parameters:
-        - $ref: '#/components/parameters/offsetParam'
-        - $ref: '#/components/parameters/limitParam'
       description: Optional extended description in CommonMark or HTML.
+      parameters:
+      - name: offset
+        in: query
+        description: The number of items to skip before starting to collect the result set.
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 0
+          type: integer
+      - name: limit
+        in: query
+        description: The numbers of items to return.
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 50
+          minimum: 1
+          type: integer
+          default: 20
       responses:
-        '400':
-          $ref: '#/components/responses/400'
-        '401':
-          $ref: '#/components/responses/401'
-        '404':
-          $ref: '#/components/responses/404'
-        '408':
-          $ref: '#/components/responses/408'
-        '418':
-          $ref: '#/components/responses/418'
-        '500':
-          $ref: '#/components/responses/500'
-        '503':
-          $ref: '#/components/responses/503'
-        '200':    # status code
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "408":
+          description: Request timeout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "418":
+          description: I'm a teapot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "503":
+          description: Service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "200":
           description: A JSON array of users
           content:
             application/json:
@@ -47,11 +88,9 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/UserDTO'
-
-    # POST api/Users - creates a new user
     post:
       tags:
-        - Users
+      - Users
       summary: Creates a new user.
       description: Optional extended description in CommonMark or HTML.
       requestBody:
@@ -60,7 +99,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UserDTO'
       responses:
-        '200':    # status code
+        "200":
           description: A JSON array of users
           content:
             application/json:
@@ -68,71 +107,89 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/UserDTO'
-  # GET api/Users/{id} - get user by id
   /api/Users/{id}:
     get:
       tags:
-        - Users
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: 'd4f8f6b0-c8e0-4e7f-b8e0-f8f8f8f8f8f8'
-            minimum: 1
-            description: The user ID
+      - Users
       summary: Get user by id
       description: Optional extended description in CommonMark or HTML.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          minimum: 1
+          type: string
+          description: The user ID
+          format: uuid
+          example: d4f8f6b0-c8e0-4e7f-b8e0-f8f8f8f8f8f8
       responses:
-        '200':
+        "200":
           description: JSON with 1 user
           content:
             application/JSON:
               schema:
                 $ref: '#/components/schemas/UserDTO'
-    # PUT api/Users/ - updates a user
     put:
       tags:
-        - Users
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: 'd4f8f6b0-c8e0-4e7f-b8e0-f8f8f8f8f8f8'
-            minimum: 1
-            description: The user ID
+      - Users
       summary: Updates a user.
       description: Optional extended description in CommonMark or HTML.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          minimum: 1
+          type: string
+          description: The user ID
+          format: uuid
+          example: d4f8f6b0-c8e0-4e7f-b8e0-f8f8f8f8f8f8
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/UserDTO'
       responses:
-        '200':    # status code
+        "200":
           description: A JSON array of users
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserDTO'
-
-  # GET api/Accounts - gets accounts (set up pagination using query parameters)
   /api/Accounts:
     get:
       tags:
-        - Accounts
+      - Accounts
       summary: Returns a list of accounts.
-      parameters:
-        - $ref: '#/components/parameters/offsetParam'
-        - $ref: '#/components/parameters/limitParam'
       description: Optional extended description in CommonMark or HTML.
+      parameters:
+      - name: offset
+        in: query
+        description: The number of items to skip before starting to collect the result set.
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 0
+          type: integer
+      - name: limit
+        in: query
+        description: The numbers of items to return.
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 50
+          minimum: 1
+          type: integer
+          default: 20
       responses:
-        '200':    # status code
+        "200":
           description: A JSON array of accounts
           content:
             application/json:
@@ -140,10 +197,9 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AccountDTO'
-    # POST api/Accounts - creates a new bank account
     post:
       tags:
-        - Accounts
+      - Accounts
       summary: Creates a new bank account.
       requestBody:
         content:
@@ -151,21 +207,45 @@ paths:
             schema:
               $ref: '#/components/schemas/PostAccountDTO'
       responses:
-        '201':
-          description: "Created"
-  # GET api/Accounts - gets accounts but only with name and IBAN (set up pagination using query parameters)
+        "201":
+          description: Created
   /api/Accounts/Search:
     get:
       tags:
-        - Accounts
+      - Accounts
       summary: Returns a list of accounts but only gives name and IBAN.
-      parameters:
-        - $ref: '#/components/parameters/offsetParam'
-        - $ref: '#/components/parameters/limitParam'
-        - $ref: '#/components/parameters/nameSearch'
       description: Optional extended description in CommonMark or HTML.
+      parameters:
+      - name: offset
+        in: query
+        description: The number of items to skip before starting to collect the result set.
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 0
+          type: integer
+      - name: limit
+        in: query
+        description: The numbers of items to return.
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 50
+          minimum: 1
+          type: integer
+          default: 20
+      - name: fullName
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          description: The full name being searched
       responses:
-        '200': # status code
+        "200":
           description: A JSON array of accounts
           content:
             application/json:
@@ -173,100 +253,110 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/NameSearchAccountDTO'
-  # GET api/Accounts/{IBAN} - gets a specific bank account
   /api/Accounts/{IBAN}:
-    parameters:
-      - in: path
-        name: IBAN
-        schema:
-          type: string
-        required: true
-        description: Gets the account of the IBAN
     get:
       tags:
-        - Accounts
+      - Accounts
       summary: Returns a account with IBAN.
       description: Optional extended description in CommonMark or HTML.
+      parameters:
+      - name: IBAN
+        in: path
+        description: Gets the account of the IBAN
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
       responses:
-        '200':    # status code
+        "200":
           description: A JSON object of user.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccountDTO'
-    # PUT api/Accounts/{IBAN} - updates a bank account from active - non-active
     put:
       tags:
-        - Accounts
+      - Accounts
       summary: Updates an Account.
       description: Optional extended description in CommonMark or HTML.
+      parameters:
+      - name: IBAN
+        in: path
+        description: Gets the account of the IBAN
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
       requestBody:
         content:
           application/json:
             schema:
-                $ref: '#/components/schemas/AccountDTO'
+              $ref: '#/components/schemas/AccountDTO'
       responses:
-        '200': # status code
+        "200":
           description: A JSON array of users
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccountDTO'
-  # POST api/Accounts/{IBAN}/Deposit – add money to the account
   /api/Accounts/{IBAN}/Deposit:
-    parameters:
-      - in: path
-        name: IBAN
-        schema:
-          type: string
-        required: true
-        description: Gets the account of the IBAN
     post:
       tags:
-        - Accounts
+      - Accounts
       summary: Adds money to the account.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TransactionDTO'
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AccountDTO'
-  # POST api/Accounts/{IBAN}/Withdraw – remove money from the account
-  /api/Accounts/{IBAN}/Withdraw:
-    parameters:
-      - in: path
-        name: IBAN
+      parameters:
+      - name: IBAN
+        in: path
+        description: Gets the account of the IBAN
+        required: true
+        style: simple
+        explode: false
         schema:
           type: string
-        required: true
-        description: Gets the account of the IBAN
-    post:
-      tags:
-        - Accounts
-      summary: Withdraws money from the account.
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/TransactionDTO'
       responses:
-        '201':
+        "201":
           description: Created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccountDTO'
-  # POST api/Transactions – transfer money from account to account
+  /api/Accounts/{IBAN}/Withdraw:
+    post:
+      tags:
+      - Accounts
+      summary: Withdraws money from the account.
+      parameters:
+      - name: IBAN
+        in: path
+        description: Gets the account of the IBAN
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionDTO'
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountDTO'
   /api/Transactions:
     post:
       tags:
-        - Transactions
+      - Transactions
       summary: Transfer money from account to account.
       requestBody:
         content:
@@ -274,45 +364,37 @@ paths:
             schema:
               $ref: '#/components/schemas/TransactionDTO'
       responses:
-        '201':
+        "201":
           description: Created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccountDTO'
-
-  # GET api/Transactions/{IBAN} – get the transaction history from one account
   /api/Transactions/{IBAN}:
-    parameters:
-      - in: path
-        name: IBAN
-        schema:
-          type: string
-        required: true
-        description: Gets the account of the IBAN
     get:
       tags:
-        - Transactions
+      - Transactions
       summary: Get the history of transactions for a specific account.
       parameters:
-        - in: path
-          name: IBAN
-          schema:
-            type: string
-          required: true
-          description: IBAN of a user.
+      - name: IBAN
+        in: path
+        description: IBAN of a user.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TransactionDTO'
-  # POST api/login – login to the system
   /api/login:
     post:
       tags:
-        - Login
+      - Login
       summary: Post the login data to the api
       requestBody:
         content:
@@ -320,16 +402,12 @@ paths:
             schema:
               $ref: '#/components/schemas/LoginDTO'
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  JWTtoken:
-                    type: string
-
+                $ref: '#/components/schemas/inline_response_200'
 components:
   schemas:
     LoginDTO:
@@ -340,9 +418,8 @@ components:
         password:
           type: string
       example:
-        email: "example@example.com"
-        password: "password"
-
+        email: example@example.com
+        password: password
     UserDTO:
       type: object
       properties:
@@ -366,8 +443,8 @@ components:
         userstatus:
           type: string
           enum:
-            - active
-            - disabled
+          - active
+          - disabled
         dayLimit:
           type: number
         transactionLimit:
@@ -375,52 +452,56 @@ components:
         role:
           type: string
           enum:
-            - admin
-            - user
+          - admin
+          - user
       example:
-        userid: "5e9f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f"
-        email: "user@gmail.com"
-        firstName: "John"
-        lastName: "Doe"
-        street: "examplestreet 1a"
-        city: "Amsterdam"
-        zipcode: "1234AB"
-        userstatus: "active"
+        userid: 5e9f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f
+        email: user@gmail.com
+        firstName: John
+        lastName: Doe
+        street: examplestreet 1a
+        city: Amsterdam
+        zipcode: 1234AB
+        userstatus: active
         dayLimit: "1000"
         transactionLimit: "100"
         role: user
-
     PostAccountDTO:
       type: object
       properties:
         accountType:
           type: string
-          enum: [ savings, current ]
+          enum:
+          - savings
+          - current
         userid:
+          type: string
           format: uuid
-          type: string #uuid
         balance:
           type: number
         active:
           type: string
-          enum: [ active, disabled ]
+          enum:
+          - active
+          - disabled
         absoluteLimit:
           type: number
         user:
           $ref: '#/components/schemas/UserDTO'
       example:
-        accountType: "savings"
+        accountType: savings
         userid: 1
         balance: "0"
-        active: "active"
+        active: active
         absoluteLimit: "1000"
-
     AccountDTO:
       type: object
       properties:
         accountType:
           type: string
-          enum: [ savings, current ]
+          enum:
+          - savings
+          - current
         userid:
           type: string
           format: uuid
@@ -430,19 +511,20 @@ components:
           type: number
         active:
           type: string
-          enum: [ active, disabled ]
+          enum:
+          - active
+          - disabled
         absoluteLimit:
           type: number
         user:
           $ref: '#/components/schemas/UserDTO'
       example:
-        accountType: "savings"
-        userid: "5e9f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f"
-        IBAN: "NL 0750 8900 0000 0175 7814"
+        accountType: savings
+        userid: 5e9f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f
+        IBAN: NL 0750 8900 0000 0175 7814
         balance: "0"
-        active: "active"
+        active: active
         absoluteLimit: "1000"
-
     NameSearchAccountDTO:
       type: object
       properties:
@@ -453,32 +535,30 @@ components:
         IBAN:
           type: string
       example:
-        firstName: "John"
-        lastName: "Doe"
-        IBAN: "NL 0750 8900 0000 0175 7814"
-
+        firstName: John
+        lastName: Doe
+        IBAN: NL 0750 8900 0000 0175 7814
     TransactionDTO:
       type: object
       properties:
         fromIBAN:
           type: string
         pincode:
-          type: string #hashed
+          type: string
         amount:
           type: integer
         timestamp:
-          type: string #datetime?
+          type: string
         fromUserId:
+          type: string
           format: uuid
-          type: string #uuid
       example:
-        fromIBAN: "NL 0750 8900 0000 0175 7814"
-        toIBAN: "NL 0750 8900 0000 0175 7814"
-        pincode: "81dc9bdb52d04dc20036dbd8313ed055" #hashed pincode
+        fromIBAN: NL 0750 8900 0000 0175 7814
+        toIBAN: NL 0750 8900 0000 0175 7814
+        pincode: 81dc9bdb52d04dc20036dbd8313ed055
         amount: 100
         timestamp: 09-01-2021
-        fromUserId: "cc48d0ec-da1e-49f4-bf57-d0313987e51b" #uuid
-
+        fromUserId: cc48d0ec-da1e-49f4-bf57-d0313987e51b
     ErrorDTO:
       type: object
       properties:
@@ -489,93 +569,97 @@ components:
         error:
           type: string
       example:
-        message: "Invalid credentials"
+        message: Invalid credentials
         status: 401
-        error: "Unauthorized"
-
+        error: Unauthorized
+    inline_response_200:
+      type: object
+      properties:
+        JWTtoken:
+          type: string
   responses:
-    304:
+    "304":
       description: Not modified
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorDTO'
-    400:
+    "400":
       description: Bad request
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorDTO'
-    401:
+    "401":
       description: Unauthorized
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorDTO'
-    404:
+    "404":
       description: Not found
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorDTO'
-    408:
+    "408":
       description: Request timeout
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorDTO'
-    418: # I'm a teapot
+    "418":
       description: I'm a teapot
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorDTO'
-    500:
+    "500":
       description: Internal server error
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorDTO'
-    503:
+    "503":
       description: Service unavailable
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorDTO'
-
   parameters:
     nameSearch:
-      in: query
       name: fullName
+      in: query
+      required: true
+      style: form
+      explode: true
       schema:
         type: string
         description: The full name being searched
-      required: true
-
-    offsetParam: # <-- Arbitrary name for the definition that will be used to refer to it.
-      # Not necessarily the same as the parameter name.
-      in: query
+    offsetParam:
       name: offset
-      required: false
-      schema:
-        type: integer
-        minimum: 0
-      description: The number of items to skip before starting to collect the result set.
-    limitParam:
       in: query
-      name: limit
+      description: The number of items to skip before starting to collect the result set.
       required: false
+      style: form
+      explode: true
       schema:
+        minimum: 0
         type: integer
-        minimum: 1
-        maximum: 50
-        default: 20
+    limitParam:
+      name: limit
+      in: query
       description: The numbers of items to return.
+      required: false
+      style: form
+      explode: true
+      schema:
+        maximum: 50
+        minimum: 1
+        type: integer
+        default: 20
   securitySchemes:
-    bearerAuth: # arbitrary name for the security scheme
+    bearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT    # optional, arbitrary value for documentation purposes
-  # 2) Apply the security globally to all operations
-security:
-  - bearerAuth: []         # use the same name as above
+      bearerFormat: JWT
