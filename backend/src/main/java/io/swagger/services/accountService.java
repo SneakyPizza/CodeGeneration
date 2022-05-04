@@ -14,5 +14,5 @@ public class accountService {
     public void addAccount(Account account) {
         accountRepository.save(account);
     }
-    
+
 }
