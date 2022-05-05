@@ -1,12 +1,24 @@
 <template>
   <section>
     <div class="container-lg">
-      <h1 class="blue mt-3 mt-lg-5">Overview</h1>
-      <div class="row">
-        <div class="card shadow mt-3">
+      <h1 class="blue mt-3 mt-lg-3">Overview</h1>
+      <div class="row mt-4">
+        <div class="card">
+          <div class="card-body">
+            <div class="">
+              <div class="round">
+                <img class="payment_icon" src="../assets/icons/box-arrow-in-down.svg" alt="img">
+              </div>
+              <p class="left">Transaction</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-4">
+        <div class="card shadow ">
           <div class="card-body">
             <h6 class="card-title">Current</h6>
-            <h2><img class="small_img margin-right" src="../assets/icons/dollar.png" alt="">Payments</h2>
+            <h2><img class="small_img margin-right" src="../assets/icons/dollar.png" alt="">Payments </h2><p class=" price">&euro; 1000,01</p>
             <p class="left50px">User info plus IBAN <br>
             Limit &euro; moneys</p>
           </div>
@@ -19,7 +31,7 @@
         <div class="card shadow ">
           <div class="card-body">
             <h6 class="card-title">Savings</h6>
-            <h2><img class="small_img margin-right" src="../assets/icons/saving-money.svg" alt="">Savings account</h2>
+            <h2><img class="small_img margin-right" src="../assets/icons/saving-money.svg" alt="">Savings account</h2><p class=" price">&euro; 1000,01</p>
             <p class="left50px">User info plus IBAN <br>
               Limit &euro; moneys</p>
           </div>
@@ -40,7 +52,7 @@ export default {
 
 <style>
 .blue {
-  color: #0058a8;
+  color: #004391;
 }
 .small_img {
   width: 40px;
@@ -62,6 +74,34 @@ export default {
   padding-left: 25px !important;
 }
 .card{
+  border-radius: 10px !important;
   padding: 0 !important;
 }
+.price {
+  font-size: 20px;
+  font-weight: bold;
+  float: right;
+}
+.card-footer:hover {
+  cursor: pointer;
+  background-color: #b6d0ea;
+}
+.round {
+
+  background: #ffc0c0;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+}
+.payment_icon {
+  margin : auto;
+  width: 40px;
+  height: 40px;
+}
+.right {
+  float: right;
+}
+.left {
+  float: left;}
 </style>
