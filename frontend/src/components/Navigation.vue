@@ -15,6 +15,9 @@
 <!--            >Login</router-link-->
 <!--          >-->
 <!--        </li>   -->
+      <li>
+           <router-link to="/AccountSearch" class="Dark_Blue nav-link" active-class="active">Accounts</router-link>
+      </li>
       </ul>
 
     </div>
