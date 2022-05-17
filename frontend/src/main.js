@@ -3,9 +3,11 @@ import App from './App.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 import Home from './components/Home.vue';
+import UserOverview from './components/UserOverview.vue';
 
 const routes = [
     { path: '/', component: Home },
+    { path: '/UserOverview', component: UserOverview },
 
 ];
 
