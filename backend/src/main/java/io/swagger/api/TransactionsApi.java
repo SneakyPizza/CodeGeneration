@@ -5,8 +5,8 @@
  */
 package io.swagger.api;
 
-import io.swagger.model.AccountDTO;
-import io.swagger.model.TransactionDTO;
+import io.swagger.model.dto.AccountDTO;
+import io.swagger.model.dto.TransactionDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;

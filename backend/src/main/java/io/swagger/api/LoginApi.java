@@ -5,8 +5,8 @@
  */
 package io.swagger.api;
 
-import io.swagger.model.InlineResponse200;
-import io.swagger.model.LoginDTO;
+import io.swagger.model.dto.InlineResponse200;
+import io.swagger.model.dto.LoginDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;

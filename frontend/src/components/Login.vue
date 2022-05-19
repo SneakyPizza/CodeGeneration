@@ -1,5 +1,5 @@
 <template>
-// login form
+<!-- login form -->
 <div class="login-form">
   <div class="login-form__header">
     <h1 class="login-form__title">
@@ -20,6 +20,7 @@
     </div>
     <button class="login-form__button" type="submit">Login</button>
   </form>
+</div>
 </template>
 
 <script>
