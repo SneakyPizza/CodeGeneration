@@ -1,17 +1,14 @@
 package io.swagger.model.entities;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-
+import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Data
-public class User {
+public class User<list> {
     @Id
     @GeneratedValue
     private UUID id;
@@ -24,5 +21,7 @@ public class User {
     private String street;
     private String city;
     private String zipcode;
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<Role> roles;
 
 }
