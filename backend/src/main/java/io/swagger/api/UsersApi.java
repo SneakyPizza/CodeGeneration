@@ -7,7 +7,7 @@ package io.swagger.api;
 
 import io.swagger.annotations.Api;
 import io.swagger.model.dto.ErrorDTO;
-import io.swagger.model.dto.UserDTO;
+import io.swagger.model.UserDTO;
 
 import java.util.UUID;
 

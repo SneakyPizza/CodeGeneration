@@ -3,12 +3,14 @@ package io.swagger.jwt;
 import java.util.Base64;
 import java.util.Date;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
+import io.swagger.model.entities.Role;
 import io.swagger.services.MyUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
