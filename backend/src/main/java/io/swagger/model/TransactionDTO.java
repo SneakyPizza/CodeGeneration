@@ -13,12 +13,15 @@ import javax.validation.constraints.*;
  * TransactionDTO
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-04T11:04:07.506Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-18T10:52:51.744Z[GMT]")
 
 
 public class TransactionDTO   {
   @JsonProperty("fromIBAN")
   private String fromIBAN = null;
+
+  @JsonProperty("toIBAN")
+  private String toIBAN = null;
 
   @JsonProperty("pincode")
   private String pincode = null;
@@ -49,6 +52,25 @@ public class TransactionDTO   {
 
   public void setFromIBAN(String fromIBAN) {
     this.fromIBAN = fromIBAN;
+  }
+
+  public TransactionDTO toIBAN(String toIBAN) {
+    this.toIBAN = toIBAN;
+    return this;
+  }
+
+  /**
+   * Get toIBAN
+   * @return toIBAN
+   **/
+  @Schema(description = "")
+  
+    public String getToIBAN() {
+    return toIBAN;
+  }
+
+  public void setToIBAN(String toIBAN) {
+    this.toIBAN = toIBAN;
   }
 
   public TransactionDTO pincode(String pincode) {
@@ -139,6 +161,7 @@ public class TransactionDTO   {
     }
     TransactionDTO transactionDTO = (TransactionDTO) o;
     return Objects.equals(this.fromIBAN, transactionDTO.fromIBAN) &&
+        Objects.equals(this.toIBAN, transactionDTO.toIBAN) &&
         Objects.equals(this.pincode, transactionDTO.pincode) &&
         Objects.equals(this.amount, transactionDTO.amount) &&
         Objects.equals(this.timestamp, transactionDTO.timestamp) &&
@@ -147,7 +170,7 @@ public class TransactionDTO   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(fromIBAN, pincode, amount, timestamp, fromUserId);
+    return Objects.hash(fromIBAN, toIBAN, pincode, amount, timestamp, fromUserId);
   }
 
   @Override
@@ -156,6 +179,7 @@ public class TransactionDTO   {
     sb.append("class TransactionDTO {\n");
     
     sb.append("    fromIBAN: ").append(toIndentedString(fromIBAN)).append("\n");
+    sb.append("    toIBAN: ").append(toIndentedString(toIBAN)).append("\n");
     sb.append("    pincode: ").append(toIndentedString(pincode)).append("\n");
     sb.append("    amount: ").append(toIndentedString(amount)).append("\n");
     sb.append("    timestamp: ").append(toIndentedString(timestamp)).append("\n");
