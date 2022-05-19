@@ -1,4 +1,4 @@
-package io.swagger.model;
+package io.swagger.model.entities;
 
 import org.springframework.security.core.GrantedAuthority;
 
