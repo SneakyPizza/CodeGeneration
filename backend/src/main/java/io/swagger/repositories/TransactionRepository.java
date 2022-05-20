@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public interface transactionRepository extends PagingAndSortingRepository<Transaction, UUID> {
+public interface TransactionRepository extends PagingAndSortingRepository<Transaction, UUID> {
 
 }

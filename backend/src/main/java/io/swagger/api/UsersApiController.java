@@ -1,9 +1,11 @@
 package io.swagger.api;
 
 import io.swagger.annotations.Api;
-import io.swagger.model.ErrorDTO;
-import java.util.UUID;
+import io.swagger.model.dto.ErrorDTO;
 import io.swagger.model.UserDTO;
+
+import java.util.UUID;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
