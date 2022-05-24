@@ -2,15 +2,14 @@ package io.swagger.model.entities;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Data
-public class Account {
+public class Account<Users> {
 
   public enum ActiveEnum {
     ACTIVE("active"),
@@ -63,6 +62,8 @@ public class Account {
   private ActiveEnum active;
 
   private BigDecimal absoluteLimit;
+
+  private Users user;
 
 //  private UserDTO user;
 

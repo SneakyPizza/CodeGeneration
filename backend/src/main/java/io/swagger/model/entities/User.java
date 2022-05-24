@@ -21,6 +21,10 @@ public class User<list> {
     private String street;
     private String city;
     private String zipcode;
+
+    @OneToMany(mappedBy = "user")
+    private List<Account> accounts;
+
     @ElementCollection(fetch = FetchType.EAGER)
     private List<Role> roles;
 

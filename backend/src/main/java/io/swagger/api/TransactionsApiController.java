@@ -5,6 +5,10 @@ import io.swagger.model.AccountDTO;
 import io.swagger.model.dto.TransactionDTO;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.model.entities.Transaction;
+import io.swagger.model.entities.User;
+import io.swagger.services.UserService;
+import io.swagger.services.transactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -16,8 +20,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,6 +51,12 @@ public class TransactionsApiController implements TransactionsApi {
     private final ObjectMapper objectMapper;
 
     private final HttpServletRequest request;
+    
+    @Autowired
+    private io.swagger.services.transactionService transactionService;
+
+    @Autowired
+    UserService userService;
 
     @org.springframework.beans.factory.annotation.Autowired
     public TransactionsApiController(ObjectMapper objectMapper, HttpServletRequest request) {
@@ -56,7 +68,14 @@ public class TransactionsApiController implements TransactionsApi {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                return new ResponseEntity<TransactionDTO>(objectMapper.readValue("{\n  \"fromIBAN\" : \"NL 0750 8900 0000 0175 7814\",\n  \"toIBAN\" : \"NL 0750 8900 0000 0175 7814\",\n  \"pincode\" : \"81dc9bdb52d04dc20036dbd8313ed055\",\n  \"amount\" : 100,\n  \"timestamp\" : \"09-01-2021\",\n  \"fromUserId\" : \"cc48d0ec-da1e-49f4-bf57-d0313987e51b\"\n}", TransactionDTO.class), HttpStatus.NOT_IMPLEMENTED);
+                //get transactionDTO from request
+                TransactionDTO transactionDTO = objectMapper.readValue("{  \"fromIBAN\" : \"fromIBAN\",  \"toIBAN\" : \"toIBAN\",  \"pincode\" : \"pincode\",  \"amount\" : 1,  \"timestamp\" : \"timestamp\",  \"fromUserId\" : \"fromUserId\"}", TransactionDTO.class);
+
+                //get user from securety context
+                String userName = (String) SecurityContextHolder.getContext().getAuthentication().getName();
+                User user = userService.getUserByUserName(userName);
+                //get  transaction history for the user
+                Transaction transaction = (Transaction) transactionService.getTransactionsByFromIban(IBAN);
             } catch (IOException e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<TransactionDTO>(HttpStatus.INTERNAL_SERVER_ERROR);
