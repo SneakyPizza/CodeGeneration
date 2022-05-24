@@ -41,11 +41,11 @@ public class MyApplicationRunner implements ApplicationRunner {
         Account BankAccount = new Account();
         BankAccount.setIBAN("NL01INHO0000000001");
         BankAccount.setBalance(new BigDecimal(1000000000));
-        BankAccount.setUser(testUser);
+//        BankAccount.setUser(testUser);
         BankAccount.setAccountType(Account.AccountTypeEnum.CURRENT);
         BankAccount.setAbsoluteLimit(new BigDecimal(1000000000));
 
-        testUser.setAccounts(new ArrayList<>(List.of(BankAccount)));
+//        testUser.setAccounts(new ArrayList<>(List.of(BankAccount)));
         userService.createUser(testUser);
         accountService.addAccount(BankAccount);
     }

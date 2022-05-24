@@ -11,5 +11,5 @@ public interface TransactionRepository extends PagingAndSortingRepository<Transa
 
     Iterable<Transaction> findByfromUserId(UUID userId);
 
-    Iterable<Transaction> findByfromIban(String fromIban);
+//    Iterable<Transaction> findByfromIban(String fromIban);
 }

@@ -75,7 +75,7 @@ public class TransactionsApiController implements TransactionsApi {
                 String userName = (String) SecurityContextHolder.getContext().getAuthentication().getName();
                 User user = userService.getUserByUserName(userName);
                 //get  transaction history for the user
-                Transaction transaction = (Transaction) transactionService.getTransactionsByFromIban(IBAN);
+//                Transaction transaction = (Transaction) transactionService.getTransactionsByFromIban(IBAN);
             } catch (IOException e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<TransactionDTO>(HttpStatus.INTERNAL_SERVER_ERROR);

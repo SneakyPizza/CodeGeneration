@@ -31,8 +31,8 @@ public class transactionService {
     }
 
     //Get all transaction by fromIban
-    public Iterable<Transaction> getTransactionsByFromIban(String fromIban){
-        return transactionRepository.findByfromIban(fromIban);
-    }
+//    public Iterable<Transaction> getTransactionsByFromIban(String fromIban){
+//        return transactionRepository.findByfromIban(fromIban);
+//    }
 
 }

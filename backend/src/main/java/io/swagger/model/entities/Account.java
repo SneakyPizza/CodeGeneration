@@ -63,7 +63,7 @@ public class Account<Users> {
 
   private BigDecimal absoluteLimit;
 
-  private Users user;
+//  private Users user;
 
 //  private UserDTO user;
 
