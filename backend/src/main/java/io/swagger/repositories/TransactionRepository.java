@@ -4,6 +4,7 @@ import io.swagger.model.entities.Transaction;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.UUID;
 
 @Repository
@@ -11,5 +12,6 @@ public interface TransactionRepository extends PagingAndSortingRepository<Transa
 
     Iterable<Transaction> findByfromUserId(UUID userId);
 
-//    Iterable<Transaction> findByfromIban(String fromIban);
+    Iterable<Transaction> findByIBAN(String iban);
+
 }

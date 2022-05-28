@@ -53,7 +53,8 @@ public class Account<Users> {
 
   private AccountTypeEnum accountType;
 
-  private UUID userid;
+  @ManyToOne
+  private User user;
 
   private String IBAN;
 
@@ -62,9 +63,5 @@ public class Account<Users> {
   private ActiveEnum active;
 
   private BigDecimal absoluteLimit;
-
-//  private Users user;
-
-//  private UserDTO user;
 
 }

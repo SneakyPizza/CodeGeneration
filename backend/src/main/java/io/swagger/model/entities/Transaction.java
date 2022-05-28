@@ -1,10 +1,12 @@
 package io.swagger.model.entities;
 
+import io.swagger.model.dto.GetTransactionDTO;
 import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import java.util.UUID;
 
 
@@ -16,9 +18,10 @@ public class Transaction   {
   @GeneratedValue
   private UUID id;
 
-  private String fromIBAN;
+  private String IBAN;
 
-  private String toIBAN;
+  @OneToOne
+  private Account Target;
 
   private String pincode;
 
@@ -28,5 +31,14 @@ public class Transaction   {
 
   private UUID fromUserId;
 
+  public GetTransactionDTO toGetTransactionDTO() {
+    GetTransactionDTO transactionDTO = new GetTransactionDTO();
+    transactionDTO.setFromIBAN(IBAN);
+    transactionDTO.setToIBAN(Target.getIBAN());
+    transactionDTO.setAmount(amount);
+    transactionDTO.setTimestamp(timestamp);
+    transactionDTO.setFromUserId(fromUserId);
+    return transactionDTO;
+  }
 
 }

@@ -5,6 +5,7 @@ import io.swagger.repositories.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -30,9 +31,7 @@ public class transactionService {
         return transactionRepository.findByfromUserId(userId);
     }
 
-    //Get all transaction by fromIban
-//    public Iterable<Transaction> getTransactionsByFromIban(String fromIban){
-//        return transactionRepository.findByfromIban(fromIban);
-//    }
+    public List<Transaction> getTransactions(String iban) {return (List<Transaction>) transactionRepository.findByIBAN(iban);}
+
 
 }

@@ -6,6 +6,7 @@ import io.swagger.model.entities.User;
 import io.swagger.services.UserService;
 import io.swagger.services.accountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,9 @@ public class MyApplicationRunner implements ApplicationRunner {
 
     @Autowired
     UserService userService;
+
+    @Value("${server.bank.iban}")
+    private String bank_Iban;
 
     @Autowired
     io.swagger.services.accountService accountService;
@@ -36,16 +40,25 @@ public class MyApplicationRunner implements ApplicationRunner {
         testUser.setStreet("test");
         testUser.setCity("test");
         testUser.setZipcode("test");
-        testUser.setRoles(new ArrayList<>(Arrays.asList(Role.ROLE_USER)));
+        testUser.setRoles(new ArrayList<>(List.of(Role.ROLE_ADMIN)));
 
         Account BankAccount = new Account();
-        BankAccount.setIBAN("NL01INHO0000000001");
+        BankAccount.setIBAN(bank_Iban);
         BankAccount.setBalance(new BigDecimal(1000000000));
-//        BankAccount.setUser(testUser);
+        BankAccount.setUser(testUser);
         BankAccount.setAccountType(Account.AccountTypeEnum.CURRENT);
         BankAccount.setAbsoluteLimit(new BigDecimal(1000000000));
+        BankAccount.setActive(Account.ActiveEnum.ACTIVE);
 
-//        testUser.setAccounts(new ArrayList<>(List.of(BankAccount)));
+        Account testAccount = new Account();
+        testAccount.setIBAN("NL91ABNA0417164300");
+        testAccount.setBalance(new BigDecimal(0));
+        testAccount.setUser(testUser);
+        testAccount.setAccountType(Account.AccountTypeEnum.SAVINGS);
+        testAccount.setAbsoluteLimit(new BigDecimal(1000000000));
+        testAccount.setActive(Account.ActiveEnum.ACTIVE);
+
+        testUser.setAccounts(new ArrayList<>(List.of(BankAccount, testAccount)));
         userService.createUser(testUser);
         accountService.addAccount(BankAccount);
     }
