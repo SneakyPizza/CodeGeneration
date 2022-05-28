@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -26,7 +27,7 @@ public class PostTransactionDTO   {
   private String pincode = null;
 
   @JsonProperty("amount")
-  private Integer amount = null;
+  private BigDecimal amount = null;
 
   @JsonProperty("timestamp")
   private String timestamp = null;
@@ -91,7 +92,7 @@ public class PostTransactionDTO   {
     this.pincode = pincode;
   }
 
-  public PostTransactionDTO amount(Integer amount) {
+  public PostTransactionDTO amount(BigDecimal amount) {
     this.amount = amount;
     return this;
   }
@@ -102,11 +103,11 @@ public class PostTransactionDTO   {
    **/
   @Schema(description = "")
   
-    public Integer getAmount() {
+    public BigDecimal getAmount() {
     return amount;
   }
 
-  public void setAmount(Integer amount) {
+  public void setAmount(BigDecimal amount) {
     this.amount = amount;
   }
 

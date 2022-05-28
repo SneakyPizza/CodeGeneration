@@ -40,7 +40,22 @@ public class MyApplicationRunner implements ApplicationRunner {
         testUser.setStreet("test");
         testUser.setCity("test");
         testUser.setZipcode("test");
+        testUser.setDayLimit(new BigDecimal(10000));
+        testUser.setTransactionLimit(new BigDecimal(500));
         testUser.setRoles(new ArrayList<>(List.of(Role.ROLE_ADMIN)));
+
+        User Bank = new User();
+        Bank.setUsername("Bank");
+        Bank.setPassword("Bank");
+        Bank.setEmail("bang@bank.nl");
+        Bank.setFirstName("Bank");
+        Bank.setLastName("Bank");
+        Bank.setStreet("Bank");
+        Bank.setCity("Bank");
+        Bank.setZipcode("Bank");
+        Bank.setDayLimit(new BigDecimal(0));
+        Bank.setTransactionLimit(new BigDecimal(0));
+        Bank.setRoles(new ArrayList<>(List.of(Role.ROLE_ADMIN)));
 
         Account BankAccount = new Account();
         BankAccount.setIBAN(bank_Iban);
@@ -58,8 +73,11 @@ public class MyApplicationRunner implements ApplicationRunner {
         testAccount.setAbsoluteLimit(new BigDecimal(1000000000));
         testAccount.setActive(Account.ActiveEnum.ACTIVE);
 
-        testUser.setAccounts(new ArrayList<>(List.of(BankAccount, testAccount)));
+        testUser.setAccounts(new ArrayList<>(List.of(testAccount)));
+        Bank.setAccounts(new ArrayList<>(List.of(BankAccount)));
         userService.createUser(testUser);
+        userService.createUser(Bank);
         accountService.addAccount(BankAccount);
+        accountService.addAccount(testAccount);
     }
 }

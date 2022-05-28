@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 
@@ -25,11 +26,15 @@ public class Transaction   {
 
   private String pincode;
 
-  private Integer amount;
+  private BigDecimal amount;
 
   private String timestamp;
 
-  private UUID fromUserId;
+  @OneToOne
+  private Account Origin;
+
+  @OneToOne
+  private User Performer;
 
   public GetTransactionDTO toGetTransactionDTO() {
     GetTransactionDTO transactionDTO = new GetTransactionDTO();
@@ -37,7 +42,7 @@ public class Transaction   {
     transactionDTO.setToIBAN(Target.getIBAN());
     transactionDTO.setAmount(amount);
     transactionDTO.setTimestamp(timestamp);
-    transactionDTO.setFromUserId(fromUserId);
+    transactionDTO.setFromUserId(Origin.getUser().getId());
     return transactionDTO;
   }
 
