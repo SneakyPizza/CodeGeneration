@@ -8,4 +8,6 @@ import java.util.UUID;
 
 @Repository
 public interface AccountRepository extends PagingAndSortingRepository<Account, UUID> {
+
+    Account findByIban(String IBAN);
 }

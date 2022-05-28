@@ -5,6 +5,9 @@ import lombok.Data;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+
+import io.swagger.model.UserDTO;
+
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -64,6 +67,6 @@ public class Account {
 
   private BigDecimal absoluteLimit;
 
-//  private UserDTO user;
+  private UserDTO user;
 
 }
