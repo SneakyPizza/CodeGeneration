@@ -15,4 +15,5 @@ public class accountService {
         accountRepository.save(account);
     }
 
+    public Object findByIBAN(String iban) {return accountRepository.findByIBAN(iban);}
 }

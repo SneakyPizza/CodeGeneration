@@ -1,14 +1,13 @@
 package io.swagger.api;
 
-import io.swagger.annotations.Api;
 import io.swagger.model.AccountDTO;
-import io.swagger.model.dto.TransactionDTO;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.model.dto.GetTransactionDTO;
+import io.swagger.model.dto.PostTransactionDTO;
+import io.swagger.model.entities.Account;
 import io.swagger.model.entities.Transaction;
 import io.swagger.model.entities.User;
 import io.swagger.services.UserService;
-import io.swagger.services.transactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -38,12 +37,12 @@ import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-04T11:04:07.506Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-28T11:30:29.125Z[GMT]")
 @RestController
-@Api(tags = {"Transactions"}, description = "the transaction API")
 public class TransactionsApiController implements TransactionsApi {
 
     private static final Logger log = LoggerFactory.getLogger(TransactionsApiController.class);
@@ -51,12 +50,15 @@ public class TransactionsApiController implements TransactionsApi {
     private final ObjectMapper objectMapper;
 
     private final HttpServletRequest request;
-    
+
     @Autowired
     private io.swagger.services.transactionService transactionService;
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    io.swagger.services.accountService accountService;
 
     @org.springframework.beans.factory.annotation.Autowired
     public TransactionsApiController(ObjectMapper objectMapper, HttpServletRequest request) {
@@ -64,28 +66,57 @@ public class TransactionsApiController implements TransactionsApi {
         this.request = request;
     }
 
-    public ResponseEntity<TransactionDTO> getTransactionHistory(@Parameter(in = ParameterIn.PATH, description = "IBAN of a user.", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
+    public ResponseEntity<GetTransactionDTO> getTransactionHistory(@Parameter(in = ParameterIn.PATH, description = "IBAN of a user.", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                //get transactionDTO from request
-                TransactionDTO transactionDTO = objectMapper.readValue("{  \"fromIBAN\" : \"fromIBAN\",  \"toIBAN\" : \"toIBAN\",  \"pincode\" : \"pincode\",  \"amount\" : 1,  \"timestamp\" : \"timestamp\",  \"fromUserId\" : \"fromUserId\"}", TransactionDTO.class);
+                //if iban is null
+                if (IBAN == null) {
+                    return new ResponseEntity<GetTransactionDTO>(HttpStatus.BAD_REQUEST);
+                }
+                //if iban is not null
+                else {
+                    //get curent user from security context
+                    User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+                    //ceck if user is owner of the account or is admin
+                    List<Account> list = user.getAccounts();
 
-                //get user from securety context
-                String userName = (String) SecurityContextHolder.getContext().getAuthentication().getName();
-                User user = userService.getUserByUserName(userName);
-                //get  transaction history for the user
-//                Transaction transaction = (Transaction) transactionService.getTransactionsByFromIban(IBAN);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<TransactionDTO>(HttpStatus.INTERNAL_SERVER_ERROR);
+                    if (list.stream().filter(a -> a.getIBAN().equals(IBAN)).findAny().isPresent() || user.getRoles().contains("ROLE_ADMIN")) {
+                        //ceck if account exists
+                        if (accountService.findByIBAN(IBAN) == null) {
+                            return new ResponseEntity<GetTransactionDTO>(HttpStatus.NOT_FOUND);
+                        }
+                        //if Account is found
+                        else {
+                            //if user has no transactions
+                            if (transactionService.getTransactions(IBAN).isEmpty()) {
+                                return new ResponseEntity<GetTransactionDTO>(HttpStatus.NO_CONTENT);
+                            }
+                            //if user has transactions
+                            else {
+                                List<Transaction> transactions = transactionService.getTransactions(IBAN);
+                                List<GetTransactionDTO> transactionDTOs = transactions.stream().map(t -> t.toGetTransactionDTO()).collect(java.util.stream.Collectors.toList());
+                                return new ResponseEntity<GetTransactionDTO>((GetTransactionDTO) transactionDTOs, HttpStatus.OK);
+                            }
+                        }
+                    }
+                    //if user is not owner of the account or is not admin
+                    else {
+                        return new ResponseEntity<GetTransactionDTO>(HttpStatus.UNAUTHORIZED);
+                    }
+                }
+            } catch (Exception e) {
+                log.error("Internal server error", e);
+                return new ResponseEntity<GetTransactionDTO>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-
-        return new ResponseEntity<TransactionDTO>(HttpStatus.NOT_IMPLEMENTED);
+        else{
+            log.error("Accept header is not valid");
+            return new ResponseEntity<GetTransactionDTO>(HttpStatus.NOT_ACCEPTABLE);
+        }
     }
 
-    public ResponseEntity<AccountDTO> transaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody TransactionDTO body) {
+    public ResponseEntity<AccountDTO> transaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostTransactionDTO body) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
@@ -98,5 +129,4 @@ public class TransactionsApiController implements TransactionsApi {
 
         return new ResponseEntity<AccountDTO>(HttpStatus.NOT_IMPLEMENTED);
     }
-
 }

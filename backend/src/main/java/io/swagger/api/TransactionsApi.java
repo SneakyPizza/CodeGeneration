@@ -6,7 +6,8 @@
 package io.swagger.api;
 
 import io.swagger.model.AccountDTO;
-import io.swagger.model.dto.TransactionDTO;
+import io.swagger.model.dto.GetTransactionDTO;
+import io.swagger.model.dto.PostTransactionDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -33,18 +34,18 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-04T11:04:07.506Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-28T11:30:29.125Z[GMT]")
 @Validated
 public interface TransactionsApi {
 
     @Operation(summary = "Get the history of transactions for a specific account.", description = "", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransactionDTO.class))) })
+        @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetTransactionDTO.class))) })
     @RequestMapping(value = "/Transactions/{IBAN}",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<TransactionDTO> getTransactionHistory(@Parameter(in = ParameterIn.PATH, description = "IBAN of a user.", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN);
+    ResponseEntity<GetTransactionDTO> getTransactionHistory(@Parameter(in = ParameterIn.PATH, description = "IBAN of a user.", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN);
 
 
     @Operation(summary = "Transfer money from account to account.", description = "", security = {
@@ -55,7 +56,7 @@ public interface TransactionsApi {
         produces = { "application/json" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<AccountDTO> transaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody TransactionDTO body);
+    ResponseEntity<AccountDTO> transaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostTransactionDTO body);
 
 }
 

@@ -3,6 +3,8 @@ package io.swagger.model.entities;
 import javax.persistence.*;
 
 import lombok.Data;
+
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,9 +23,11 @@ public class User<list> {
     private String street;
     private String city;
     private String zipcode;
+    private BigDecimal dayLimit;
+    private BigDecimal transactionLimit;
 
-//    @OneToMany(mappedBy = "user")
-//    private List<Account> accounts;
+    @OneToMany(cascade=CascadeType.ALL)
+    private List<Account> accounts;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<Role> roles;
