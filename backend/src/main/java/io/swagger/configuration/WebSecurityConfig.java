@@ -24,23 +24,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     JwtTokenFilter jwtTokenFilter;
 
     private static final String[] AUTH_WHITELIST = {
-        //Change whitelist later because of security reasons
-        "/login",
-        "/home",
-        "/h2-console/**/**",
-        "/Users/**",
-        "/Account/**",
-        "/Transaction/**",
-        //swagger uls
-        // -- Swagger UI v3 (OpenAPI)
-        "/v3/api-docs/**",
-        "/swagger-ui/**",
-        "/swagger-ui.html",
-        "/api-docs/**",
-        "/swagger-resources",
-        "/swagger-resources/**",
-        "/configuration/**",
-        "/webjars/**",
+            "/login",
+            "/home",
+            "/h2-console/**/**",
+//            "/Users/**",
+//            "/Account/**",
+//            "/Transaction/**",
+            //swagger uls
+            // -- Swagger UI v3 (OpenAPI)
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/api-docs/**",
+            "/swagger-resources",
+            "/swagger-resources/**",
+            "/configuration/**",
+            "/webjars/**",
     };
 
     @Override

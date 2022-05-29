@@ -19,5 +19,14 @@ public class UserService {
     public User updateUser(String userId, User user) {
         return userRepository.save(user);
     }
+
+    public User getUserByUserName(String userName) {
+        return userRepository.findByUsername(userName);
+    }
+
+    //finf by username
+    public User findByUsername(String userName) {
+        return userRepository.findByUsername(userName);
+    }
 }
 

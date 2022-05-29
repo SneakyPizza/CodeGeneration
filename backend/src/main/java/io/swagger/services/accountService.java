@@ -19,6 +19,7 @@ public class accountService {
     private AccountRepository accountRepository;
 
     //Add a new account object to the database (POST)
+    /*
     public void addAccount(Account account) {
         if(accountRepository.findByIban(account.getIBAN()) == null){
             accountRepository.save(account);
@@ -26,12 +27,14 @@ public class accountService {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "IBAN already in use");
         }
     }
+    */
 
     //Get all accounts (GET)
     public Iterable<Account> getAllAccounts(){
         return accountRepository.findAll();
     }
 
+    /*
     //Get a Account with IBAN (GET)
     public Account getAccountWithIBAN (String iban){
         if(accountRepository.findByIban(iban) != null){
@@ -39,7 +42,7 @@ public class accountService {
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account with given Iban was not found");
         }
-    }
+    } */
 
     //Update a existing account with a new account object (PUT)
     public void updateAccount (Account account){
@@ -49,4 +52,5 @@ public class accountService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found");
         }
     }
+    public Object findByIBAN(String iban) {return accountRepository.findByIBAN(iban);}
 }
