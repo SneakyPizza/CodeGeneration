@@ -28,7 +28,7 @@ public class transactionService {
     public Transaction getTransactionById(UUID id){ return transactionRepository.findById(id).get(); }
 
     //Get all transactions from a specific user
-    public Iterable<Transaction> getTransactionsByUserId(UUID userId){ return transactionRepository.findByfromUserId(userId);}
+
 
     public List<Transaction> getTransactions(String iban) {return (List<Transaction>) transactionRepository.findByIBAN(iban);}
 
@@ -62,6 +62,13 @@ public class transactionService {
         return transaction.getOrigin().getBalance().subtract(transaction.getAmount()).doubleValue() >= transaction.getOrigin().getAbsoluteLimit().doubleValue();
     }
 
+    //!!!!
+    //!!!!!!
+    //!!!!!!
+    //!!!!!!
+    //note done yet!!!!
+    //!!!!!!
+    //!!!!!!
     public boolean validateDayLimit(Transaction transaction){
         //check if day limit is not exceeded
         return transaction.getOrigin().getUser().getDayLimit().subtract(transaction.getAmount()).doubleValue() >= 0;

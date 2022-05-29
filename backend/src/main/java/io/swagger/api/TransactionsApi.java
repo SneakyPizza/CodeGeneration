@@ -45,7 +45,7 @@ public interface TransactionsApi {
     @RequestMapping(value = "/Transactions/{IBAN}",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<GetTransactionDTO> getTransactionHistory(@Parameter(in = ParameterIn.PATH, description = "IBAN of a user.", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN);
+    ResponseEntity<List<GetTransactionDTO>> getTransactionHistory(@Parameter(in = ParameterIn.PATH, description = "IBAN of a user.", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN);
 
 
     @Operation(summary = "Transfer money from account to account.", description = "", security = {

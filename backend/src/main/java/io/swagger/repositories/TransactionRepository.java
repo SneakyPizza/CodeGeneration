@@ -10,8 +10,6 @@ import java.util.UUID;
 @Repository
 public interface TransactionRepository extends PagingAndSortingRepository<Transaction, UUID> {
 
-    Iterable<Transaction> findByfromUserId(UUID userId);
-
     Iterable<Transaction> findByIBAN(String iban);
 
 }

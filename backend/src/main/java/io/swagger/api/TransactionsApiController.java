@@ -66,13 +66,13 @@ public class TransactionsApiController implements TransactionsApi {
         this.request = request;
     }
 
-    public ResponseEntity<GetTransactionDTO> getTransactionHistory(@Parameter(in = ParameterIn.PATH, description = "IBAN of a user.", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
+    public ResponseEntity<List<GetTransactionDTO>> getTransactionHistory(@Parameter(in = ParameterIn.PATH, description = "IBAN of a user.", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
                 //if iban is null
                 if (IBAN == null) {
-                    return new ResponseEntity<GetTransactionDTO>(HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<List<GetTransactionDTO>>(HttpStatus.BAD_REQUEST);
                 }
                 //if iban is not null
                 else {
@@ -84,35 +84,35 @@ public class TransactionsApiController implements TransactionsApi {
                     if (list.stream().filter(a -> a.getIBAN().equals(IBAN)).findAny().isPresent() || user.getRoles().contains("ROLE_ADMIN")) {
                         //ceck if account exists
                         if (accountService.findByIBAN(IBAN) == null) {
-                            return new ResponseEntity<GetTransactionDTO>(HttpStatus.NOT_FOUND);
+                            return new ResponseEntity<List<GetTransactionDTO>>(HttpStatus.NOT_FOUND);
                         }
                         //if Account is found
                         else {
                             //if user has no transactions
                             if (transactionService.getTransactions(IBAN).isEmpty()) {
-                                return new ResponseEntity<GetTransactionDTO>(HttpStatus.NO_CONTENT);
+                                return new ResponseEntity<List<GetTransactionDTO>>(HttpStatus.NO_CONTENT);
                             }
                             //if user has transactions
                             else {
                                 List<Transaction> transactions = transactionService.getTransactions(IBAN);
                                 List<GetTransactionDTO> transactionDTOs = transactions.stream().map(t -> t.toGetTransactionDTO()).collect(java.util.stream.Collectors.toList());
-                                return new ResponseEntity<GetTransactionDTO>((GetTransactionDTO) transactionDTOs, HttpStatus.OK);
+                                return new ResponseEntity<List<GetTransactionDTO>>( transactionDTOs, HttpStatus.OK);
                             }
                         }
                     }
                     //if user is not owner of the account or is not admin
                     else {
-                        return new ResponseEntity<GetTransactionDTO>(HttpStatus.UNAUTHORIZED);
+                        return new ResponseEntity<List<GetTransactionDTO>>( HttpStatus.UNAUTHORIZED);
                     }
                 }
             } catch (Exception e) {
                 log.error("Internal server error", e);
-                return new ResponseEntity<GetTransactionDTO>(HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<List<GetTransactionDTO>>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
         else{
             log.error("Accept header is not valid");
-            return new ResponseEntity<GetTransactionDTO>(HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<List<GetTransactionDTO>>(HttpStatus.NOT_ACCEPTABLE);
         }
     }
 
