@@ -23,7 +23,7 @@ public class User<list> {
     private String street;
     private String city;
     private String zipcode;
-    private BigDecimal dayLimit;
+    private BigDecimal dayLimit;;
     private BigDecimal transactionLimit;
 
     @OneToMany(cascade=CascadeType.ALL)
