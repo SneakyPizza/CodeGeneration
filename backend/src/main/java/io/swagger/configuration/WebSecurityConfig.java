@@ -28,7 +28,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/home",
             "/h2-console/**/**",
 //            "/Users/**",
-//            "/Account/**",
+            "/Accounts/**",
+            "/Accounts",
+            "/Accounts?offset=0&limit=20",
 //            "/Transaction/**",
             //swagger uls
             // -- Swagger UI v3 (OpenAPI)

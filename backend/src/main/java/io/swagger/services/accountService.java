@@ -1,5 +1,7 @@
 package io.swagger.services;
 
+import io.swagger.model.AccountDTO;
+import io.swagger.model.dto.PostAccountDTO;
 import io.swagger.model.entities.Account;
 import io.swagger.repositories.AccountRepository;
 
@@ -19,30 +21,32 @@ public class accountService {
     private AccountRepository accountRepository;
 
     //Add a new account object to the database (POST)
-    /*
-    public void addAccount(Account account) {
-        if(accountRepository.findByIban(account.getIBAN()) == null){
-            accountRepository.save(account);
-        } else {
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "IBAN already in use");
-        }
+    
+    public void addAccount(PostAccountDTO account) {
+        //if(accountRepository.findByIBAN(account.getIBAN()) == null){
+            //accountRepository.save(account);
+        //} 
+        //else {
+            //throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "IBAN already in use");
+        //}
     }
-    */
+    
 
     //Get all accounts (GET)
     public Iterable<Account> getAllAccounts(){
         return accountRepository.findAll();
     }
 
-    /*
+    
     //Get a Account with IBAN (GET)
     public Account getAccountWithIBAN (String iban){
-        if(accountRepository.findByIban(iban) != null){
-            return accountRepository.findByIban(iban);
+        if(accountRepository.findByIBAN(iban) != null){
+            //return accountRepository.findByIBAN(iban);
+            return (Account) accountRepository.findByIBAN(iban);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account with given Iban was not found");
         }
-    } */
+    }
 
     //Update a existing account with a new account object (PUT)
     public void updateAccount (Account account){

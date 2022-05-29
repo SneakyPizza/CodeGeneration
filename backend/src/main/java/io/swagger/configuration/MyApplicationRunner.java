@@ -79,5 +79,6 @@ public class MyApplicationRunner implements ApplicationRunner {
         userService.createUser(Bank);
         //accountService.addAccount(BankAccount);
         //accountService.addAccount(testAccount);
+        //accountService.addAccount(testAccount);
     }
 }
