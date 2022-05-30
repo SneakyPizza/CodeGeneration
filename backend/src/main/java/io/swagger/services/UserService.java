@@ -11,6 +11,14 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    //generate 4number pincode
+    public String generatePincode(){
+        StringBuilder pincode = new StringBuilder();
+        for(int i = 0; i < 4; i++){
+            pincode.append((int) (Math.random() * 10));
+        }
+        return pincode.toString();
+    }
 
     public User createUser(User user) {
         return userRepository.save(user);

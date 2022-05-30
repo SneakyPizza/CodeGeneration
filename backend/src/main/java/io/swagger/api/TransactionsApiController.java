@@ -116,17 +116,39 @@ public class TransactionsApiController implements TransactionsApi {
         }
     }
 
-    public ResponseEntity<AccountDTO> transaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostTransactionDTO body) {
+    public ResponseEntity<GetTransactionDTO> transaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostTransactionDTO body) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                return new ResponseEntity<AccountDTO>(objectMapper.readValue("{\n  \"accountType\" : \"savings\",\n  \"userid\" : \"5e9f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f\",\n  \"IBAN\" : \"NL 0750 8900 0000 0175 7814\",\n  \"balance\" : \"0\",\n  \"active\" : \"active\",\n  \"absoluteLimit\" : \"1000\"\n}", AccountDTO.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<AccountDTO>( HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+                //get curent user from security context
+                User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+                //ceck if user is owner of the account or is admin
+                List<Account> list = user.getAccounts();
 
-        return new ResponseEntity<AccountDTO>(HttpStatus.NOT_IMPLEMENTED);
+                if (list.stream().filter(a -> a.getIBAN().equals(body.getFromIBAN())).findAny().isPresent() || user.getRoles().contains("ROLE_ADMIN")) {
+                    //ceck if fromIBAN and toIBAN exists
+                    if (accountService.findByIBAN(body.getFromIBAN()) == null || accountService.findByIBAN(body.getToIBAN()) == null) {
+                        return new ResponseEntity<GetTransactionDTO>(HttpStatus.NOT_FOUND);
+                    }
+                    else {
+                        //creste transaction object
+                        Transaction transaction = new Transaction();
+                        transaction.setPerformer(user);
+                        transaction.setOrigin((Account) accountService.findByIBAN(body.getFromIBAN()));
+                        transaction.setTarget((Account) accountService.findByIBAN(body.getToIBAN()));
+                        transaction.setAmount(body.getAmount());
+                        transaction.setPincode(body.getPincode());
+                        //validate PIN
+
+                    }
+                }
+            }
+            catch (Exception e) {
+                log.error("Couldn't serialize response for content type application/json", e);
+                return new ResponseEntity<GetTransactionDTO>( HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            //not implemented
+        }
+        return new ResponseEntity<GetTransactionDTO>(HttpStatus.NOT_IMPLEMENTED);
     }
 }

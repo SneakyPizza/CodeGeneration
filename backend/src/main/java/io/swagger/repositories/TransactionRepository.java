@@ -4,6 +4,7 @@ import io.swagger.model.entities.Transaction;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -12,4 +13,5 @@ public interface TransactionRepository extends PagingAndSortingRepository<Transa
 
     Iterable<Transaction> findByIBAN(String iban);
 
+    Object findByIBANAndTimestamp(String iban, LocalDateTime now);
 }

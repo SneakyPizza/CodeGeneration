@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,17 +21,23 @@ public class transactionService {
     }
 
     //Get all transactions from the database
-    public Iterable<Transaction> getAllTransactions(){
-        return transactionRepository.findAll();
+    public List<Transaction> getAllTransactions(){
+        return (List<Transaction>) transactionRepository.findAll();
     }
 
     //Get a transaction by id
     public Transaction getTransactionById(UUID id){ return transactionRepository.findById(id).get(); }
 
     //Get all transactions from a specific user
-
-
     public List<Transaction> getTransactions(String iban) {return (List<Transaction>) transactionRepository.findByIBAN(iban);}
+
+//    //Get today's transactions from a user
+//    public List<Transaction> getTodaysTransactions(User user) {
+//       //get today's transactions from all the accounts owned by user
+//        List<Transaction> transactions = (List<Transaction>) transactionRepository.findByTimestamp(LocalDateTime.now());
+//        //filter transactions by user
+//        return transactions.stream().filter(transaction -> transaction.getOrigin().getUser().getId().equals(user.getId())).collect(java.util.stream.Collectors.toList());
+//    }
 
     //check if a transaction is valid
     public TransactionValidation isValidTransaction(Transaction transaction){
@@ -52,6 +59,9 @@ public class transactionService {
         else if(!validateIsOwner(transaction)){
             return new TransactionValidation(false, "You do not have access to this account");
         }
+        else if(!validatePINcode(transaction)){
+            return new TransactionValidation(false, "PIN code is incorrect");
+        }
         else{
             return new TransactionValidation(true, "Transaction is valid");
         }
@@ -60,6 +70,10 @@ public class transactionService {
     private boolean validateBalance(Transaction transaction) {
         //check if origin has enough money
         return transaction.getOrigin().getBalance().subtract(transaction.getAmount()).doubleValue() >= transaction.getOrigin().getAbsoluteLimit().doubleValue();
+    }
+    //validate pin
+    private boolean validatePINcode(Transaction transaction) {
+        return transaction.getPerformer().getPincode().equals(transaction.getPincode());
     }
 
     //!!!!
