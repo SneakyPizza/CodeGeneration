@@ -2,6 +2,7 @@ package io.swagger.model.entities;
 
 import javax.persistence.*;
 
+import io.swagger.model.UserDTO;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -32,4 +33,20 @@ public class User<list> {
     @ElementCollection(fetch = FetchType.EAGER)
     private List<Role> roles;
 
+    public UserDTO getUserDTO() {
+    	UserDTO userDTO = new UserDTO();
+    	userDTO.setUserid(this.id);
+    	userDTO.setUsername(this.username);
+    	userDTO.setPassword(this.password);
+    	userDTO.setEmail(this.email);
+    	userDTO.setFirstName(this.firstName);
+    	userDTO.setLastName(this.lastName);
+    	userDTO.setStreet(this.street);
+    	userDTO.setCity(this.city);
+    	userDTO.setZipcode(this.zipcode);
+    	userDTO.setDayLimit(this.dayLimit);
+    	userDTO.setTransactionLimit(this.transactionLimit);
+    	userDTO.setRoles(this.roles);
+    	return userDTO;
+    }
 }
