@@ -1,7 +1,9 @@
 package io.swagger.api;
 
+import io.swagger.annotations.Api;
 import io.swagger.model.AccountDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.model.dto.ErrorDTO;
 import io.swagger.model.dto.GetTransactionDTO;
 import io.swagger.model.dto.PostTransactionDTO;
 import io.swagger.model.entities.Account;
@@ -20,6 +22,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,6 +46,7 @@ import java.util.Map;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-28T11:30:29.125Z[GMT]")
 @RestController
+@Api(tags = {"Transactions"}, description = "the transaction API")
 public class TransactionsApiController implements TransactionsApi {
 
     private static final Logger log = LoggerFactory.getLogger(TransactionsApiController.class);
@@ -66,7 +70,7 @@ public class TransactionsApiController implements TransactionsApi {
         this.request = request;
     }
 
-    public ResponseEntity<List<GetTransactionDTO>> getTransactionHistory(@Parameter(in = ParameterIn.PATH, description = "IBAN of a user.", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
+    public ResponseEntity<? extends Object> getTransactionHistory(@Parameter(in = ParameterIn.PATH, description = "IBAN of a user.", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
@@ -107,7 +111,7 @@ public class TransactionsApiController implements TransactionsApi {
                 }
             } catch (Exception e) {
                 log.error("Internal server error", e);
-                return new ResponseEntity<List<GetTransactionDTO>>(HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<ErrorDTO>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
         else{
@@ -138,6 +142,7 @@ public class TransactionsApiController implements TransactionsApi {
                         transaction.setTarget((Account) accountService.findByIBAN(body.getToIBAN()));
                         transaction.setAmount(body.getAmount());
                         transaction.setPincode(body.getPincode());
+
                         //validate PIN
 
                     }
