@@ -123,21 +123,16 @@ public class AccountsApiController implements AccountsApi {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
+                //Convert iterable to list
                 List<Account> accountlist = StreamSupport.stream(accountservice.getAllAccounts()
                 .spliterator(), false)
                 .collect(Collectors.toList());
 
                 //Map account list to accountdto
                 List<AccountDTO> dtos = new ArrayList<AccountDTO>();
-                // =  accountlist.stream().map(user -> modelMapper.map(user, AccountDTO.class)).collect(Collectors.toList());
                 for (Account account : accountlist) {
-                    AccountDTO a = new AccountDTO();
-                    a.setAbsoluteLimit(account.getAbsoluteLimit());
-                    //a.setAccountType(account.getAccountType().values()[0]);
-                    //a.setActive(account.getActive());
-                    a.setBalance(account.getBalance());
-                    a.setIBAN(account.getIBAN());
-                    //a.setUser(account.getUser());
+                    AccountDTO a = account.toAccountDTO();
+                    dtos.add(a);
                 }
 
                 return new ResponseEntity<List<AccountDTO>>(dtos, HttpStatus.OK);

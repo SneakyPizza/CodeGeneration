@@ -3,8 +3,10 @@ package io.swagger.services;
 import io.swagger.model.AccountDTO;
 import io.swagger.model.dto.PostAccountDTO;
 import io.swagger.model.entities.Account;
+import io.swagger.model.entities.User;
 import io.swagger.repositories.AccountRepository;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +35,8 @@ public class accountService {
     
 
     //Get all accounts (GET)
-    public Iterable<Account> getAllAccounts(){
-        return accountRepository.findAll();
+    public List<Account> getAllAccounts(){
+        return (List<Account>) accountRepository.findAll();
     }
 
     
