@@ -60,7 +60,7 @@ public class MyApplicationRunner implements ApplicationRunner {
         Account BankAccount = new Account();
         BankAccount.setIBAN(bank_Iban);
         BankAccount.setBalance(new BigDecimal(1000000000));
-        BankAccount.setUser(testUser);
+        BankAccount.setUser(Bank);
         BankAccount.setAccountType(Account.AccountTypeEnum.CURRENT);
         BankAccount.setAbsoluteLimit(new BigDecimal(1000000000));
         BankAccount.setActive(Account.ActiveEnum.ACTIVE);

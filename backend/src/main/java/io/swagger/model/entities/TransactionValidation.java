@@ -1,6 +1,8 @@
 package io.swagger.model.entities;
 
+import lombok.Data;
 
+@Data
 public class TransactionValidation {
     //enum with transaction validation
     public enum TransactionValidationStatus {

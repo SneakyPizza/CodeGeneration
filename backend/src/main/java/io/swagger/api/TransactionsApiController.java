@@ -8,6 +8,7 @@ import io.swagger.model.dto.GetTransactionDTO;
 import io.swagger.model.dto.PostTransactionDTO;
 import io.swagger.model.entities.Account;
 import io.swagger.model.entities.Transaction;
+import io.swagger.model.entities.TransactionValidation;
 import io.swagger.model.entities.User;
 import io.swagger.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,6 +41,7 @@ import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -86,15 +88,15 @@ public class TransactionsApiController implements TransactionsApi {
                     List<Account> list = user.getAccounts();
 
                     if (list.stream().filter(a -> a.getIBAN().equals(IBAN)).findAny().isPresent() || user.getRoles().contains("ROLE_ADMIN")) {
-                        //ceck if account exists
+                        //check if account exists
                         if (accountService.findByIBAN(IBAN) == null) {
-                            return new ResponseEntity<List<GetTransactionDTO>>(HttpStatus.NOT_FOUND);
+                            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "This account does not exist!", 404, "NOT_FOUND"), HttpStatus.NOT_FOUND);
                         }
                         //if Account is found
                         else {
                             //if user has no transactions
                             if (transactionService.getTransactions(IBAN).isEmpty()) {
-                                return new ResponseEntity<List<GetTransactionDTO>>(HttpStatus.NO_CONTENT);
+                                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "User does not have any transactions.", 204, "NO_CONTENT"), HttpStatus.NO_CONTENT);
                             }
                             //if user has transactions
                             else {
@@ -106,21 +108,21 @@ public class TransactionsApiController implements TransactionsApi {
                     }
                     //if user is not owner of the account or is not admin
                     else {
-                        return new ResponseEntity<List<GetTransactionDTO>>( HttpStatus.UNAUTHORIZED);
+                        return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "You do not have acces!", 401, "UNAUTHORIZED"), HttpStatus.UNAUTHORIZED);
                     }
                 }
             } catch (Exception e) {
                 log.error("Internal server error", e);
-                return new ResponseEntity<ErrorDTO>(HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "An internal server error had occured!", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
         else{
             log.error("Accept header is not valid");
-            return new ResponseEntity<List<GetTransactionDTO>>(HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Accept header is not valid!", 406, "NOT_ACCEPTABLE"), HttpStatus.NOT_ACCEPTABLE);
         }
     }
 
-    public ResponseEntity<GetTransactionDTO> transaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostTransactionDTO body) {
+    public ResponseEntity<? extends Object> transaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostTransactionDTO body) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
@@ -132,7 +134,7 @@ public class TransactionsApiController implements TransactionsApi {
                 if (list.stream().filter(a -> a.getIBAN().equals(body.getFromIBAN())).findAny().isPresent() || user.getRoles().contains("ROLE_ADMIN")) {
                     //ceck if fromIBAN and toIBAN exists
                     if (accountService.findByIBAN(body.getFromIBAN()) == null || accountService.findByIBAN(body.getToIBAN()) == null) {
-                        return new ResponseEntity<GetTransactionDTO>(HttpStatus.NOT_FOUND);
+                        return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Account does not exist!", 404, "NOT_FOUND"), HttpStatus.NOT_FOUND);
                     }
                     else {
                         //creste transaction object
@@ -142,18 +144,51 @@ public class TransactionsApiController implements TransactionsApi {
                         transaction.setTarget((Account) accountService.findByIBAN(body.getToIBAN()));
                         transaction.setAmount(body.getAmount());
                         transaction.setPincode(body.getPincode());
+                        //validate transaction
+                        TransactionValidation validation = transactionService.isValidTransaction(transaction);
+                        if(validation.getIsValid().equals(TransactionValidation.TransactionValidationStatus.VALID)){
+                            //if transaction is valid
+                            transaction.setTimestamp(LocalDateTime.now());
+                            transactionService.addTransaction(transaction);
+                            //check if transaction is executed
 
-                        //validate PIN
-
+                            //!!!!!!!!!!!!!!!!!!!!
+                            //executiom logic WIP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                            //!!!!!!!!!!!!!!!
+                            if(transactionService.transactionExists(transaction.getId())){
+                                return new ResponseEntity<GetTransactionDTO>(transaction.toGetTransactionDTO(), HttpStatus.OK);
+                            }
+                            else{
+                                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Transaction failed!", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
+                            }
+                        }
+                        else if(validation.getStatus() == TransactionValidation.TransactionValidationStatus.UNAUTHORIZED){
+                            //return errorDTO
+                            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), validation.getMessage(), 401, validation.getStatus().toString()), HttpStatus.UNAUTHORIZED);
+                        }
+                        else if(validation.getStatus() == TransactionValidation.TransactionValidationStatus.NOT_ALLOWED || validation.getStatus() == TransactionValidation.TransactionValidationStatus.NOT_ACTIVE){
+                            //return errorDTO
+                            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), validation.getMessage(), 403, validation.getStatus().toString()), HttpStatus.FORBIDDEN);
+                        }
+                        else{
+                            //return errorDTO
+                            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), validation.getMessage(), 400, validation.getStatus().toString()), HttpStatus.BAD_REQUEST);
+                        }
                     }
+                }
+                //if user is not owner of the account or is not admin
+                else {
+                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "You do not have acces!", 401, "UNAUTHORIZED"), HttpStatus.UNAUTHORIZED);
                 }
             }
             catch (Exception e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<GetTransactionDTO>( HttpStatus.INTERNAL_SERVER_ERROR);
+                log.error("Internal server error", e);
+                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "An internal server error had occured!", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
             }
-            //not implemented
         }
-        return new ResponseEntity<GetTransactionDTO>(HttpStatus.NOT_IMPLEMENTED);
+        else{
+            log.error("Accept header is not valid");
+            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Accept header is not valid!", 406, "NOT_ACCEPTABLE"), HttpStatus.NOT_ACCEPTABLE);
+        }
     }
 }

@@ -31,6 +31,11 @@ public class transactionService {
     //Get all transactions from a specific user
     public List<Transaction> getTransactions(String iban) {return (List<Transaction>) transactionRepository.findByIBAN(iban);}
 
+    //check if transaction is exists
+    public boolean transactionExists(UUID id){
+        return transactionRepository.existsById(id);
+    }
+
     //Get today's transactions from a user
     public List<Transaction> getTodaysTransactions(Transaction transaction) {
         LocalDateTime now = LocalDateTime.now();
