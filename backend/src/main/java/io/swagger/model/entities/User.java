@@ -24,7 +24,7 @@ public class User<list> {
     private String street;
     private String city;
     private String zipcode;
-    private BigDecimal dayLimit;;
+    private BigDecimal dayLimit;
     private BigDecimal transactionLimit;
     private String Pincode;
 
@@ -32,7 +32,7 @@ public class User<list> {
     private List<Account> accounts;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    private List<Role> roles;
+    private List<UserDTO.Role> roles;
 
     public UserDTO getUserDTO() {
     	UserDTO userDTO = new UserDTO();
