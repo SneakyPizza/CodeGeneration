@@ -8,5 +8,5 @@ import java.util.UUID;
 
 @Repository
 public interface LoginRepository extends PagingAndSortingRepository<User, UUID> {
-    boolean login(String username, String password);
+//    boolean login(String username, String password);
 }

@@ -96,13 +96,14 @@ public class UsersApiController implements UsersApi {
                 }
                 else {
                     // needs more security checks 
-                    List<User> users = (List<User>) userService.getAllUsers(offset, limit);
-                    List<UserDTO> userDTOs = new ArrayList<>();
-                    for (User user : users) {
-                        UserDTO userDTO = user.getUserDTO();
-                        userDTOs.add(userDTO);
-                    }
-                    return new ResponseEntity<List<UserDTO>>(userDTOs, HttpStatus.OK);
+//                    List<User> users = (List<User>) userService.getAllUsers(offset, limit);
+//                    List<UserDTO> userDTOs = new ArrayList<>();
+//                    for (User user : users) {
+//                        UserDTO userDTO = user.getUserDTO();
+//                        userDTOs.add(userDTO);
+//                    }
+                    return new ResponseEntity<List<UserDTO>>( HttpStatus.OK);
+//                    return new ResponseEntity<List<UserDTO>>(userDTOs, HttpStatus.OK);
                 }
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);

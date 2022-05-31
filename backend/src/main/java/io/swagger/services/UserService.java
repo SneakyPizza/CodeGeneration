@@ -30,9 +30,9 @@ public class UserService {
         return userRepository.findById(id).get();
     }
 
-    public User getAllUsers(int limit, int offset) {
-        return (User) userRepository.getAllUsers(limit, offset);
-    }
+//    public User getAllUsers(int limit, int offset) {
+//        return (User) userRepository.getAllUsers(limit, offset);
+//    }
 
     public User createUser(User user) {
         return userRepository.save(user);

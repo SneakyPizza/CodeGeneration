@@ -10,7 +10,7 @@ public class LoginService {
     @Autowired
     private LoginRepository loginRepository;
 
-    public boolean login(String username, String password) {
-        return loginRepository.login(username, password);
-    }
+//    public boolean login(String username, String password) {
+//        return loginRepository.login(username, password);
+//    }
 }
