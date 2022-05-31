@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 
@@ -28,7 +29,7 @@ public class Transaction   {
 
   private BigDecimal amount;
 
-  private String timestamp;
+  private LocalDateTime timestamp;
 
   @OneToOne
   private Account Origin;
@@ -41,7 +42,9 @@ public class Transaction   {
     transactionDTO.setFromIBAN(IBAN);
     transactionDTO.setToIBAN(Target.getIBAN());
     transactionDTO.setAmount(amount);
-    transactionDTO.setTimestamp(timestamp);
+    //set timestamp is current datetime
+    transactionDTO.setTimestamp(LocalDateTime.now().toString());
+
     transactionDTO.setFromUserId(Origin.getUser().getId());
     return transactionDTO;
   }

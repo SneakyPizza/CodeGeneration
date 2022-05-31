@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
@@ -15,12 +17,15 @@ import javax.validation.constraints.*;
  * UserDTO
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-04T11:04:07.506Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-30T13:34:38.950Z[GMT]")
 
 
 public class UserDTO   {
   @JsonProperty("userid")
   private UUID userid = null;
+
+  @JsonProperty("username")
+  private String username = null;
 
   @JsonProperty("password")
   private String password = null;
@@ -113,7 +118,8 @@ public class UserDTO   {
     }
   }
   @JsonProperty("role")
-  private RoleEnum role = null;
+  @Valid
+  private List<RoleEnum> role = null;
 
   public UserDTO userid(UUID userid) {
     this.userid = userid;
@@ -133,6 +139,25 @@ public class UserDTO   {
 
   public void setUserid(UUID userid) {
     this.userid = userid;
+  }
+
+  public UserDTO username(String username) {
+    this.username = username;
+    return this;
+  }
+
+  /**
+   * Get username
+   * @return username
+   **/
+  @Schema(description = "")
+  
+    public String getUsername() {
+    return username;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
   }
 
   public UserDTO password(String password) {
@@ -327,8 +352,16 @@ public class UserDTO   {
     this.transactionLimit = transactionLimit;
   }
 
-  public UserDTO role(RoleEnum role) {
+  public UserDTO role(List<RoleEnum> role) {
     this.role = role;
+    return this;
+  }
+
+  public UserDTO addRoleItem(RoleEnum roleItem) {
+    if (this.role == null) {
+      this.role = new ArrayList<RoleEnum>();
+    }
+    this.role.add(roleItem);
     return this;
   }
 
@@ -338,11 +371,11 @@ public class UserDTO   {
    **/
   @Schema(description = "")
   
-    public RoleEnum getRole() {
+    public List<RoleEnum> getRole() {
     return role;
   }
 
-  public void setRole(RoleEnum role) {
+  public void setRole(List<RoleEnum> role) {
     this.role = role;
   }
 
@@ -357,6 +390,7 @@ public class UserDTO   {
     }
     UserDTO userDTO = (UserDTO) o;
     return Objects.equals(this.userid, userDTO.userid) &&
+        Objects.equals(this.username, userDTO.username) &&
         Objects.equals(this.password, userDTO.password) &&
         Objects.equals(this.email, userDTO.email) &&
         Objects.equals(this.firstName, userDTO.firstName) &&
@@ -372,7 +406,7 @@ public class UserDTO   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(userid, password, email, firstName, lastName, street, city, zipcode, userstatus, dayLimit, transactionLimit, role);
+    return Objects.hash(userid, username, password, email, firstName, lastName, street, city, zipcode, userstatus, dayLimit, transactionLimit, role);
   }
 
   @Override
@@ -381,6 +415,7 @@ public class UserDTO   {
     sb.append("class UserDTO {\n");
     
     sb.append("    userid: ").append(toIndentedString(userid)).append("\n");
+    sb.append("    username: ").append(toIndentedString(username)).append("\n");
     sb.append("    password: ").append(toIndentedString(password)).append("\n");
     sb.append("    email: ").append(toIndentedString(email)).append("\n");
     sb.append("    firstName: ").append(toIndentedString(firstName)).append("\n");

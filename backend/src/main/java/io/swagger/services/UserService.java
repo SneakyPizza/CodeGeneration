@@ -17,6 +17,15 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    //generate 4number pincode
+    public String generatePincode(){
+        StringBuilder pincode = new StringBuilder();
+        for(int i = 0; i < 4; i++){
+            pincode.append((int) (Math.random() * 10));
+        }
+        return pincode.toString();
+    }
+
     public User getUser(UUID id) {
         return userRepository.findById(id).get();
     }
