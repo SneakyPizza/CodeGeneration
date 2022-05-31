@@ -63,12 +63,15 @@ public class UsersApiController implements UsersApi {
         this.request = request;
     }
 
-    public ResponseEntity<List<UserDTO>> addUser(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody UserDTO body) {
+    public ResponseEntity<List<UserDTO>> addUser(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody UserDTO userDTO) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                return new ResponseEntity<List<UserDTO>>(objectMapper.readValue("[ {\n  \"userid\" : \"5e9f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f\",\n  \"email\" : \"user@gmail.com\",\n  \"firstName\" : \"John\",\n  \"lastName\" : \"Doe\",\n  \"street\" : \"examplestreet 1a\",\n  \"city\" : \"Amsterdam\",\n  \"zipcode\" : \"1234AB\",\n  \"userstatus\" : \"active\",\n  \"dayLimit\" : \"1000\",\n  \"transactionLimit\" : \"100\",\n  \"role\" : \"user\"\n}, {\n  \"userid\" : \"5e9f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f\",\n  \"email\" : \"user@gmail.com\",\n  \"firstName\" : \"John\",\n  \"lastName\" : \"Doe\",\n  \"street\" : \"examplestreet 1a\",\n  \"city\" : \"Amsterdam\",\n  \"zipcode\" : \"1234AB\",\n  \"userstatus\" : \"active\",\n  \"dayLimit\" : \"1000\",\n  \"transactionLimit\" : \"100\",\n  \"role\" : \"user\"\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
+                if (userDTO == null) {
+                    log.error("Not implemented");
+                    return new ResponseEntity<List<UserDTO>>(HttpStatus.NOT_IMPLEMENTED);
+                }
+            } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<List<UserDTO>>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
