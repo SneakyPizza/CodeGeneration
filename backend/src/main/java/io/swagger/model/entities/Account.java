@@ -3,6 +3,10 @@ package io.swagger.model.entities;
 import lombok.Data;
 
 import javax.persistence.*;
+
+import io.swagger.model.AccountDTO;
+import io.swagger.model.AccountDTO.AccountTypeEnum;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
@@ -63,5 +67,24 @@ public class Account<Users> {
   private ActiveEnum active;
 
   private BigDecimal absoluteLimit;
+
+
+  public AccountDTO toAccountDTO(){
+    AccountDTO dto = new AccountDTO();
+    dto.setAbsoluteLimit(absoluteLimit);
+    //String acct = accountType.value;
+    AccountDTO.AccountTypeEnum accounttype_value = AccountDTO.AccountTypeEnum.fromValue(accountType.value);
+    //= AccountDTO.AccountTypeEnum.valueOf(accountType.toString());
+    dto.setAccountType(accounttype_value);
+
+    String acct = active.value;
+    AccountDTO.ActiveEnum accountactive_value = AccountDTO.ActiveEnum.fromValue(acct);
+
+    dto.setActive(accountactive_value);
+    dto.setBalance(balance);
+    dto.setIBAN(IBAN);
+    dto.setUser(user.toUserDTO());
+    return dto;
+  }
 
 }
