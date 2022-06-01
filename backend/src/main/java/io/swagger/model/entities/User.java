@@ -75,7 +75,7 @@ public class User<list> {
         try {
             // encrypts password in MD5
             MessageDigest md = null;
-            md = MessageDigest.getInstance("MD5");
+            md = MessageDigest.getInstance("SHA-512");
             md.update(password.getBytes());
             byte[] digest = md.digest();
             String hash = DatatypeConverter
