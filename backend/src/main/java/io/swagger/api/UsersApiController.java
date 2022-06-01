@@ -71,6 +71,16 @@ public class UsersApiController implements UsersApi {
                     log.error("Not implemented");
                     return new ResponseEntity<List<UserDTO>>(HttpStatus.NOT_IMPLEMENTED);
                 }
+                else if (userDTO.getUserid() == null || userDTO.getUsername() == null || userDTO.getPassword() == null || userDTO.getEmail() == null || userDTO.getFirstName() == null || userDTO.getLastName() == null || userDTO.getStreet() == null || userDTO.getCity() == null || userDTO.getZipcode() == null || userDTO.getUserstatus() == null || userDTO.getDayLimit() == null || userDTO.getTransactionLimit() == null || userDTO.getRoles() == null) {
+                    log.error("Not implemented");
+                    return new ResponseEntity<List<UserDTO>>(HttpStatus.NOT_IMPLEMENTED);
+                }
+                else {
+                    User user = new User();
+                    user.getUserModel(userDTO);
+                    user = userService.createUser(user);
+                    return new ResponseEntity<List<UserDTO>>(HttpStatus.OK);
+                }
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<List<UserDTO>>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -102,7 +112,7 @@ public class UsersApiController implements UsersApi {
 //                        UserDTO userDTO = user.getUserDTO();
 //                        userDTOs.add(userDTO);
 //                    }
-                    return new ResponseEntity<List<UserDTO>>( HttpStatus.OK);
+                    return new ResponseEntity<List<UserDTO>>(HttpStatus.OK);
 //                    return new ResponseEntity<List<UserDTO>>(userDTOs, HttpStatus.OK);
                 }
             } catch (Exception e) {

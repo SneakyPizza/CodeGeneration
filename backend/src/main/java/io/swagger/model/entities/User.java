@@ -1,11 +1,14 @@
 package io.swagger.model.entities;
 
 import javax.persistence.*;
+import javax.xml.bind.DatatypeConverter;
 
 import io.swagger.model.UserDTO;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,5 +52,37 @@ public class User<list> {
     	userDTO.setTransactionLimit(this.transactionLimit);
     	userDTO.setRoles(this.roles);
     	return userDTO;
+    }
+
+    public User getUserModel(UserDTO userDTO) {
+        User user = new User();
+        user.setId(userDTO.getUserid());
+        user.setUsername(userDTO.getUsername());
+        user.setPassword(userDTO.getPassword());
+        user.setEmail(userDTO.getEmail());
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        user.setStreet(userDTO.getStreet());
+        user.setCity(userDTO.getCity());
+        user.setZipcode(userDTO.getZipcode());
+        user.setDayLimit(userDTO.getDayLimit());
+        user.setTransactionLimit(userDTO.getTransactionLimit());
+        user.setRoles(userDTO.getRoles());
+        return user;
+    }
+
+    public void setPassword(String password) {
+        try {
+            // encrypts password in MD5
+            MessageDigest md = null;
+            md = MessageDigest.getInstance("MD5");
+            md.update(password.getBytes());
+            byte[] digest = md.digest();
+            String hash = DatatypeConverter
+                    .printHexBinary(digest).toUpperCase();
+            this.password = hash;
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

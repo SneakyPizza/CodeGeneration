@@ -35,6 +35,7 @@ public class UserService {
 //    }
 
     public User createUser(User user) {
+        user.setPincode(generatePincode());
         return userRepository.save(user);
     }
 
