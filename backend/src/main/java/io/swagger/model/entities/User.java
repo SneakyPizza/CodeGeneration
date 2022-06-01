@@ -27,7 +27,7 @@ public class User<list> {
     private BigDecimal transactionLimit;
     private String Pincode;
 
-    @OneToMany(cascade=CascadeType.ALL)
+    @OneToMany(cascade=CascadeType.PERSIST)
     private List<Account> accounts;
 
     @ElementCollection(fetch = FetchType.EAGER)

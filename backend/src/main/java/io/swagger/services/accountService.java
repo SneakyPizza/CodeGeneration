@@ -15,5 +15,10 @@ public class accountService {
         accountRepository.save(account);
     }
 
+    //update an account object to the database
+    public void updateAccount(Account account) {
+        accountRepository.save(account);
+    }
+
     public Object findByIBAN(String iban) {return accountRepository.findByIBAN(iban);}
 }

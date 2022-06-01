@@ -1,6 +1,7 @@
 package io.swagger.services;
 
 import io.swagger.model.entities.*;
+import io.swagger.repositories.AccountRepository;
 import io.swagger.repositories.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,10 @@ import java.util.UUID;
 
 @Service
 public class transactionService {
+
+    @Autowired
+    private AccountRepository accountRepository;
+
     @Autowired
     private TransactionRepository transactionRepository;
 
@@ -153,4 +158,11 @@ public class transactionService {
         }
     }
 
+    public void doTransaction(Transaction transaction) {
+        transaction.execute();
+        transactionRepository.save(transaction);
+        //save accounts
+        accountRepository.save(transaction.getOrigin());
+        accountRepository.save(transaction.getTarget());
+    }
 }

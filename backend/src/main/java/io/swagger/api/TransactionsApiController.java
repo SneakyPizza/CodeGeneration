@@ -148,13 +148,8 @@ public class TransactionsApiController implements TransactionsApi {
                         TransactionValidation validation = transactionService.isValidTransaction(transaction);
                         if(validation.getIsValid().equals(TransactionValidation.TransactionValidationStatus.VALID)){
                             //if transaction is valid
-                            transaction.setTimestamp(LocalDateTime.now());
-                            transactionService.addTransaction(transaction);
+                            transactionService.doTransaction(transaction);
                             //check if transaction is executed
-
-                            //!!!!!!!!!!!!!!!!!!!!
-                            //executiom logic WIP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                            //!!!!!!!!!!!!!!!
                             if(transactionService.transactionExists(transaction.getId())){
                                 return new ResponseEntity<GetTransactionDTO>(transaction.toGetTransactionDTO(), HttpStatus.OK);
                             }
