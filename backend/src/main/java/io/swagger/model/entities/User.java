@@ -71,7 +71,7 @@ public class User<list> {
         return user;
     }
 
-    public void setPassword(String password) {
+    public void setPassword(String password) { // needs better hashing algorithm
         try {
             // encrypts password in MD5
             MessageDigest md = null;
@@ -81,6 +81,21 @@ public class User<list> {
             String hash = DatatypeConverter
                     .printHexBinary(digest).toUpperCase();
             this.password = hash;
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setPincode(String Pincode) {
+        try {
+            // encrypts password in MD5
+            MessageDigest md = null;
+            md = MessageDigest.getInstance("MD5");
+            md.update(Pincode.getBytes());
+            byte[] digest = md.digest();
+            String hash = DatatypeConverter
+                    .printHexBinary(digest).toUpperCase();
+            this.Pincode = hash;
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
