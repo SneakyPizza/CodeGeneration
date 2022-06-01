@@ -3,10 +3,15 @@ package io.swagger.api;
 import io.swagger.annotations.Api;
 import io.swagger.model.dto.ErrorDTO;
 import io.swagger.model.UserDTO;
+import io.swagger.model.dto.GetTransactionDTO;
+import io.swagger.model.entities.User;
 
+
+import java.util.ArrayList;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -18,6 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,18 +54,34 @@ public class UsersApiController implements UsersApi {
 
     private final HttpServletRequest request;
 
+    @Autowired
+    private UserService userService;
+
     @org.springframework.beans.factory.annotation.Autowired
     public UsersApiController(ObjectMapper objectMapper, HttpServletRequest request) {
         this.objectMapper = objectMapper;
         this.request = request;
     }
 
-    public ResponseEntity<List<UserDTO>> addUser(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody UserDTO body) {
+    public ResponseEntity<List<UserDTO>> addUser(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody UserDTO userDTO) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                return new ResponseEntity<List<UserDTO>>(objectMapper.readValue("[ {\n  \"userid\" : \"5e9f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f\",\n  \"email\" : \"user@gmail.com\",\n  \"firstName\" : \"John\",\n  \"lastName\" : \"Doe\",\n  \"street\" : \"examplestreet 1a\",\n  \"city\" : \"Amsterdam\",\n  \"zipcode\" : \"1234AB\",\n  \"userstatus\" : \"active\",\n  \"dayLimit\" : \"1000\",\n  \"transactionLimit\" : \"100\",\n  \"role\" : \"user\"\n}, {\n  \"userid\" : \"5e9f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f\",\n  \"email\" : \"user@gmail.com\",\n  \"firstName\" : \"John\",\n  \"lastName\" : \"Doe\",\n  \"street\" : \"examplestreet 1a\",\n  \"city\" : \"Amsterdam\",\n  \"zipcode\" : \"1234AB\",\n  \"userstatus\" : \"active\",\n  \"dayLimit\" : \"1000\",\n  \"transactionLimit\" : \"100\",\n  \"role\" : \"user\"\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
+                if (userDTO == null) {
+                    log.error("Not implemented");
+                    return new ResponseEntity<List<UserDTO>>(HttpStatus.NOT_IMPLEMENTED);
+                }
+                else if (userDTO.getUserid() == null || userDTO.getUsername() == null || userDTO.getPassword() == null || userDTO.getEmail() == null || userDTO.getFirstName() == null || userDTO.getLastName() == null || userDTO.getStreet() == null || userDTO.getCity() == null || userDTO.getZipcode() == null || userDTO.getUserstatus() == null || userDTO.getDayLimit() == null || userDTO.getTransactionLimit() == null || userDTO.getRoles() == null) {
+                    log.error("Not implemented");
+                    return new ResponseEntity<List<UserDTO>>(HttpStatus.NOT_IMPLEMENTED);
+                }
+                else {
+                    User user = new User();
+                    user.getUserModel(userDTO);
+                    user = userService.createUser(user);
+                    return new ResponseEntity<List<UserDTO>>(HttpStatus.OK);
+                }
+            } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<List<UserDTO>>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -74,8 +96,26 @@ public class UsersApiController implements UsersApi {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                return new ResponseEntity<List<UserDTO>>(objectMapper.readValue("[ {\n  \"userid\" : \"5e9f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f\",\n  \"email\" : \"user@gmail.com\",\n  \"firstName\" : \"John\",\n  \"lastName\" : \"Doe\",\n  \"street\" : \"examplestreet 1a\",\n  \"city\" : \"Amsterdam\",\n  \"zipcode\" : \"1234AB\",\n  \"userstatus\" : \"active\",\n  \"dayLimit\" : \"1000\",\n  \"transactionLimit\" : \"100\",\n  \"role\" : \"user\"\n}, {\n  \"userid\" : \"5e9f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f\",\n  \"email\" : \"user@gmail.com\",\n  \"firstName\" : \"John\",\n  \"lastName\" : \"Doe\",\n  \"street\" : \"examplestreet 1a\",\n  \"city\" : \"Amsterdam\",\n  \"zipcode\" : \"1234AB\",\n  \"userstatus\" : \"active\",\n  \"dayLimit\" : \"1000\",\n  \"transactionLimit\" : \"100\",\n  \"role\" : \"user\"\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
+                if (offset == null) {
+                    log.error("Offset not implemented");
+                    return new ResponseEntity<List<UserDTO>>(HttpStatus.NOT_IMPLEMENTED);
+                }
+                else if (limit == null) {
+                    log.error("Limit not implemented");
+                    return new ResponseEntity<List<UserDTO>>(HttpStatus.NOT_IMPLEMENTED);
+                }
+                else {
+                    // needs more security checks 
+//                    List<User> users = (List<User>) userService.getAllUsers(offset, limit);
+//                    List<UserDTO> userDTOs = new ArrayList<>();
+//                    for (User user : users) {
+//                        UserDTO userDTO = user.getUserDTO();
+//                        userDTOs.add(userDTO);
+//                    }
+                    return new ResponseEntity<List<UserDTO>>(HttpStatus.OK);
+//                    return new ResponseEntity<List<UserDTO>>(userDTOs, HttpStatus.OK);
+                }
+            } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<List<UserDTO>>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -88,8 +128,16 @@ public class UsersApiController implements UsersApi {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                return new ResponseEntity<UserDTO>(objectMapper.readValue("{\n  \"userid\" : \"5e9f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f\",\n  \"email\" : \"user@gmail.com\",\n  \"firstName\" : \"John\",\n  \"lastName\" : \"Doe\",\n  \"street\" : \"examplestreet 1a\",\n  \"city\" : \"Amsterdam\",\n  \"zipcode\" : \"1234AB\",\n  \"userstatus\" : \"active\",\n  \"dayLimit\" : \"1000\",\n  \"transactionLimit\" : \"100\",\n  \"role\" : \"user\"\n}", UserDTO.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
+                if (id == null) {
+                    log.error("Not implemented");
+                    return new ResponseEntity<UserDTO>(HttpStatus.NOT_IMPLEMENTED);
+                }
+                else {
+                    User user = userService.getUser(id);
+                    UserDTO userDTO = user.getUserDTO();
+                    return new ResponseEntity<UserDTO>((UserDTO) userDTO, HttpStatus.OK);
+                }
+            } catch (Exception e) { // no IOException because object mapper does not work
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<UserDTO>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
