@@ -11,4 +11,5 @@ import java.util.UUID;
 public interface UserRepository extends PagingAndSortingRepository<User, UUID> {
 
     User findByUsername(String username);
+    User findbyUUID(UUID uuid);
 }

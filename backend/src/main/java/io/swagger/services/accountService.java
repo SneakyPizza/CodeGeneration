@@ -1,11 +1,14 @@
 package io.swagger.services;
 
 import io.swagger.model.AccountDTO;
+import io.swagger.model.AccountDTO.AccountTypeEnum;
 import io.swagger.model.dto.PostAccountDTO;
 import io.swagger.model.entities.Account;
 import io.swagger.model.entities.User;
 import io.swagger.repositories.AccountRepository;
+import io.swagger.utils.ibanGenerator;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,15 +25,26 @@ public class accountService {
     @Autowired
     private AccountRepository accountRepository;
 
+    @Autowired
+    private UserService userService;
+
+    private ibanGenerator ibanGen;
+
     //Add a new account object to the database (POST)
-    
     public void addAccount(PostAccountDTO account) {
-        //if(accountRepository.findByIBAN(account.getIBAN()) == null){
-            //accountRepository.save(account);
-        //} 
-        //else {
-            //throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "IBAN already in use");
-        //}
+        Account a = new Account<User>();
+        a.setAbsoluteLimit(account.getAbsoluteLimit());
+        a.setBalance(new BigDecimal(0));
+        a.setAccountType(Account.AccountTypeEnum.fromValue(account.getAccountType().toString()));
+
+        a.setActive(Account.ActiveEnum.fromValue(account.getActive().toString()));
+        a.setUser(userService.findByUUID(account.getUserid()));
+
+        a.setIBAN(ibanGen.GenerateIban());
+        while(accountRepository.findByIBAN(a.getIBAN()) != null){
+            a.setIBAN(ibanGen.GenerateIban());
+        }
+        accountRepository.save(a);
     }
     
 
@@ -42,12 +56,7 @@ public class accountService {
     
     //Get a Account with IBAN (GET)
     public Account getAccountWithIBAN (String iban){
-        if(accountRepository.findByIBAN(iban) != null){
-            //return accountRepository.findByIBAN(iban);
-            return (Account) accountRepository.findByIBAN(iban);
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account with given Iban was not found");
-        }
+        return (Account) accountRepository.findByIBAN(iban);
     }
 
     //Update a existing account with a new account object (PUT)

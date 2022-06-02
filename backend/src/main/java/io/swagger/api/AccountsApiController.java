@@ -58,7 +58,6 @@ public class AccountsApiController implements AccountsApi {
         this.objectMapper = objectMapper;
         this.request = request;
     }
-
     public ResponseEntity<AccountDTO> accountDeposit(@Parameter(in = ParameterIn.PATH, description = "Gets the account of the IBAN", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostTransactionDTO body) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
@@ -92,7 +91,8 @@ public class AccountsApiController implements AccountsApi {
         System.out.println("test");
         if (accept != null && accept.contains("application/json")) {
             try{
-                accountservice.addAccount(body);
+                //accountservice.addAccount(body);
+                
                 return new ResponseEntity<Void>(HttpStatus.OK);
             } catch(Exception e){
                 log.error("Couldn't serialize response for content type application/json", e);
@@ -122,6 +122,7 @@ public class AccountsApiController implements AccountsApi {
 , defaultValue="20")) @Valid @RequestParam(value = "limit", required = false, defaultValue="20") Integer limit) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
+            
             try {
                 //Convert iterable to list
                 List<Account> accountlist = StreamSupport.stream(accountservice.getAllAccounts()
@@ -141,8 +142,7 @@ public class AccountsApiController implements AccountsApi {
                 return new ResponseEntity<List<AccountDTO>>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-
-        return new ResponseEntity<List<AccountDTO>>(HttpStatus.I_AM_A_TEAPOT);
+        return new ResponseEntity<List<AccountDTO>>(HttpStatus.CONFLICT);
     }
 
     public ResponseEntity<List<NameSearchAccountDTO>> searchAccount(@NotNull @Parameter(in = ParameterIn.QUERY, description = "" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "fullName", required = true) String fullName,@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the result set." ,schema=@Schema(allowableValues={  }
