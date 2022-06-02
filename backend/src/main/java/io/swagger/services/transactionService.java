@@ -49,7 +49,7 @@ public class transactionService {
 
     //check if a transaction is valid
     public TransactionValidation isValidTransaction(Transaction transaction){
-        if(!validateIsOwner(transaction)){
+        if(!validateIsOwner(transaction) &&  transaction.getType() == TransactionType.TRANSFER) {
             return new TransactionValidation(false, "You do not have access to this account",TransactionValidation.TransactionValidationStatus.UNAUTHORIZED);
         }
         else if(!validatePINcode(transaction)){
@@ -67,10 +67,10 @@ public class transactionService {
         else if(!validateBalance(transaction)){
             return new TransactionValidation(false, "Insufficient funds", TransactionValidation.TransactionValidationStatus.INSUFFICIENT_FUNDS);
         }
-        else if(!validateTransactionLimit(transaction)){
+        else if(!validateTransactionLimit(transaction) && transaction.getType() != TransactionType.DEPOSIT){
             return new TransactionValidation(false, "Transaction limit exceeded", TransactionValidation.TransactionValidationStatus.TRANSACTION_LIMIT_EXCEEDED);
         }
-        else if(!validateDayLimit(transaction)){
+        else if(!validateDayLimit(transaction) && transaction.getType() != TransactionType.DEPOSIT){
             return new TransactionValidation(false, "Day limit exceeded", TransactionValidation.TransactionValidationStatus.DAILY_LIMIT_EXCEEDED);
         }
         else{
@@ -82,7 +82,6 @@ public class transactionService {
         //check if origin and target are active
         return transaction.getOrigin().getActive().equals(Account.ActiveEnum.ACTIVE) && transaction.getTarget().getActive().equals(Account.ActiveEnum.ACTIVE);
     }
-
 
     private boolean validateBalance(Transaction transaction) {
         //check if origin has enough money

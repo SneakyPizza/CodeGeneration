@@ -6,10 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.dto.ErrorDTO;
 import io.swagger.model.dto.GetTransactionDTO;
 import io.swagger.model.dto.PostTransactionDTO;
-import io.swagger.model.entities.Account;
-import io.swagger.model.entities.Transaction;
-import io.swagger.model.entities.TransactionValidation;
-import io.swagger.model.entities.User;
+import io.swagger.model.entities.*;
 import io.swagger.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -140,6 +137,7 @@ public class TransactionsApiController implements TransactionsApi {
                         //creste transaction object
                         Transaction transaction = new Transaction();
                         transaction.setPerformer(user);
+                        transaction.setType(TransactionType.TRANSFER);
                         transaction.setOrigin((Account) accountService.findByIBAN(body.getFromIBAN()));
                         transaction.setTarget((Account) accountService.findByIBAN(body.getToIBAN()));
                         transaction.setAmount(body.getAmount());

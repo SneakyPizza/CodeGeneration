@@ -3,6 +3,7 @@ package io.swagger.model;
 import io.swagger.model.dto.GetTransactionDTO;
 import io.swagger.model.entities.Account;
 import io.swagger.model.entities.Transaction;
+import io.swagger.model.entities.TransactionType;
 import io.swagger.model.entities.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -153,6 +154,19 @@ public class transactionTest {
     @Test
     void toGetTransactionDTOWithNull() {
         assertThrows(NullPointerException.class, () -> transaction.toGetTransactionDTO());
+    }
+
+    //testing type
+    @Test
+    void setTypeToNull() {
+        assertThrows(NullPointerException.class, () -> transaction.setType(null));
+    }
+
+    @Test
+    void setType() {
+        TransactionType type = TransactionType.TRANSFER;
+        transaction.setType(type);
+        assertEquals(type, transaction.getType());
     }
 
 }

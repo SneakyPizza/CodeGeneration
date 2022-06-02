@@ -4,7 +4,6 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import io.swagger.model.UserDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -16,7 +15,7 @@ import javax.validation.constraints.*;
  * AccountDTO
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-04T11:04:07.506Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-06-01T12:08:14.492Z[GMT]")
 
 
 public class AccountDTO   {
@@ -97,9 +96,6 @@ public class AccountDTO   {
 
   @JsonProperty("absoluteLimit")
   private BigDecimal absoluteLimit = null;
-
-  @JsonProperty("user")
-  private UserDTO user = null;
 
   public AccountDTO accountType(AccountTypeEnum accountType) {
     this.accountType = accountType;
@@ -218,29 +214,9 @@ public class AccountDTO   {
     this.absoluteLimit = absoluteLimit;
   }
 
-  public AccountDTO user(UserDTO user) {
-    this.user = user;
-    return this;
-  }
-
-  /**
-   * Get user
-   * @return user
-   **/
-  @Schema(description = "")
-  
-    @Valid
-    public UserDTO getUser() {
-    return user;
-  }
-
-  public void setUser(UserDTO user) {
-    this.user = user;
-  }
-
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(java.lang.Object o) {
     if (this == o) {
       return true;
     }
@@ -253,13 +229,12 @@ public class AccountDTO   {
         Objects.equals(this.IBAN, accountDTO.IBAN) &&
         Objects.equals(this.balance, accountDTO.balance) &&
         Objects.equals(this.active, accountDTO.active) &&
-        Objects.equals(this.absoluteLimit, accountDTO.absoluteLimit) &&
-        Objects.equals(this.user, accountDTO.user);
+        Objects.equals(this.absoluteLimit, accountDTO.absoluteLimit);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(accountType, userid, IBAN, balance, active, absoluteLimit, user);
+    return Objects.hash(accountType, userid, IBAN, balance, active, absoluteLimit);
   }
 
   @Override
@@ -273,7 +248,6 @@ public class AccountDTO   {
     sb.append("    balance: ").append(toIndentedString(balance)).append("\n");
     sb.append("    active: ").append(toIndentedString(active)).append("\n");
     sb.append("    absoluteLimit: ").append(toIndentedString(absoluteLimit)).append("\n");
-    sb.append("    user: ").append(toIndentedString(user)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -282,7 +256,7 @@ public class AccountDTO   {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
+  private String toIndentedString(java.lang.Object o) {
     if (o == null) {
       return "null";
     }

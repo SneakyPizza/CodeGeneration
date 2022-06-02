@@ -30,6 +30,8 @@ public class Transaction   {
   @NonNull
   private UUID id;
   @NonNull()
+  private TransactionType type;
+  @NonNull
   private String IBAN;
   @NonNull
   @OneToOne
