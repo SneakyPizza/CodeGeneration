@@ -79,7 +79,9 @@ public class UsersApiController implements UsersApi {
                     User user = new User();
                     user.getUserModel(userDTO);
                     user = userService.createUser(user);
-                    return new ResponseEntity<List<UserDTO>>(HttpStatus.OK);
+                    List<UserDTO> userDTOs = new ArrayList<>(1);
+                    userDTOs.add(user.getUserDTO());
+                    return new ResponseEntity<List<UserDTO>>(userDTOs, HttpStatus.OK);
                 }
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
@@ -135,7 +137,7 @@ public class UsersApiController implements UsersApi {
                 else {
                     User user = userService.getUser(id);
                     UserDTO userDTO = user.getUserDTO();
-                    return new ResponseEntity<UserDTO>((UserDTO) userDTO, HttpStatus.OK);
+                    return new ResponseEntity<UserDTO>(userDTO, HttpStatus.OK);
                 }
             } catch (Exception e) { // no IOException because object mapper does not work
                 log.error("Couldn't serialize response for content type application/json", e);
@@ -146,12 +148,22 @@ public class UsersApiController implements UsersApi {
         return new ResponseEntity<UserDTO>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<UserDTO> updateUser(@DecimalMin("1")@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") UUID id,@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody UserDTO body) {
+    public ResponseEntity<UserDTO> updateUser(@DecimalMin("1")@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") UUID id,@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody UserDTO userDTO) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                return new ResponseEntity<UserDTO>(objectMapper.readValue("{\n  \"userid\" : \"5e9f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f\",\n  \"email\" : \"user@gmail.com\",\n  \"firstName\" : \"John\",\n  \"lastName\" : \"Doe\",\n  \"street\" : \"examplestreet 1a\",\n  \"city\" : \"Amsterdam\",\n  \"zipcode\" : \"1234AB\",\n  \"userstatus\" : \"active\",\n  \"dayLimit\" : \"1000\",\n  \"transactionLimit\" : \"100\",\n  \"role\" : \"user\"\n}", UserDTO.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
+                if (userDTO == null) {
+                    log.error("Not implemented");
+                    return new ResponseEntity<UserDTO>(HttpStatus.NOT_IMPLEMENTED);
+                }
+                else {
+                    User user = new User();
+                    user.getUserModel(userDTO);
+                    user = userService.updateUser(user);
+                    UserDTO userDTO2 = user.getUserDTO();
+                    return new ResponseEntity<UserDTO>(userDTO2, HttpStatus.OK);
+                }
+            } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<UserDTO>(HttpStatus.INTERNAL_SERVER_ERROR);
             }

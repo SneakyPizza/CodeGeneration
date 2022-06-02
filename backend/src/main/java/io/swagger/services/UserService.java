@@ -2,9 +2,15 @@ package io.swagger.services;
 
 import io.swagger.model.entities.User;
 import io.swagger.repositories.UserRepository;
+import io.swagger.jwt.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import javax.naming.AuthenticationException;
 import java.util.UUID;
 
 @Service
@@ -12,6 +18,12 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtTokenProvider tokenProvider;
 
     public UserService (UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -46,6 +58,11 @@ public class UserService {
     // find by username
     public User findByUsername(String userName) {
         return userRepository.findByUsername(userName);
+    }
+
+    public String login(String username, String password) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        return tokenProvider.createToken(username, userRepository.findByUsername(username).getRoles());
     }
 }
 
