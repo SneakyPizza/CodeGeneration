@@ -36,7 +36,7 @@ public class User<list> {
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<UserDTO.Role> roles;
-
+    
     public UserDTO getUserDTO() {
     	UserDTO userDTO = new UserDTO();
     	userDTO.setUserid(this.id);
