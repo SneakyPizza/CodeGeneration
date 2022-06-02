@@ -38,7 +38,8 @@ public class accountService {
         a.setAccountType(Account.AccountTypeEnum.fromValue(account.getAccountType().toString()));
 
         a.setActive(Account.ActiveEnum.fromValue(account.getActive().toString()));
-        a.setUser(userService.findByUUID(account.getUserid()));
+        //a.setUser(userService.findByUUID(account.getUserid()));
+        a.setUser(userService.getUser(account.getUserid()));
 
         a.setIBAN(ibanGen.GenerateIban());
         while(accountRepository.findByIBAN(a.getIBAN()) != null){

@@ -3,6 +3,7 @@ package io.swagger.services;
 import io.swagger.model.entities.User;
 import io.swagger.repositories.UserRepository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +41,8 @@ public class UserService {
         return userRepository.findByUsername(userName);
     }
 
-    public User findByUUID(UUID uuid) {
-        return userRepository.findbyUUID(uuid);
+    public User getUser(UUID id) {
+        return userRepository.findById(id).get();
     }
 }
 

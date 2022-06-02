@@ -91,7 +91,7 @@ public class AccountsApiController implements AccountsApi {
         System.out.println("test");
         if (accept != null && accept.contains("application/json")) {
             try{
-                //accountservice.addAccount(body);
+                accountservice.addAccount(body);
                 
                 return new ResponseEntity<Void>(HttpStatus.OK);
             } catch(Exception e){
