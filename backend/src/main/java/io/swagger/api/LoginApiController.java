@@ -51,11 +51,9 @@ public class LoginApiController implements LoginApi {
                 if (loginDTO == null) {
                     log.error("Not implemented");
                     return new ResponseEntity<JWT_DTO>(HttpStatus.NOT_IMPLEMENTED);
-                }
-                else {
+                } else {
                     try {
-                        JWT_DTO jwt_dto = new JWT_DTO();
-                        jwt_dto.setJwTtoken(userService.login(loginDTO.getUsername(), loginDTO.getPassword()));
+                        JWT_DTO jwt_dto = userService.login(loginDTO.getUsername(), loginDTO.getPassword());
                         return new ResponseEntity<JWT_DTO>(HttpStatus.OK);
                     } catch (Exception e) {
                         log.error("Invalid username or password", e);
