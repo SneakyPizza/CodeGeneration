@@ -1,6 +1,7 @@
 package io.swagger.model.entities;
 
 import io.swagger.model.dto.GetTransactionDTO;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -51,6 +52,18 @@ public class Transaction   {
   @NonNull
   @OneToOne
   private User Performer;
+
+  //all args constructor
+    public Transaction(TransactionType type, String IBAN, Account Target, String pincode, BigDecimal amount, LocalDateTime timestamp, Account Origin, User Performer) {
+        this.type = type;
+        this.IBAN = IBAN;
+        this.Target = Target;
+        this.pincode = pincode;
+        this.amount = amount;
+        this.timestamp = timestamp;
+        this.Origin = Origin;
+        this.Performer = Performer;
+    }
 
   public GetTransactionDTO toGetTransactionDTO() {
     GetTransactionDTO transactionDTO = new GetTransactionDTO();
