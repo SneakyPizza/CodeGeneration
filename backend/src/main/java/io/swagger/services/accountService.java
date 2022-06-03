@@ -61,12 +61,19 @@ public class accountService {
     }
 
     //Update a existing account with a new account object (PUT)
+    /*
     public void updateAccount (Account account){
         if(accountRepository.findById(account.getId()) != null){
             accountRepository.save(account); //Not sure if this updates the account corresponding with he UUID or adds another account.
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found");
         }
+    }*/
+    
+    //update an account object to the database
+    public void updateAccount(Account account) {
+        accountRepository.save(account);
     }
+
     public Object findByIBAN(String iban) {return accountRepository.findByIBAN(iban);}
 }

@@ -9,11 +9,17 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    public UserService (UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     //generate 4number pincode
     public String generatePincode(){
@@ -24,25 +30,26 @@ public class UserService {
         return pincode.toString();
     }
 
-    public User createUser(User user) {
-        return userRepository.save(user);
-    }
-
-    public User updateUser(String userId, User user) {
-        return userRepository.save(user);
-    }
-
-    public User getUserByUserName(String userName) {
-        return userRepository.findByUsername(userName);
-    }
-
-    //finf by username
-    public User findByUsername(String userName) {
-        return userRepository.findByUsername(userName);
-    }
-
     public User getUser(UUID id) {
         return userRepository.findById(id).get();
+    }
+
+//    public User getAllUsers(int limit, int offset) {
+//        return (User) userRepository.getAllUsers(limit, offset);
+//    }
+
+    public User createUser(User user) {
+        user.setPincode(generatePincode());
+        return userRepository.save(user);
+    }
+
+    public User updateUser(User user) {
+        return userRepository.save(user);
+    }
+
+    // find by username
+    public User findByUsername(String userName) {
+        return userRepository.findByUsername(userName);
     }
 }
 

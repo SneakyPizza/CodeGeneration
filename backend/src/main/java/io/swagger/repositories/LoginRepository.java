@@ -7,10 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public interface UserRepository extends PagingAndSortingRepository<User, UUID> {
-
-
-    User findByUsername(String username);
-
-    //User findById(UUID id);
+public interface LoginRepository extends PagingAndSortingRepository<User, UUID> {
+//    boolean login(String username, String password);
 }
