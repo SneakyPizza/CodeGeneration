@@ -2,7 +2,6 @@ package io.swagger.api;
 
 import io.swagger.annotations.Api;
 import io.swagger.model.AccountDTO;
-<<<<<<< HEAD
 import io.swagger.model.AccountDTO.AccountTypeEnum;
 import io.swagger.model.dto.NameSearchAccountDTO;
 import io.swagger.model.dto.PostAccountDTO;
@@ -10,13 +9,11 @@ import io.swagger.model.dto.PostAccountDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.dto.PostTransactionDTO;
 import io.swagger.model.entities.Account;
-=======
 import io.swagger.model.dto.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.entities.*;
 import io.swagger.services.UserService;
->>>>>>> origin/backend-jaimy
 import io.swagger.services.accountService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -26,10 +23,7 @@ import lombok.extern.java.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-<<<<<<< HEAD
-=======
 import org.springframework.beans.factory.annotation.Value;
->>>>>>> origin/backend-jaimy
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -45,11 +39,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import java.io.Console;
 import java.io.IOException;
-<<<<<<< HEAD
 import java.util.ArrayList;
-=======
 import java.time.LocalDateTime;
->>>>>>> origin/backend-jaimy
 import java.util.List;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -71,15 +62,12 @@ public class AccountsApiController implements AccountsApi {
     private final HttpServletRequest request;
 
     @Autowired
-<<<<<<< HEAD
-=======
     private io.swagger.services.transactionService transactionService;
 
     @Autowired
     UserService userService;
 
     @Autowired
->>>>>>> origin/backend-jaimy
     private accountService accountservice;
 
     @org.springframework.beans.factory.annotation.Autowired
@@ -87,11 +75,7 @@ public class AccountsApiController implements AccountsApi {
         this.objectMapper = objectMapper;
         this.request = request;
     }
-<<<<<<< HEAD
-    public ResponseEntity<AccountDTO> accountDeposit(@Parameter(in = ParameterIn.PATH, description = "Gets the account of the IBAN", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostTransactionDTO body) {
-=======
     public ResponseEntity<? extends Object> accountDeposit(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody DepositDTO body) {
->>>>>>> origin/backend-jaimy
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
