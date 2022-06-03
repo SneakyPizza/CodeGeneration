@@ -1,10 +1,12 @@
 package io.swagger.services;
 
+import io.swagger.model.UserDTO;
 import io.swagger.model.dto.JWT_DTO;
 import io.swagger.model.entities.User;
 import io.swagger.repositories.UserRepository;
 import io.swagger.jwt.JwtTokenProvider;
 
+import java.awt.print.Pageable;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,10 +37,10 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
     private PincodeGenerator pincodeGenerator;
 
     public UserService (UserRepository userRepository) {
+        pincodeGenerator = new PincodeGenerator();
         this.userRepository = userRepository;
     }
 
@@ -46,15 +48,14 @@ public class UserService {
         return userRepository.findById(id).get();
     }
 
-    public User getAllUsers(int limit, int offset) {  return (User) userRepository.findAllUsers(limit, offset);  }
+    public User getAllUsers(int limit, int offset) {
+        return (User) userRepository.findAll(/*limit, offset*/); // doesnt work properly yet
+    }
 
-    public JWT_DTO createUser(User user) {
+    public User createUser(User user) {
         user.setPincode(pincodeGenerator.generatePincode());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
-        JWT_DTO jwt_dto = new JWT_DTO();
-        jwt_dto.setJwTtoken(tokenProvider.createToken(user.getUsername(), user.getRoles()));
-        return jwt_dto;
+        return userRepository.save(user);
     }
 
     public User updateUser(User user) {

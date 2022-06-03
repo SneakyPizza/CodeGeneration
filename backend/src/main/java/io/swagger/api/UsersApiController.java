@@ -69,7 +69,7 @@ public class UsersApiController implements UsersApi {
     }
 
     public ResponseEntity<List<UserDTO>> addUser(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody UserDTO userDTO) {
-        String accept = request.getHeader("Accept");
+        String accept = request.getHeader("Created");
         if (accept != null && accept.contains("application/json")) {
             try {
                 if (userDTO == null) {
@@ -83,15 +83,14 @@ public class UsersApiController implements UsersApi {
                     return new ResponseEntity<List<UserDTO>>(HttpStatus.NOT_IMPLEMENTED);
                 }
                 else {
-                    // create new user
+                    // initializes the user
                     User user = new User();
-                    user.getUserModel(userDTO);
-
-                    // DOES NOT WORK PROPERLY
-                    JWT_DTO jwt_dto = userService.createUser(user);
-                    String username = jwtTokenProvider.getUsername(jwt_dto.getJwTtoken());
+                    user = user.getUserModel(userDTO);
+                    // creates user in db
+                    User createdUser = userService.createUser(user);
+                    // puts userdto in list and sends it back
                     List<UserDTO> userDTOs = new ArrayList<>(1);
-                    userDTOs.add(userService.findByUsername(username).getUserDTO());
+                    userDTOs.add(createdUser.getUserDTO());
                     return new ResponseEntity<List<UserDTO>>(userDTOs, HttpStatus.OK);
                 }
             } catch (Exception e) { // no IOException because object mapper does not work
@@ -156,8 +155,7 @@ public class UsersApiController implements UsersApi {
                     // checks if null
                     log.error("Not implemented");
                     return new ResponseEntity<UserDTO>(HttpStatus.NOT_IMPLEMENTED);
-                } else if (UUID.fromString(id)) { // doesnt work
-
+                //} //else if (UUID.fromString(id)) { // doesnt work
                 } else {
                     // gets user and converts to userdto
                     User user = userService.getUser(id);
