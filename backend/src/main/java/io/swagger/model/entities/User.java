@@ -4,6 +4,7 @@ import javax.persistence.*;
 import javax.xml.bind.DatatypeConverter;
 
 import io.swagger.model.UserDTO;
+import io.swagger.model.dto.NameSearchAccountDTO;
 import lombok.Data;
 import org.hibernate.annotations.Type;
 
@@ -88,6 +89,14 @@ public class User<list> {
         user.setRoles(userDTO.getRoles());
         return user;
     }
+
+    public NameSearchAccountDTO toNameSearchAccountDTO(String iban){
+        NameSearchAccountDTO dto = new NameSearchAccountDTO();
+        dto.setFirstName(this.getFirstName());
+        dto.setLastName(this.getLastName());
+        dto.setIBAN(iban);
+        return dto;
+      }
 
     public void setPassword(String password) {
         try {

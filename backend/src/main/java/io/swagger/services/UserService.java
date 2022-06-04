@@ -3,6 +3,7 @@ package io.swagger.services;
 import io.swagger.model.entities.User;
 import io.swagger.repositories.UserRepository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -48,6 +49,14 @@ public class UserService {
     // find by username
     public User findByUsername(String userName) {
         return userRepository.findByUsername(userName);
+    }
+
+    public List<User> findByFirstName(String firstname){
+        return userRepository.findByFirstName(firstname);
+    }
+
+    public List<User> findByLastName(String lastname){
+        return userRepository.findByLastName(lastname);
     }
 }
 

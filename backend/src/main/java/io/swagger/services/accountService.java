@@ -35,30 +35,12 @@ public class accountService {
     //Add a new account object to the database (POST)
     public void addAccount(PostAccountDTO account) {
         Account a = new Account<User>();
-
         a.setAbsoluteLimit(account.getAbsoluteLimit());
-        System.out.println(a.getAbsoluteLimit());
-
         a.setBalance(new BigDecimal(0));
-        System.out.println(a.getBalance());
-
-
         a.setAccountType(Account.AccountTypeEnum.fromValue(account.getAccountType().toString()));
-        System.out.println(a.getAccountType());
-
         a.setActive(Account.ActiveEnum.fromValue(account.getActive().toString()));
-        System.out.println(a.getActive());
-
-        //a.setUser(userService.findByUUID(account.getUserid()));
         a.setUser(userService.getUser(account.getUserid()));
-        //System.out.println(a.getUser().toString());
-
         a.setIBAN(ibanGen.GenerateIban());
-        System.out.println(a.getIBAN());
-
-        //Check if the IBAN already exists
-
-
         accountRepository.save(a);
     }
     
@@ -92,6 +74,10 @@ public class accountService {
         a.setAbsoluteLimit(account.getAbsoluteLimit());
         a.setIBAN(account.getIBAN());
         accountRepository.save(a);
+    }
+
+    public List<Account> findByUserId(UUID userid){
+        return accountRepository.findByUserId(userid);
     }
 
     public Object findByIBAN(String iban) {return accountRepository.findByIBAN(iban);}
