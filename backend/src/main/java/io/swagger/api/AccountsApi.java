@@ -61,7 +61,7 @@ public interface AccountsApi {
     @RequestMapping(value = "/Accounts",
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<Void> addAccount(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostAccountDTO body);
+    ResponseEntity<? extends Object> addAccount(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostAccountDTO body);
 
 
     @Operation(summary = "Returns a account with IBAN.", description = "Optional extended description in CommonMark or HTML.", security = {
@@ -106,7 +106,7 @@ public interface AccountsApi {
         produces = { "application/json" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<AccountDTO> updateAccountStatus(@Parameter(in = ParameterIn.PATH, description = "Gets the account of the IBAN", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody AccountDTO body);
+    ResponseEntity<? extends Object> updateAccountStatus(@Parameter(in = ParameterIn.PATH, description = "Gets the account of the IBAN", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody AccountDTO body);
 
 }
 

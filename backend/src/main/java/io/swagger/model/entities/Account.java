@@ -6,6 +6,7 @@ import javax.persistence.*;
 
 import io.swagger.model.AccountDTO;
 import io.swagger.model.AccountDTO.AccountTypeEnum;
+import org.hibernate.annotations.Type;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -71,6 +72,7 @@ public class Account<Users> {
 
   @Id
   @GeneratedValue
+  @Type(type="uuid-char")
   private UUID id;
 
   private AccountTypeEnum accountType;

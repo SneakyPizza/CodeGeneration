@@ -3,11 +3,9 @@ package io.swagger.api;
 import io.swagger.annotations.Api;
 import io.swagger.model.AccountDTO;
 import io.swagger.model.AccountDTO.AccountTypeEnum;
-import io.swagger.model.dto.NameSearchAccountDTO;
-import io.swagger.model.dto.PostAccountDTO;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.model.dto.PostTransactionDTO;
+
 import io.swagger.model.entities.Account;
 import io.swagger.model.dto.*;
 
@@ -157,20 +155,19 @@ public class AccountsApiController implements AccountsApi {
         }
     }
 
-    public ResponseEntity<Void> addAccount(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostAccountDTO body) {
-        String accept = request.getHeader("Accept");
-        System.out.println("test");
+    public ResponseEntity<? extends Object> addAccount(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostAccountDTO body) {
+        String accept = request.getHeader("Content-Type");
         if (accept != null && accept.contains("application/json")) {
             try{
                 accountservice.addAccount(body);
                 
-                return new ResponseEntity<Void>(HttpStatus.OK);
+                return new ResponseEntity<PostAccountDTO>(HttpStatus.OK);
             } catch(Exception e){
                 log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<Void>(HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Couldn't serialize response for content type application/json", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+        return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Accept header is invalid", 406, "NOT_ACCEPTABLE"), HttpStatus.NOT_ACCEPTABLE);
     }
 
     public ResponseEntity<AccountDTO> getAccount(@Parameter(in = ParameterIn.PATH, description = "Gets the account of the IBAN", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
@@ -232,12 +229,14 @@ public class AccountsApiController implements AccountsApi {
         return new ResponseEntity<List<NameSearchAccountDTO>>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<AccountDTO> updateAccountStatus(@Parameter(in = ParameterIn.PATH, description = "Gets the account of the IBAN", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody AccountDTO body) {
+    public ResponseEntity<? extends Object> updateAccountStatus(@Parameter(in = ParameterIn.PATH, description = "Gets the account of the IBAN", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody AccountDTO body) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                return new ResponseEntity<AccountDTO>(objectMapper.readValue("{\n  \"accountType\" : \"savings\",\n  \"userid\" : \"5e9f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f\",\n  \"IBAN\" : \"NL 0750 8900 0000 0175 7814\",\n  \"balance\" : \"0\",\n  \"active\" : \"active\",\n  \"absoluteLimit\" : \"1000\"\n}", AccountDTO.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
+                accountservice.updateAccount(IBAN, body);
+                
+                //return new ResponseEntity<AccountDTO>(objectMapper.readValue("{\n  \"accountType\" : \"savings\",\n  \"userid\" : \"5e9f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f\",\n  \"IBAN\" : \"NL 0750 8900 0000 0175 7814\",\n  \"balance\" : \"0\",\n  \"active\" : \"active\",\n  \"absoluteLimit\" : \"1000\"\n}", AccountDTO.class), HttpStatus.NOT_IMPLEMENTED);
+            } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<AccountDTO>(HttpStatus.INTERNAL_SERVER_ERROR);
             }

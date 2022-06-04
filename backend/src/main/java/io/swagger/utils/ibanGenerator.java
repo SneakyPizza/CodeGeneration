@@ -8,11 +8,11 @@ public class ibanGenerator {
         StringBuilder s = new StringBuilder();
         Random r = new Random();
         s.append("NL");
-        s.append(r.nextInt(0, 9));
-        s.append(r.nextInt(0, 9));
+        s.append(r.nextInt(10));
+        s.append(r.nextInt(10));
         s.append("INHO0");
         for(int i = 0; i < 10;i++){
-            s.append(r.nextInt(0,9));
+            s.append(r.nextInt(10));
         }
         return s.toString();
     }

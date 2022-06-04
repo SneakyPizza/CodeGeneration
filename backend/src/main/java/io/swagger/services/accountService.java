@@ -12,6 +12,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+import javax.validation.constraints.NotNull;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.method.P;
@@ -28,23 +30,35 @@ public class accountService {
     @Autowired
     private UserService userService;
 
-    private ibanGenerator ibanGen;
+    private ibanGenerator ibanGen = new ibanGenerator();
 
     //Add a new account object to the database (POST)
     public void addAccount(PostAccountDTO account) {
         Account a = new Account<User>();
+
         a.setAbsoluteLimit(account.getAbsoluteLimit());
+        System.out.println(a.getAbsoluteLimit());
+
         a.setBalance(new BigDecimal(0));
+        System.out.println(a.getBalance());
+
+
         a.setAccountType(Account.AccountTypeEnum.fromValue(account.getAccountType().toString()));
+        System.out.println(a.getAccountType());
 
         a.setActive(Account.ActiveEnum.fromValue(account.getActive().toString()));
+        System.out.println(a.getActive());
+
         //a.setUser(userService.findByUUID(account.getUserid()));
         a.setUser(userService.getUser(account.getUserid()));
+        //System.out.println(a.getUser().toString());
 
         a.setIBAN(ibanGen.GenerateIban());
-        while(accountRepository.findByIBAN(a.getIBAN()) != null){
-            a.setIBAN(ibanGen.GenerateIban());
-        }
+        System.out.println(a.getIBAN());
+
+        //Check if the IBAN already exists
+
+
         accountRepository.save(a);
     }
     
@@ -71,8 +85,13 @@ public class accountService {
     }*/
     
     //update an account object to the database
-    public void updateAccount(Account account) {
-        accountRepository.save(account);
+    public void updateAccount(String iban, AccountDTO account) {
+        Account a = getAccountWithIBAN(iban);
+        a.setAccountType(Account.AccountTypeEnum.fromValue(account.getAccountType().toString()));
+        a.setActive(Account.ActiveEnum.fromValue(account.getActive().toString()));
+        a.setAbsoluteLimit(account.getAbsoluteLimit());
+        a.setIBAN(account.getIBAN());
+        accountRepository.save(a);
     }
 
     public Object findByIBAN(String iban) {return accountRepository.findByIBAN(iban);}
