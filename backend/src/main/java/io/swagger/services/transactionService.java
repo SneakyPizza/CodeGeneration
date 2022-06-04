@@ -1,8 +1,10 @@
 package io.swagger.services;
 
 import io.swagger.model.entities.*;
+import io.swagger.repositories.AccountRepository;
 import io.swagger.repositories.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -12,6 +14,13 @@ import java.util.UUID;
 
 @Service
 public class transactionService {
+
+    @Value("${server.bank.iban}")
+    private String bank_Iban;
+
+    @Autowired
+    private AccountRepository accountRepository;
+
     @Autowired
     private TransactionRepository transactionRepository;
 
@@ -31,40 +40,51 @@ public class transactionService {
     //Get all transactions from a specific user
     public List<Transaction> getTransactions(String iban) {return (List<Transaction>) transactionRepository.findByIBAN(iban);}
 
-//    //Get today's transactions from a user
-//    public List<Transaction> getTodaysTransactions(User user) {
-//       //get today's transactions from all the accounts owned by user
-//        List<Transaction> transactions = (List<Transaction>) transactionRepository.findByTimestamp(LocalDateTime.now());
-//        //filter transactions by user
-//        return transactions.stream().filter(transaction -> transaction.getOrigin().getUser().getId().equals(user.getId())).collect(java.util.stream.Collectors.toList());
-//    }
+    //check if transaction is exists
+    public boolean transactionExists(UUID id){
+        return transactionRepository.existsById(id);
+    }
+
+    //Get today's transactions from a user
+    public List<Transaction> getTodaysTransactions(Transaction transaction) {
+        LocalDateTime now = LocalDateTime.now();
+        return (List<Transaction>) transactionRepository.findByIBANAndTimestamp(transaction.getIBAN(), now);
+    }
 
     //check if a transaction is valid
     public TransactionValidation isValidTransaction(Transaction transaction){
-        if(!validateBalance(transaction)){
-            return new TransactionValidation(false, "Insufficient funds");
-        }
-        else if(!validateTransactionLimit(transaction)){
-            return new TransactionValidation(false, "Transaction limit exceeded");
-        }
-        else if(!validateDayLimit(transaction)){
-            return new TransactionValidation(false, "Day limit exceeded");
-        }
-        else if(!validateSavingsAccount(transaction)){
-            return new TransactionValidation(false, "Savings account cannot be used for this transaction");
-        }
-        else if(!validateThatOriginIsNotTarget(transaction)){
-            return new TransactionValidation(false, "Cannot transfer money to the same account");
-        }
-        else if(!validateIsOwner(transaction)){
-            return new TransactionValidation(false, "You do not have access to this account");
+        if(!validateIsOwner(transaction) &&  transaction.getType() == TransactionType.TRANSFER) {
+            return new TransactionValidation(false, "You do not have access to this account",TransactionValidation.TransactionValidationStatus.UNAUTHORIZED);
         }
         else if(!validatePINcode(transaction)){
-            return new TransactionValidation(false, "PIN code is incorrect");
+            return new TransactionValidation(false, "PIN code is incorrect",TransactionValidation.TransactionValidationStatus.INVALID_PIN);
+        }
+        else if(!validateIsActive(transaction)){
+            return new TransactionValidation(false, "Both accounts need to be active",TransactionValidation.TransactionValidationStatus.NOT_ACTIVE);
+        }
+        else if(!validateSavingsAccount(transaction)){
+            return new TransactionValidation(false, "Savings account cannot be used for this transaction", TransactionValidation.TransactionValidationStatus.NOT_ALLOWED);
+        }
+        else if(!validateThatOriginIsNotTarget(transaction)){
+            return new TransactionValidation(false, "Cannot transfer money to the same account", TransactionValidation.TransactionValidationStatus.NOT_ALLOWED);
+        }
+        else if(!validateBalance(transaction)){
+            return new TransactionValidation(false, "Insufficient funds", TransactionValidation.TransactionValidationStatus.INSUFFICIENT_FUNDS);
+        }
+        else if(!validateTransactionLimit(transaction) && transaction.getType() != TransactionType.DEPOSIT){
+            return new TransactionValidation(false, "Transaction limit exceeded", TransactionValidation.TransactionValidationStatus.TRANSACTION_LIMIT_EXCEEDED);
+        }
+        else if(!validateDayLimit(transaction) && transaction.getType() != TransactionType.DEPOSIT){
+            return new TransactionValidation(false, "Day limit exceeded", TransactionValidation.TransactionValidationStatus.DAILY_LIMIT_EXCEEDED);
         }
         else{
-            return new TransactionValidation(true, "Transaction is valid");
+            return new TransactionValidation(true, "Transaction is valid", TransactionValidation.TransactionValidationStatus.VALID);
         }
+    }
+    //validate that origin and target are active accounts
+    private boolean validateIsActive(Transaction transaction){
+        //check if origin and target are active
+        return transaction.getOrigin().getActive().equals(Account.ActiveEnum.ACTIVE) && transaction.getTarget().getActive().equals(Account.ActiveEnum.ACTIVE);
     }
 
     private boolean validateBalance(Transaction transaction) {
@@ -76,20 +96,51 @@ public class transactionService {
         return transaction.getPerformer().getPincode().equals(transaction.getPincode());
     }
 
-    //!!!!
-    //!!!!!!
-    //!!!!!!
-    //!!!!!!
-    //note done yet!!!!
-    //!!!!!!
-    //!!!!!!
     public boolean validateDayLimit(Transaction transaction){
-        //check if day limit is not exceeded
-        return transaction.getOrigin().getUser().getDayLimit().subtract(transaction.getAmount()).doubleValue() >= 0;
+       //check if performer is admin and if so, return true
+        if(transaction.getPerformer().getRoles().contains("ROLE_ADMIN")){
+           //if performer owns origin
+            if(transaction.getOrigin().getUser().getId().equals(transaction.getPerformer().getId())){
+                //check if origin has exceeded day limit
+                //get all transactions from origin
+                List<Transaction> transactions = getTodaysTransactions(transaction);
+                //get sum of all transactions
+                BigDecimal sum = BigDecimal.ZERO;
+                for(Transaction t : transactions){
+                    sum = sum.add(t.getAmount());
+                }
+                //check if sum is greater than day limit
+                return sum.add(transaction.getAmount()).doubleValue() <= transaction.getPerformer().getDayLimit().doubleValue();
+            }
+            else{
+                return true;
+            }
+        }
+        else if(transaction.getPerformer().getRoles().contains("ROLE_ADMIN") && !transaction.getOrigin().getIBAN().equals(bank_Iban)){
+            return true;
+        }
+        else{
+            //check if origin has exceeded day limit
+            //get all transactions from origin
+            List<Transaction> transactions = getTodaysTransactions(transaction);
+            //get sum of all transactions
+            BigDecimal sum = BigDecimal.ZERO;
+            for(Transaction t : transactions){
+                sum = sum.add(t.getAmount());
+            }
+            //check if sum is greater than day limit
+            return sum.add(transaction.getAmount()).doubleValue() <= transaction.getPerformer().getDayLimit().doubleValue();
+        }
     }
     public boolean validateTransactionLimit(Transaction transaction){
         //check if transaction limit is not exceeded
-        return transaction.getOrigin().getUser().getTransactionLimit().doubleValue() >= transaction.getAmount().doubleValue();
+        if(transaction.getOrigin().getIBAN().equals(bank_Iban)){
+            return true;
+        }
+        else{
+            return transaction.getOrigin().getUser().getTransactionLimit().doubleValue() >= transaction.getAmount().doubleValue();
+
+        }
     }
     public boolean validateSavingsAccount(Transaction transaction){
         //only the owner of the savings account can transfer money to it or from it.
@@ -119,4 +170,11 @@ public class transactionService {
         }
     }
 
+    public void doTransaction(Transaction transaction) {
+        transaction.execute();
+        transactionRepository.save(transaction);
+        //save accounts
+        accountRepository.save(transaction.getOrigin());
+        accountRepository.save(transaction.getTarget());
+    }
 }
