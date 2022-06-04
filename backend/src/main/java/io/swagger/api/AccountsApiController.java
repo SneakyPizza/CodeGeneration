@@ -59,8 +59,6 @@ public class AccountsApiController implements AccountsApi {
         this.request = request;
     }
     public ResponseEntity<? extends Object> accountDeposit(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody DepositDTO body) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
             try {
                 //get curent user from security context
                 User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -78,6 +76,7 @@ public class AccountsApiController implements AccountsApi {
                         transaction.setType(TransactionType.DEPOSIT);
                         transaction.setOrigin((Account) accountservice.findByIBAN(bank_Iban));
                         transaction.setTarget((Account) accountservice.findByIBAN(body.getToIBAN()));
+                        transaction.setIBAN(bank_Iban);
                         transaction.setAmount(body.getAmount());
                         transaction.setPincode(body.getPincode());
                         return doTransaction(transaction);
@@ -92,16 +91,10 @@ public class AccountsApiController implements AccountsApi {
                 log.error("Internal server error", e);
                 return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "An internal server error had occured!", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        }
-        else{
-            log.error("Accept header is not valid");
-            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Accept header is not valid!", 406, "NOT_ACCEPTABLE"), HttpStatus.NOT_ACCEPTABLE);
-        }
     }
 
     public ResponseEntity<? extends Object> accountWithdraw(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody WithdrawDTO body) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
+
             try {
                 //get curent user from security context
                 User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -117,6 +110,7 @@ public class AccountsApiController implements AccountsApi {
                         Transaction transaction = new Transaction();
                         transaction.setPerformer(user);
                         transaction.setType(TransactionType.WITHDRAWAL);
+                        transaction.setIBAN(body.getFromIBAN());
                         transaction.setOrigin((Account) accountservice.findByIBAN(body.getFromIBAN()));
                         transaction.setTarget((Account) accountservice.findByIBAN(bank_Iban));
                         transaction.setAmount(body.getAmount());
@@ -133,11 +127,6 @@ public class AccountsApiController implements AccountsApi {
                 log.error("Internal server error", e);
                 return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "An internal server error had occured!", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        }
-        else{
-            log.error("Accept header is not valid");
-            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Accept header is not valid!", 406, "NOT_ACCEPTABLE"), HttpStatus.NOT_ACCEPTABLE);
-        }
     }
 
     public ResponseEntity<Void> addAccount(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostAccountDTO body) {
@@ -208,7 +197,7 @@ public class AccountsApiController implements AccountsApi {
     private ResponseEntity<? extends Object> doTransaction(Transaction transaction){
         //validate transaction
         TransactionValidation validation = transactionService.isValidTransaction(transaction);
-        if(validation.getIsValid().equals(TransactionValidation.TransactionValidationStatus.VALID)){
+        if(validation.getStatus() == TransactionValidation.TransactionValidationStatus.VALID){
             //if transaction is valid
             transactionService.doTransaction(transaction);
             //check if transaction is executed

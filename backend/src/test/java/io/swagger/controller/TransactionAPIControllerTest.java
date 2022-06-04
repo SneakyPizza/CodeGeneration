@@ -147,11 +147,11 @@ public class TransactionAPIControllerTest {
         List<Transaction> transactions = List.of(transaction);
         when(transactionService.getAllTransactions()).thenReturn(transactions);
 
-        mockMvc.perform(get("/transactions/NL01INHO0000000001")
-                .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/Transactions/NL01INHO0000000001")
+                .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)));
     }
-    
+
 }

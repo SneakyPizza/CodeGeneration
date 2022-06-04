@@ -90,6 +90,7 @@ public class Transaction   {
 
   //execute transaction
   public void execute(){
+        this.setTimestamp(LocalDateTime.now());
     this.Origin.setBalance(this.Origin.getBalance().subtract(this.amount));
     this.Target.setBalance(this.Target.getBalance().add(this.amount));
   }

@@ -59,7 +59,7 @@ public class MyApplicationRunner implements ApplicationRunner {
         Bank.setStreet("Bank");
         Bank.setCity("Bank");
         Bank.setZipcode("Bank");
-        Bank.setDayLimit(new BigDecimal(0));
+        Bank.setDayLimit(new BigDecimal(String.valueOf(BigDecimal.valueOf(900000000000000L))));
         Bank.setTransactionLimit(new BigDecimal(0));
         Bank.setRoles(new ArrayList<>(List.of(Role.ROLE_ADMIN)));
 
@@ -68,15 +68,15 @@ public class MyApplicationRunner implements ApplicationRunner {
         BankAccount.setBalance(new BigDecimal(1000000000));
         BankAccount.setUser(Bank);
         BankAccount.setAccountType(Account.AccountTypeEnum.CURRENT);
-        BankAccount.setAbsoluteLimit(new BigDecimal(1000000000));
+        BankAccount.setAbsoluteLimit(new BigDecimal(0));
         BankAccount.setActive(Account.ActiveEnum.ACTIVE);
 
         Account testAccount = new Account();
         testAccount.setIBAN("NL01INHO0000000002");
         testAccount.setBalance(new BigDecimal(0));
         testAccount.setUser(testUser);
-        testAccount.setAccountType(Account.AccountTypeEnum.SAVINGS);
-        testAccount.setAbsoluteLimit(new BigDecimal(1000000000));
+        testAccount.setAccountType(Account.AccountTypeEnum.CURRENT);
+        testAccount.setAbsoluteLimit(new BigDecimal(0));
         testAccount.setActive(Account.ActiveEnum.ACTIVE);
 
         testUser.setAccounts(new ArrayList<>(List.of(testAccount)));

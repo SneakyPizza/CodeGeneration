@@ -5,6 +5,7 @@ import javax.xml.bind.DatatypeConverter;
 
 import io.swagger.model.UserDTO;
 import lombok.Data;
+import org.hibernate.annotations.Type;
 
 import java.math.BigDecimal;
 import java.security.MessageDigest;
@@ -17,6 +18,7 @@ import java.util.UUID;
 public class User<list> {
     @Id
     @GeneratedValue
+    @Type(type="uuid-char")
     private UUID id;
 
     private String username;
