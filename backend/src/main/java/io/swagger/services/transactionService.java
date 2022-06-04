@@ -71,7 +71,7 @@ public class transactionService {
         else if(!validateBalance(transaction)){
             return new TransactionValidation(false, "Insufficient funds", TransactionValidation.TransactionValidationStatus.INSUFFICIENT_FUNDS);
         }
-        else if(!validateTransactionLimit(transaction) && transaction.getType() != TransactionType.DEPOSIT){
+        else if(!validateTransactionLimit(transaction)){
             return new TransactionValidation(false, "Transaction limit exceeded", TransactionValidation.TransactionValidationStatus.TRANSACTION_LIMIT_EXCEEDED);
         }
         else if(!validateDayLimit(transaction) && transaction.getType() != TransactionType.DEPOSIT){
@@ -134,8 +134,11 @@ public class transactionService {
     }
     public boolean validateTransactionLimit(Transaction transaction){
         //check if transaction limit is not exceeded
-        if(transaction.getOrigin().getIBAN().equals(bank_Iban)){
+        if(transaction.getOrigin().getIBAN().equals(bank_Iban) && transaction.getPerformer().getRoles().contains("ROLE_ADMIN") && transaction.getType() != TransactionType.DEPOSIT){
             return true;
+        }
+        else if(transaction.getType() == TransactionType.DEPOSIT){
+            return transaction.getTarget().getUser().getTransactionLimit().doubleValue() >= transaction.getAmount().doubleValue();
         }
         else{
             return transaction.getOrigin().getUser().getTransactionLimit().doubleValue() >= transaction.getAmount().doubleValue();
