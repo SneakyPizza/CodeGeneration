@@ -12,33 +12,33 @@ import javax.validation.constraints.*;
  * LoginDTO
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-04T11:04:07.506Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-06-02T12:21:33.956Z[GMT]")
 
 
 public class LoginDTO   {
-  @JsonProperty("email")
-  private String email = null;
+  @JsonProperty("username")
+  private String username = null;
 
   @JsonProperty("password")
   private String password = null;
 
-  public LoginDTO email(String email) {
-    this.email = email;
+  public LoginDTO username(String username) {
+    this.username = username;
     return this;
   }
 
   /**
-   * Get email
-   * @return email
+   * Get username
+   * @return username
    **/
   @Schema(description = "")
-  
-    public String getEmail() {
-    return email;
+
+  public String getUsername() {
+    return username;
   }
 
-  public void setEmail(String email) {
-    this.email = email;
+  public void setUsername(String username) {
+    this.username = username;
   }
 
   public LoginDTO password(String password) {
@@ -51,8 +51,8 @@ public class LoginDTO   {
    * @return password
    **/
   @Schema(description = "")
-  
-    public String getPassword() {
+
+  public String getPassword() {
     return password;
   }
 
@@ -62,7 +62,7 @@ public class LoginDTO   {
 
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(java.lang.Object o) {
     if (this == o) {
       return true;
     }
@@ -70,21 +70,21 @@ public class LoginDTO   {
       return false;
     }
     LoginDTO loginDTO = (LoginDTO) o;
-    return Objects.equals(this.email, loginDTO.email) &&
-        Objects.equals(this.password, loginDTO.password);
+    return Objects.equals(this.username, loginDTO.username) &&
+            Objects.equals(this.password, loginDTO.password);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(email, password);
+    return Objects.hash(username, password);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class LoginDTO {\n");
-    
-    sb.append("    email: ").append(toIndentedString(email)).append("\n");
+
+    sb.append("    username: ").append(toIndentedString(username)).append("\n");
     sb.append("    password: ").append(toIndentedString(password)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -94,7 +94,7 @@ public class LoginDTO   {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
+  private String toIndentedString(java.lang.Object o) {
     if (o == null) {
       return "null";
     }

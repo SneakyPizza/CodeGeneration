@@ -10,6 +10,7 @@ import org.hibernate.annotations.Type;
 import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,8 +38,8 @@ public class User<list> {
     private List<Account> accounts;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    private List<UserDTO.Role> roles;
-
+    private List<Role> roles;
+    
     public UserDTO getUserDTO() {
     	UserDTO userDTO = new UserDTO();
     	userDTO.setUserid(this.id);
@@ -52,7 +53,7 @@ public class User<list> {
     	userDTO.setZipcode(this.zipcode);
     	userDTO.setDayLimit(this.dayLimit);
     	userDTO.setTransactionLimit(this.transactionLimit);
-    	userDTO.setRoles(this.roles);
+    	userDTO.setRoles(Collections.singletonList(UserDTO.Role.fromValue(this.roles.toString())));
     	return userDTO;
     }
 

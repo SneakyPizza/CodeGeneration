@@ -1,10 +1,25 @@
 package io.swagger.services;
 
+import io.swagger.model.UserDTO;
+import io.swagger.model.dto.JWT_DTO;
 import io.swagger.model.entities.User;
 import io.swagger.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import io.swagger.jwt.JwtTokenProvider;
 
+import java.awt.print.Pageable;
+import java.util.Optional;
+import java.util.UUID;
+
+import io.swagger.utils.PincodeGenerator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import javax.naming.AuthenticationException;
 import java.util.UUID;
 
 @Service
@@ -13,29 +28,33 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public UserService (UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
-    //generate 4number pincode
-    public String generatePincode(){
-        StringBuilder pincode = new StringBuilder();
-        for(int i = 0; i < 4; i++){
-            pincode.append((int) (Math.random() * 10));
-        }
-        return pincode.toString();
+    @Autowired
+    private JwtTokenProvider tokenProvider;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    private PincodeGenerator pincodeGenerator;
+
+    public UserService (UserRepository userRepository) {
+        pincodeGenerator = new PincodeGenerator();
+        this.userRepository = userRepository;
     }
 
     public User getUser(UUID id) {
         return userRepository.findById(id).get();
     }
 
-//    public User getAllUsers(int limit, int offset) {
-//        return (User) userRepository.getAllUsers(limit, offset);
-//    }
+    public User getAllUsers(int limit, int offset) {
+        return (User) userRepository.findAll(/*limit, offset*/); // doesnt work properly yet
+    }
 
     public User createUser(User user) {
-        user.setPincode(generatePincode());
+        user.setPincode(pincodeGenerator.generatePincode());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
@@ -46,6 +65,14 @@ public class UserService {
     // find by username
     public User findByUsername(String userName) {
         return userRepository.findByUsername(userName);
+    }
+
+    public JWT_DTO login(String username, String password) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        JWT_DTO jwt_dto = new JWT_DTO();
+        User user = userRepository.findByUsername(username);
+        jwt_dto.setJwTtoken(tokenProvider.createToken(username, user.getRoles()));
+        return jwt_dto;
     }
 }
 
