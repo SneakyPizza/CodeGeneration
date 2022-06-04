@@ -43,7 +43,7 @@ public class accountService {
 
         a.setIBAN(ibanGen.GenerateIban());
         while(accountRepository.findByIBAN(a.getIBAN()) != null){
-            a.setIBAN(ibanGen.GenerateIban());
+//            a.setIBAN(ibanGen.GenerateIban());
         }
         accountRepository.save(a);
     }
@@ -66,12 +66,6 @@ public class accountService {
     }
 
     //Update a existing account with a new account object (PUT)
-    public void updateAccount (Account account){
-        if(accountRepository.findById(account.getId()) != null){
-            accountRepository.save(account); //Not sure if this updates the account corresponding with he UUID or adds another account.
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found");
-        }
-    }
+
     public Object findByIBAN(String iban) {return accountRepository.findByIBAN(iban);}
 }
