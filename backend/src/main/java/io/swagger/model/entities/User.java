@@ -5,10 +5,12 @@ import javax.xml.bind.DatatypeConverter;
 
 import io.swagger.model.UserDTO;
 import lombok.Data;
+import org.hibernate.annotations.Type;
 
 import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,6 +19,7 @@ import java.util.UUID;
 public class User<list> {
     @Id
     @GeneratedValue
+    @Type(type="uuid-char")
     private UUID id;
 
     private String username;
@@ -35,7 +38,7 @@ public class User<list> {
     private List<Account> accounts;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    private List<UserDTO.Role> roles;
+    private List<Role> roles;
     
     public UserDTO getUserDTO() {
     	UserDTO userDTO = new UserDTO();
@@ -50,7 +53,7 @@ public class User<list> {
     	userDTO.setZipcode(this.zipcode);
     	userDTO.setDayLimit(this.dayLimit);
     	userDTO.setTransactionLimit(this.transactionLimit);
-    	userDTO.setRoles(this.roles);
+    	userDTO.setRoles(Collections.singletonList(UserDTO.Role.fromValue(this.roles.toString())));
     	return userDTO;
     }
 
@@ -69,35 +72,5 @@ public class User<list> {
         user.setTransactionLimit(userDTO.getTransactionLimit());
         user.setRoles(userDTO.getRoles());
         return user;
-    }
-
-    public void setPassword(String password) { // needs better hashing algorithm
-        try {
-            // encrypts password in MD5
-            MessageDigest md = null;
-            md = MessageDigest.getInstance("MD5");
-            md.update(password.getBytes());
-            byte[] digest = md.digest();
-            String hash = DatatypeConverter
-                    .printHexBinary(digest).toUpperCase();
-            this.password = hash;
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void setPincode(String Pincode) {
-        try {
-            // encrypts password in MD5
-            MessageDigest md = null;
-            md = MessageDigest.getInstance("MD5");
-            md.update(Pincode.getBytes());
-            byte[] digest = md.digest();
-            String hash = DatatypeConverter
-                    .printHexBinary(digest).toUpperCase();
-            this.Pincode = hash;
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

@@ -45,22 +45,17 @@ public class LoginApiController implements LoginApi {
     }
 
     public ResponseEntity<JWT_DTO> login(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody LoginDTO loginDTO) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                if (loginDTO == null) {
-                    log.error("Not implemented");
-                    return new ResponseEntity<JWT_DTO>(HttpStatus.NOT_IMPLEMENTED);
-                } else {
-                    JWT_DTO jwt_dto = userService.login(loginDTO.getUsername(), loginDTO.getPassword());
-                    return new ResponseEntity<JWT_DTO>(HttpStatus.OK);
-                }
-            } catch (Exception e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<JWT_DTO>(HttpStatus.INTERNAL_SERVER_ERROR);
+        try {
+            if (loginDTO == null) {
+                log.error("Not implemented");
+                return new ResponseEntity<JWT_DTO>(HttpStatus.NOT_IMPLEMENTED);
+            } else {
+                JWT_DTO jwt_dto = userService.login(loginDTO.getUsername(), loginDTO.getPassword());
+                return new ResponseEntity<JWT_DTO>(jwt_dto, HttpStatus.OK);
             }
+        } catch (Exception e) {
+            log.error("Couldn't serialize response for content type application/json", e);
+            return new ResponseEntity<JWT_DTO>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return new ResponseEntity<JWT_DTO>(HttpStatus.NOT_IMPLEMENTED);
     }
 }

@@ -44,6 +44,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/configuration/**",
             "/webjars/**",
             "/Users/**",
+            "/Users/{id}",
             "/Users",
     };
 
