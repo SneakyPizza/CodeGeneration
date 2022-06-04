@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private JwtTokenFilter jwtTokenFilter;
+    JwtTokenFilter jwtTokenFilter;
 
     private static final String[] AUTH_WHITELIST = {
             "/login",
