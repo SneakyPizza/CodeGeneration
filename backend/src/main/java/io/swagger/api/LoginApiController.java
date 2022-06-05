@@ -47,15 +47,15 @@ public class LoginApiController implements LoginApi {
     public ResponseEntity<JWT_DTO> login(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody LoginDTO loginDTO) {
         try {
             if (loginDTO == null) {
-                log.error("Not implemented");
-                return new ResponseEntity<JWT_DTO>(HttpStatus.NOT_IMPLEMENTED);
+                log.error("Bad request: id is null");
+                return new ResponseEntity<JWT_DTO>(HttpStatus.BAD_REQUEST);
             } else {
                 JWT_DTO jwt_dto = userService.login(loginDTO.getUsername(), loginDTO.getPassword());
                 return new ResponseEntity<JWT_DTO>(jwt_dto, HttpStatus.OK);
             }
         } catch (Exception e) {
-            log.error("Couldn't serialize response for content type application/json", e);
-            return new ResponseEntity<JWT_DTO>(HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error("Username/password incorrect", e);
+            return new ResponseEntity<JWT_DTO>(HttpStatus.UNAUTHORIZED);
         }
     }
 }

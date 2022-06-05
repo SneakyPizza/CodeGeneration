@@ -1,10 +1,12 @@
 package io.swagger.api;
 
 import io.swagger.annotations.Api;
+import io.swagger.model.GetUserDTO;
 import io.swagger.model.dto.ErrorDTO;
 import io.swagger.model.UserDTO;
 import io.swagger.model.dto.GetTransactionDTO;
 import io.swagger.model.dto.JWT_DTO;
+import io.swagger.model.entities.Account;
 import io.swagger.model.entities.User;
 import io.swagger.jwt.JwtTokenProvider;
 
@@ -44,6 +46,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-04T11:04:07.506Z[GMT]")
 @RestController
@@ -92,13 +96,13 @@ public class UsersApiController implements UsersApi {
                 return new ResponseEntity<List<UserDTO>>(userDTOs, HttpStatus.OK);
             }
         } catch (Exception e) { // no IOException because object mapper does not work
-            log.error("Couldn't serialize response for content type application/json", e);
-            return new ResponseEntity<List<UserDTO>>(HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error("Not found", e);
+            return new ResponseEntity<List<UserDTO>>(HttpStatus.NOT_FOUND);
         }
     }
 
-    public ResponseEntity<List<UserDTO>> getAllUsers(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the result set." ,schema=@Schema(allowableValues={  }
-)) @Valid @RequestParam(value = "offset", required = false) Integer offset,@Min(1) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return." ,schema=@Schema(allowableValues={  }, minimum="1", maximum="50"
+    public ResponseEntity<List<GetUserDTO>> getAllUsers(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the result set." ,schema=@Schema(allowableValues={  }
+)) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Min(1) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return." ,schema=@Schema(allowableValues={  }, minimum="1", maximum="50"
 , defaultValue="20")) @Valid @RequestParam(value = "limit", required = false, defaultValue="20") Integer limit) {
         String accept = request.getHeader("Accept");
         try {
@@ -116,55 +120,55 @@ public class UsersApiController implements UsersApi {
             if (limit >= 50) {
                 // checks if too high of a value
                 log.error("Payload Too Large");
-                return new ResponseEntity<List<UserDTO>>(HttpStatus.PAYLOAD_TOO_LARGE);
+                return new ResponseEntity<List<GetUserDTO>>(HttpStatus.PAYLOAD_TOO_LARGE);
             } else if (offset > 2000000000) {
                 // checks if too high of a value
                 log.error("Payload Too Large");
-                return new ResponseEntity<List<UserDTO>>(HttpStatus.PAYLOAD_TOO_LARGE);
+                return new ResponseEntity<List<GetUserDTO>>(HttpStatus.PAYLOAD_TOO_LARGE);
             } else {
                 // get all users
-                List<User> users = (List<User>) userService.getAllUsers(offset, limit);
-                List<UserDTO> userDTOs = new ArrayList<>(users.size());
+                List<User> users = (List<User>) userService.getAllUsers();
+                List<GetUserDTO> getUserDTOs = new ArrayList<>();
                 // turns all users in userdtos
                 for (User user : users) {
-                    UserDTO userDTO = user.getUserDTO();
-                    userDTOs.add(userDTO);
+                    GetUserDTO getUserDTO = user.getGetUserDTO();
+                    getUserDTOs.add(getUserDTO);
                 }
-                return new ResponseEntity<List<UserDTO>>(userDTOs, HttpStatus.OK);
+                return new ResponseEntity<List<GetUserDTO>>(getUserDTOs, HttpStatus.OK);
             }
         } catch (Exception e) { // no IOException because object mapper does not work
-            log.error("Couldn't serialize response for content type application/json", e);
-            return new ResponseEntity<List<UserDTO>>(HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error("Not found", e);
+            return new ResponseEntity<List<GetUserDTO>>(HttpStatus.NOT_FOUND);
         }
     }
 
-    public ResponseEntity<UserDTO> getUser(@DecimalMin("1")@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") UUID id) {
+    public ResponseEntity<GetUserDTO> getUser(/*@DecimalMin("1")*/@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") UUID id) {
         try {
             if (id == null) {
                 // checks if null
                 log.error("Not implemented");
-                return new ResponseEntity<UserDTO>(HttpStatus.NOT_IMPLEMENTED);
-                //} //else if (UUID.fromString(id)) { // doesnt work
+                return new ResponseEntity<GetUserDTO>(HttpStatus.NOT_IMPLEMENTED);
             } else {
                 // gets user and converts to userdto
                 User user = userService.getUser(id);
+                System.out.println(user);
 
                 if (user == null) {
                     // checks if null
-                    log.error("Not found");
-                    return new ResponseEntity<UserDTO>(HttpStatus.NOT_FOUND);
+                    log.error("Bad request: user is null");
+                    return new ResponseEntity<GetUserDTO>(HttpStatus.BAD_REQUEST);
                 } else {
-                    UserDTO userDTO = user.getUserDTO();
-                    return new ResponseEntity<UserDTO>(userDTO, HttpStatus.OK);
+                    GetUserDTO getUserDTO = user.getGetUserDTO();
+                    return new ResponseEntity<GetUserDTO>(getUserDTO, HttpStatus.OK);
                 }
             }
         } catch (Exception e) { // no IOException because object mapper does not work
-            log.error("Couldn't serialize response for content type application/json", e);
-            return new ResponseEntity<UserDTO>(HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error("Not found", e);
+            return new ResponseEntity<GetUserDTO>(HttpStatus.NOT_FOUND);
         }
     }
 
-    public ResponseEntity<UserDTO> updateUser(@DecimalMin("1")@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") UUID id,@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody UserDTO userDTO) {
+    public ResponseEntity<UserDTO> updateUser(/*@DecimalMin("1")*/@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") UUID id,@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody UserDTO userDTO) {
         try {
             if (userDTO == null) {
                 log.error("Not implemented");
@@ -172,14 +176,14 @@ public class UsersApiController implements UsersApi {
             }
             else {
                 User user = new User();
-                user.getUserModel(userDTO);
-                user = userService.updateUser(user);
-                UserDTO userDTO2 = user.getUserDTO();
-                return new ResponseEntity<UserDTO>(userDTO2, HttpStatus.OK);
+                user = user.getUserModel(userDTO);
+                User updatedUser = userService.updateUser(user);
+                UserDTO updatedUserDTO = updatedUser.getUserDTO();
+                return new ResponseEntity<UserDTO>(updatedUserDTO, HttpStatus.OK);
             }
         } catch (Exception e) { // no IOException because object mapper does not work
-            log.error("Couldn't serialize response for content type application/json", e);
-            return new ResponseEntity<UserDTO>(HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error("Not found", e);
+            return new ResponseEntity<UserDTO>(HttpStatus.NOT_FOUND);
         }
     }
 

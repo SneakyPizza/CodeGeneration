@@ -1,26 +1,19 @@
 package io.swagger.services;
 
-import io.swagger.model.UserDTO;
 import io.swagger.model.dto.JWT_DTO;
 import io.swagger.model.entities.User;
 import io.swagger.repositories.UserRepository;
 import io.swagger.jwt.JwtTokenProvider;
 
-import java.awt.print.Pageable;
-import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 
 import io.swagger.utils.PincodeGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
-import javax.naming.AuthenticationException;
-import java.util.UUID;
 
 @Service
 public class UserService {
@@ -48,8 +41,8 @@ public class UserService {
         return userRepository.findById(id).get();
     }
 
-    public User getAllUsers(int limit, int offset) {
-        return (User) userRepository.findAll(/*limit, offset*/); // doesnt work properly yet
+    public List<User> getAllUsers(/*int limit, int offset*/) {
+        return userRepository.findAll(/*limit, offset*/); // doesnt work properly yet
     }
 
     public User createUser(User user) {

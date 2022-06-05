@@ -3,6 +3,7 @@ package io.swagger.model.entities;
 import javax.persistence.*;
 import javax.xml.bind.DatatypeConverter;
 
+import io.swagger.model.GetUserDTO;
 import io.swagger.model.UserDTO;
 import lombok.Data;
 import org.hibernate.annotations.Type;
@@ -53,8 +54,41 @@ public class User<list> {
     	userDTO.setZipcode(this.zipcode);
     	userDTO.setDayLimit(this.dayLimit);
     	userDTO.setTransactionLimit(this.transactionLimit);
-    	userDTO.setRoles(Collections.singletonList(UserDTO.Role.fromValue(this.roles.toString())));
+        if (this.roles.contains(Role.ROLE_ADMIN) && this.roles.contains(Role.ROLE_USER)) {
+            userDTO.setRoles(List.of(UserDTO.Role.ADMIN, UserDTO.Role.USER));
+        } else if(this.roles.contains(Role.ROLE_ADMIN)) {
+            userDTO.setRoles(List.of(UserDTO.Role.ADMIN));
+        } else if(this.roles.contains(Role.ROLE_USER)) {
+            userDTO.setRoles(List.of(UserDTO.Role.USER));
+        } else {
+            userDTO.setRoles(Collections.emptyList());
+        }
+    	//userDTO.setRoles(Collections.singletonList(UserDTO.Role.fromValue(this.roles.toString())));
     	return userDTO;
+    }
+
+    public GetUserDTO getGetUserDTO() {
+        GetUserDTO getUserDTO = new GetUserDTO();
+        getUserDTO.setUserid(this.id);
+        getUserDTO.setUsername(this.username);
+        getUserDTO.setEmail(this.email);
+        getUserDTO.setFirstName(this.firstName);
+        getUserDTO.setLastName(this.lastName);
+        getUserDTO.setStreet(this.street);
+        getUserDTO.setCity(this.city);
+        getUserDTO.setZipcode(this.zipcode);
+        getUserDTO.setDayLimit(this.dayLimit);
+        getUserDTO.setTransactionLimit(this.transactionLimit);
+        if (this.roles.contains(Role.ROLE_ADMIN) && this.roles.contains(Role.ROLE_USER)) {
+            getUserDTO.setRoles(List.of(GetUserDTO.Role.ADMIN, GetUserDTO.Role.USER));
+        } else if(this.roles.contains(Role.ROLE_ADMIN)) {
+            getUserDTO.setRoles(List.of(GetUserDTO.Role.ADMIN));
+        } else if(this.roles.contains(Role.ROLE_USER)) {
+            getUserDTO.setRoles(List.of(GetUserDTO.Role.USER));
+        } else {
+            getUserDTO.setRoles(Collections.emptyList());
+        }
+        return getUserDTO;
     }
 
     public User getUserModel(UserDTO userDTO) {
@@ -70,7 +104,16 @@ public class User<list> {
         user.setZipcode(userDTO.getZipcode());
         user.setDayLimit(userDTO.getDayLimit());
         user.setTransactionLimit(userDTO.getTransactionLimit());
-        user.setRoles(userDTO.getRoles());
+        if (userDTO.getRoles().contains(GetUserDTO.Role.ADMIN) && userDTO.getRoles().contains(GetUserDTO.Role.USER)) {
+            user.setRoles(List.of(Role.ROLE_ADMIN, Role.ROLE_USER));
+        } else if(userDTO.getRoles().contains(GetUserDTO.Role.ADMIN)) {
+            user.setRoles(List.of(Role.ROLE_ADMIN));
+        } else if(userDTO.getRoles().contains(GetUserDTO.Role.USER)) {
+            user.setRoles(List.of(Role.ROLE_USER));
+        } else {
+            user.setRoles(Collections.emptyList());
+        }
+        //user.setRoles(userDTO.getRoles());
         return user;
     }
 }
