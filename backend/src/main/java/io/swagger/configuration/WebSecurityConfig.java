@@ -28,13 +28,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/home",
             "/h2-console/**/**",
 //            "/Users/**",
-            "/Accounts/**",
-            "/Accounts",
-            "/Accounts?offset=0&limit=20",
-            "/Accounts?offset=1&limit=20",
-//            "/Transaction/**",
+
             //swagger uls
             // -- Swagger UI v3 (OpenAPI)
+            "/Transactions/{IBAN}**",
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/swagger-ui.html",
@@ -43,9 +40,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/swagger-resources/**",
             "/configuration/**",
             "/webjars/**",
-            "/Users/**",
-            "/Users/{id}",
-            "/Users",
     };
 
     @Override

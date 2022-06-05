@@ -6,9 +6,7 @@
 package io.swagger.api;
 
 import io.swagger.model.AccountDTO;
-import io.swagger.model.dto.NameSearchAccountDTO;
-import io.swagger.model.dto.PostAccountDTO;
-import io.swagger.model.dto.PostTransactionDTO;
+import io.swagger.model.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -35,25 +33,35 @@ import java.util.List;
 public interface AccountsApi {
 
     @Operation(summary = "Adds money to the account.", description = "", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "201", description = "Created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AccountDTO.class))) })
-    @RequestMapping(value = "/Accounts/{IBAN}/Deposit",
-        produces = { "application/json" }, 
-        consumes = { "application/json" }, 
-        method = RequestMethod.POST)
-    ResponseEntity<AccountDTO> accountDeposit(@Parameter(in = ParameterIn.PATH, description = "Gets the account of the IBAN", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostTransactionDTO body);
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AccountDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "405", description = "Not Allowed", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
+    @RequestMapping(value = "/Accounts/Deposit",
+            produces = { "application/json" },
+            consumes = { "application/json" },
+            method = RequestMethod.POST)
+    ResponseEntity<? extends Object> accountDeposit(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody DepositDTO body);
 
 
     @Operation(summary = "Withdraws money from the account.", description = "", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "201", description = "Created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AccountDTO.class))) })
-    @RequestMapping(value = "/Accounts/{IBAN}/Withdraw",
-        produces = { "application/json" }, 
-        consumes = { "application/json" }, 
-        method = RequestMethod.POST)
-    ResponseEntity<AccountDTO> accountWithdraw(@Parameter(in = ParameterIn.PATH, description = "Gets the account of the IBAN", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostTransactionDTO body);
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AccountDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
+            @ApiResponse(responseCode = "405", description = "Not Allowed", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class)))})
+    @RequestMapping(value = "/Accounts/Withdraw",
+            produces = { "application/json" },
+            consumes = { "application/json" },
+            method = RequestMethod.POST)
+    ResponseEntity<? extends Object> accountWithdraw(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody WithdrawDTO body);
 
 
     @Operation(summary = "Creates a new bank account.", description = "", security = {
