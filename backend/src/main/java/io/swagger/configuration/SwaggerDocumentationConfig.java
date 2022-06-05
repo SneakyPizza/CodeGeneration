@@ -1,8 +1,13 @@
 package io.swagger.configuration;
 
+import com.fasterxml.classmate.TypeResolver;
+import io.swagger.model.dto.ErrorDTO;
+import io.swagger.model.dto.GetTransactionDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.service.Contact;
 import springfox.documentation.service.HttpAuthenticationScheme;
 import springfox.documentation.spi.DocumentationType;
@@ -20,6 +25,9 @@ import java.util.Collections;
 @Configuration
 public class SwaggerDocumentationConfig {
 
+    @Autowired
+    TypeResolver typeResolver;
+
     @Bean
     public Docket customImplementation(){
         HttpAuthenticationScheme bearerAuth = HttpAuthenticationScheme
@@ -30,7 +38,7 @@ public class SwaggerDocumentationConfig {
         return new Docket(DocumentationType.OAS_30)
                 .select()
                     .apis(RequestHandlerSelectors.basePackage("io.swagger.api"))
-                    .build()
+                    .build().additionalModels(typeResolver.resolve(ErrorDTO.class), typeResolver.resolve(GetTransactionDTO.class))
                 .directModelSubstitute(org.threeten.bp.LocalDate.class, java.sql.Date.class)
                 .directModelSubstitute(org.threeten.bp.OffsetDateTime.class, java.util.Date.class)
                 .securitySchemes(Collections.singletonList(bearerAuth))
