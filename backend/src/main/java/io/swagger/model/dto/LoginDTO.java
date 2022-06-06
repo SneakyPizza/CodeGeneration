@@ -22,6 +22,13 @@ public class LoginDTO   {
   @JsonProperty("password")
   private String password = null;
 
+  //constructor full
+    public LoginDTO(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
+
   public LoginDTO username(String username) {
     this.username = username;
     return this;
