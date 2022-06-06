@@ -6,6 +6,8 @@ import javax.xml.bind.DatatypeConverter;
 import io.swagger.model.GetUserDTO;
 import io.swagger.model.UserDTO;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.hibernate.annotations.Type;
 
 import java.math.BigDecimal;
@@ -17,30 +19,80 @@ import java.util.UUID;
 
 @Entity
 @Data
-public class User<list> {
+@NoArgsConstructor
+public class User {
     @Id
     @GeneratedValue
     @Type(type="uuid-char")
+    @NonNull
     private UUID id;
-
+    @NonNull
     private String username;
+    @NonNull
     private String password;
+    @NonNull
     private String email;
+    @NonNull
     private String firstName;
+    @NonNull
     private String lastName;
+    @NonNull
     private String street;
+    @NonNull
     private String city;
+    @NonNull
     private String zipcode;
+    @NonNull
     private BigDecimal dayLimit;
+    @NonNull
     private BigDecimal transactionLimit;
-    private String Pincode;
+    @NonNull
+    private String pincode;
 
     @OneToMany(cascade=CascadeType.PERSIST)
     private List<Account> accounts;
 
     @ElementCollection(fetch = FetchType.EAGER)
+    @NonNull
     private List<Role> roles;
-    
+
+    // all args constructor
+    public User(String username, String password, String email, String firstName, String lastName, String street, String city, String zipcode, BigDecimal dayLimit, BigDecimal transactionLimit, String pincode, List<Account> accounts, List<Role> roles) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.street = street;
+        this.city = city;
+        this.zipcode = zipcode;
+        this.dayLimit = dayLimit;
+        this.transactionLimit = transactionLimit;
+        this.pincode = pincode;
+        this.accounts = accounts;
+        this.roles = roles;
+    }
+
+    public void setDayLimit(BigDecimal dayLimit) {
+        // check if dayLimit is positive
+        if (dayLimit.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Day limit must be positive"); // throws exception if dayLimit is negative
+        }
+        else {
+            this.dayLimit = dayLimit;
+        }
+    }
+
+    public void setTransactionLimit(BigDecimal transactionLimit) {
+        // check if transactionLimit is positive
+        if (transactionLimit.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Transaction limit must be positive"); // throws exception if transactionLimit is negative
+        }
+        else {
+            this.transactionLimit = transactionLimit;
+        }
+    }
+
     public UserDTO getUserDTO() {
     	UserDTO userDTO = new UserDTO();
     	userDTO.setUserid(this.id);
@@ -113,7 +165,6 @@ public class User<list> {
         } else {
             user.setRoles(Collections.emptyList());
         }
-        //user.setRoles(userDTO.getRoles());
         return user;
     }
 }
