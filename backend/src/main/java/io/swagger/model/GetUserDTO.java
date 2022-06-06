@@ -1,18 +1,17 @@
 package io.swagger.model;
 
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
-import org.springframework.validation.annotation.Validated;
-
-import javax.persistence.Id;
-import javax.validation.Valid;
 
 /**
  * UserDTO
@@ -21,15 +20,12 @@ import javax.validation.Valid;
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-31T10:41:25.283Z[GMT]")
 
 
-public class UserDTO   {
+public class GetUserDTO {
   @JsonProperty("userid")
   private UUID userid = null;
 
   @JsonProperty("username")
   private String username = null;
-
-  @JsonProperty("password")
-  private String password = null;
 
   @JsonProperty("email")
   private String email = null;
@@ -122,7 +118,7 @@ public class UserDTO   {
   @Valid
   private List<Role> roles = null;
 
-  public UserDTO userid(UUID userid) {
+  public GetUserDTO userid(UUID userid) {
     this.userid = userid;
     return this;
   }
@@ -142,7 +138,7 @@ public class UserDTO   {
     this.userid = userid;
   }
 
-  public UserDTO username(String username) {
+  public GetUserDTO username(String username) {
     this.username = username;
     return this;
   }
@@ -161,26 +157,8 @@ public class UserDTO   {
     this.username = username;
   }
 
-  public UserDTO password(String password) {
-    this.password = password;
-    return this;
-  }
 
-  /**
-   * Get password
-   * @return password
-   **/
-  @Schema(description = "")
-
-  public String getPassword() {
-    return password;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-  }
-
-  public UserDTO email(String email) {
+  public GetUserDTO email(String email) {
     this.email = email;
     return this;
   }
@@ -199,7 +177,7 @@ public class UserDTO   {
     this.email = email;
   }
 
-  public UserDTO firstName(String firstName) {
+  public GetUserDTO firstName(String firstName) {
     this.firstName = firstName;
     return this;
   }
@@ -218,7 +196,7 @@ public class UserDTO   {
     this.firstName = firstName;
   }
 
-  public UserDTO lastName(String lastName) {
+  public GetUserDTO lastName(String lastName) {
     this.lastName = lastName;
     return this;
   }
@@ -237,7 +215,7 @@ public class UserDTO   {
     this.lastName = lastName;
   }
 
-  public UserDTO street(String street) {
+  public GetUserDTO street(String street) {
     this.street = street;
     return this;
   }
@@ -256,7 +234,7 @@ public class UserDTO   {
     this.street = street;
   }
 
-  public UserDTO city(String city) {
+  public GetUserDTO city(String city) {
     this.city = city;
     return this;
   }
@@ -275,7 +253,7 @@ public class UserDTO   {
     this.city = city;
   }
 
-  public UserDTO zipcode(String zipcode) {
+  public GetUserDTO zipcode(String zipcode) {
     this.zipcode = zipcode;
     return this;
   }
@@ -294,7 +272,7 @@ public class UserDTO   {
     this.zipcode = zipcode;
   }
 
-  public UserDTO userstatus(UserstatusEnum userstatus) {
+  public GetUserDTO userstatus(UserstatusEnum userstatus) {
     this.userstatus = userstatus;
     return this;
   }
@@ -313,7 +291,7 @@ public class UserDTO   {
     this.userstatus = userstatus;
   }
 
-  public UserDTO dayLimit(BigDecimal dayLimit) {
+  public GetUserDTO dayLimit(BigDecimal dayLimit) {
     this.dayLimit = dayLimit;
     return this;
   }
@@ -333,7 +311,7 @@ public class UserDTO   {
     this.dayLimit = dayLimit;
   }
 
-  public UserDTO transactionLimit(BigDecimal transactionLimit) {
+  public GetUserDTO transactionLimit(BigDecimal transactionLimit) {
     this.transactionLimit = transactionLimit;
     return this;
   }
@@ -353,12 +331,12 @@ public class UserDTO   {
     this.transactionLimit = transactionLimit;
   }
 
-  public UserDTO roles(List<Role> roles) {
+  public GetUserDTO roles(List<Role> roles) {
     this.roles = roles;
     return this;
   }
 
-  public UserDTO addRolesItem(Role rolesItem) {
+  public GetUserDTO addRolesItem(Role rolesItem) {
     if (this.roles == null) {
       this.roles = new ArrayList<Role>();
     }
@@ -382,17 +360,16 @@ public class UserDTO   {
 
 
   @Override
-  public boolean equals(java.lang.Object o) {
+  public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    UserDTO userDTO = (UserDTO) o;
+    GetUserDTO userDTO = (GetUserDTO) o;
     return Objects.equals(this.userid, userDTO.userid) &&
             Objects.equals(this.username, userDTO.username) &&
-            Objects.equals(this.password, userDTO.password) &&
             Objects.equals(this.email, userDTO.email) &&
             Objects.equals(this.firstName, userDTO.firstName) &&
             Objects.equals(this.lastName, userDTO.lastName) &&
@@ -407,7 +384,7 @@ public class UserDTO   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(userid, username, password, email, firstName, lastName, street, city, zipcode, userstatus, dayLimit, transactionLimit, roles);
+    return Objects.hash(userid, username, email, firstName, lastName, street, city, zipcode, userstatus, dayLimit, transactionLimit, roles);
   }
 
   @Override
@@ -417,7 +394,6 @@ public class UserDTO   {
 
     sb.append("    userid: ").append(toIndentedString(userid)).append("\n");
     sb.append("    username: ").append(toIndentedString(username)).append("\n");
-    sb.append("    password: ").append(toIndentedString(password)).append("\n");
     sb.append("    email: ").append(toIndentedString(email)).append("\n");
     sb.append("    firstName: ").append(toIndentedString(firstName)).append("\n");
     sb.append("    lastName: ").append(toIndentedString(lastName)).append("\n");
@@ -436,7 +412,7 @@ public class UserDTO   {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(java.lang.Object o) {
+  private String toIndentedString(Object o) {
     if (o == null) {
       return "null";
     }
