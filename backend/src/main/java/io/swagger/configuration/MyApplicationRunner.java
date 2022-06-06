@@ -4,20 +4,22 @@ import io.swagger.model.entities.Account;
 import io.swagger.model.entities.Role;
 import io.swagger.model.entities.Transaction;
 import io.swagger.model.entities.User;
+import io.swagger.repositories.AccountRepository;
+import io.swagger.repositories.UserRepository;
 import io.swagger.services.UserService;
-import io.swagger.services.accountService;
 import io.swagger.services.transactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 public class MyApplicationRunner implements ApplicationRunner {
@@ -32,14 +34,21 @@ public class MyApplicationRunner implements ApplicationRunner {
     private String bank_Iban;
 
     @Autowired
-    io.swagger.services.accountService accountService;
+    UserRepository userRepository;
+
+    @Autowired
+    AccountRepository accountRepo;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
         User testUser = new User();
         testUser.setUsername("test");
-        testUser.setPassword("test");
+        testUser.setPincode("1234");
+        testUser.setPassword(passwordEncoder.encode("test"));
         testUser.setEmail("test@test.nl");
         testUser.setFirstName("test");
         testUser.setLastName("test");
@@ -52,7 +61,8 @@ public class MyApplicationRunner implements ApplicationRunner {
 
         User Bank = new User();
         Bank.setUsername("Bank");
-        Bank.setPassword("Bank");
+        Bank.setPincode("1234");
+        Bank.setPassword(passwordEncoder.encode("Bank"));
         Bank.setEmail("bang@bank.nl");
         Bank.setFirstName("Bank");
         Bank.setLastName("Bank");
@@ -81,10 +91,10 @@ public class MyApplicationRunner implements ApplicationRunner {
 
         testUser.setAccounts(new ArrayList<>(List.of(testAccount)));
         Bank.setAccounts(new ArrayList<>(List.of(BankAccount)));
-        userService.createUser(testUser);
-        userService.createUser(Bank);
-        accountService.addAccount(BankAccount);
-        accountService.addAccount(testAccount);
+        userRepository.save(testUser);
+        userRepository.save(Bank);
+        accountRepo.save(BankAccount);
+        accountRepo.save(testAccount);
 
         //test transaction
         Transaction transaction = new Transaction();
@@ -100,8 +110,8 @@ public class MyApplicationRunner implements ApplicationRunner {
         System.out.println(transaction.getTarget().getBalance());
         transactionService.addTransaction(transaction);
         if(transactionService.transactionExists(transaction.getId())){
-            accountService.updateAccount(transaction.getOrigin());
-            accountService.updateAccount(transaction.getTarget());
+            accountRepo.save(transaction.getOrigin());
+            accountRepo.save(transaction.getTarget());
         }
     }
 }

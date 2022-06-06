@@ -21,17 +21,17 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    JwtTokenFilter jwtTokenFilter;
+    private JwtTokenFilter jwtTokenFilter;
 
     private static final String[] AUTH_WHITELIST = {
             "/login",
             "/home",
             "/h2-console/**/**",
 //            "/Users/**",
-//            "/Account/**",
-            "/Transactions/**",
+
             //swagger uls
             // -- Swagger UI v3 (OpenAPI)
+            "/Transactions/{IBAN}**",
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/swagger-ui.html",
@@ -44,7 +44,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
+        
         http.csrf().disable();    // no CSRF protection needed
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);  // no sessions needed
 

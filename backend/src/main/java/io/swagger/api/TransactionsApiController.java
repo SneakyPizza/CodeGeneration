@@ -115,7 +115,8 @@ public class TransactionsApiController implements TransactionsApi {
     public ResponseEntity<? extends Object> transaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostTransactionDTO body) {
         try {
             //get curent user from security context
-                User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+                String name = SecurityContextHolder.getContext().getAuthentication().getName();
+            User user = userService.findByUsername(name);
                 //ceck if user is owner of the account or is admin
                 List<Account> list = user.getAccounts();
 

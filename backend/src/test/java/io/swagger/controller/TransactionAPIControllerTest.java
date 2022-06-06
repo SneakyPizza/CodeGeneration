@@ -5,7 +5,6 @@ import io.swagger.api.TransactionsApiController;
 import io.swagger.configuration.WebSecurityConfig;
 import io.swagger.model.entities.*;
 import io.swagger.repositories.AccountRepository;
-import io.swagger.repositories.LoginRepository;
 import io.swagger.repositories.UserRepository;
 import io.swagger.services.transactionService;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,8 +59,6 @@ public class TransactionAPIControllerTest {
     @MockBean
     private UserRepository userRepository;
 
-    @MockBean
-    private LoginRepository loginRepository;
 
     @Autowired
     private ObjectMapper mapper;
