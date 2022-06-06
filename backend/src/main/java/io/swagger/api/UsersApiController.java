@@ -11,6 +11,7 @@ import io.swagger.model.entities.User;
 import io.swagger.jwt.JwtTokenProvider;
 
 
+import java.awt.print.Pageable;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -151,7 +152,6 @@ public class UsersApiController implements UsersApi {
             } else {
                 // gets user and converts to userdto
                 User user = userService.getUser(id);
-                System.out.println(user);
 
                 if (user == null) {
                     // checks if null

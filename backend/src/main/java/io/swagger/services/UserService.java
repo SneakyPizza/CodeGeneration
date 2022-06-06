@@ -42,8 +42,8 @@ public class UserService {
         return userRepository.findById(id).get();
     }
 
-    public List<User> getAllUsers(Pageable pageable) {
-        return userRepository.findAllUsersWithPagination(pageable); // doesnt work properly yet
+    public List<User> getAllUsers() {
+        return userRepository.findAll(); // doesnt work properly yet
     }
 
     public User createUser(User user) {
