@@ -5,7 +5,6 @@ import io.swagger.api.TransactionsApiController;
 import io.swagger.configuration.WebSecurityConfig;
 import io.swagger.model.entities.*;
 import io.swagger.repositories.AccountRepository;
-import io.swagger.repositories.LoginRepository;
 import io.swagger.repositories.UserRepository;
 import io.swagger.services.transactionService;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,8 +59,6 @@ public class TransactionAPIControllerTest {
     @MockBean
     private UserRepository userRepository;
 
-    @MockBean
-    private LoginRepository loginRepository;
 
     @Autowired
     private ObjectMapper mapper;
@@ -147,11 +144,11 @@ public class TransactionAPIControllerTest {
         List<Transaction> transactions = List.of(transaction);
         when(transactionService.getAllTransactions()).thenReturn(transactions);
 
-        mockMvc.perform(get("/transactions/NL01INHO0000000001")
-                .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/Transactions/NL01INHO0000000001")
+                .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)));
     }
-    
+
 }

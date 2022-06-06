@@ -4,6 +4,7 @@ import io.swagger.model.entities.*;
 import io.swagger.repositories.AccountRepository;
 import io.swagger.repositories.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -13,6 +14,9 @@ import java.util.UUID;
 
 @Service
 public class transactionService {
+
+    @Value("${server.bank.iban}")
+    private String bank_Iban;
 
     @Autowired
     private AccountRepository accountRepository;
@@ -67,7 +71,7 @@ public class transactionService {
         else if(!validateBalance(transaction)){
             return new TransactionValidation(false, "Insufficient funds", TransactionValidation.TransactionValidationStatus.INSUFFICIENT_FUNDS);
         }
-        else if(!validateTransactionLimit(transaction) && transaction.getType() != TransactionType.DEPOSIT){
+        else if(!validateTransactionLimit(transaction)){
             return new TransactionValidation(false, "Transaction limit exceeded", TransactionValidation.TransactionValidationStatus.TRANSACTION_LIMIT_EXCEEDED);
         }
         else if(!validateDayLimit(transaction) && transaction.getType() != TransactionType.DEPOSIT){
@@ -112,6 +116,9 @@ public class transactionService {
                 return true;
             }
         }
+        else if(transaction.getPerformer().getRoles().contains("ROLE_ADMIN") && !transaction.getOrigin().getIBAN().equals(bank_Iban)){
+            return true;
+        }
         else{
             //check if origin has exceeded day limit
             //get all transactions from origin
@@ -127,7 +134,16 @@ public class transactionService {
     }
     public boolean validateTransactionLimit(Transaction transaction){
         //check if transaction limit is not exceeded
-        return transaction.getOrigin().getUser().getTransactionLimit().doubleValue() >= transaction.getAmount().doubleValue();
+        if(transaction.getOrigin().getIBAN().equals(bank_Iban) && transaction.getPerformer().getRoles().contains("ROLE_ADMIN") && transaction.getType() != TransactionType.DEPOSIT){
+            return true;
+        }
+        else if(transaction.getType() == TransactionType.DEPOSIT){
+            return transaction.getTarget().getUser().getTransactionLimit().doubleValue() >= transaction.getAmount().doubleValue();
+        }
+        else{
+            return transaction.getOrigin().getUser().getTransactionLimit().doubleValue() >= transaction.getAmount().doubleValue();
+
+        }
     }
     public boolean validateSavingsAccount(Transaction transaction){
         //only the owner of the savings account can transfer money to it or from it.

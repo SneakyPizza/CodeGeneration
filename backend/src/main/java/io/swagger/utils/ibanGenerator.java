@@ -18,7 +18,6 @@ public class ibanGenerator {
     }
 
     public boolean ValidateIban(String iban){
-
         return false;
     }
 }

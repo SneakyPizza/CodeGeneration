@@ -6,6 +6,7 @@
 package io.swagger.api;
 
 import io.swagger.annotations.Api;
+import io.swagger.model.GetUserDTO;
 import io.swagger.model.dto.ErrorDTO;
 import io.swagger.model.UserDTO;
 
@@ -73,7 +74,7 @@ public interface UsersApi {
     @RequestMapping(value = "/Users",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<UserDTO>> getAllUsers(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the result set." ,schema=@Schema(allowableValues={  }
+    ResponseEntity<List<GetUserDTO>> getAllUsers(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the result set." ,schema=@Schema(allowableValues={  }
 )) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Min(1) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return." ,schema=@Schema(allowableValues={  }, minimum="1", maximum="50"
 , defaultValue="20")) @Valid @RequestParam(value = "limit", required = false, defaultValue="20") Integer limit);
 
@@ -85,7 +86,7 @@ public interface UsersApi {
     @RequestMapping(value = "/Users/{id}",
         produces = { "application/JSON" }, 
         method = RequestMethod.GET)
-    ResponseEntity<UserDTO> getUser(@DecimalMin("1")@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") UUID id);
+    ResponseEntity<GetUserDTO> getUser(/*@DecimalMin("1")*/@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") UUID id);
 
 
     @Operation(summary = "Updates a user.", description = "Optional extended description in CommonMark or HTML.", security = {
@@ -96,7 +97,7 @@ public interface UsersApi {
         produces = { "application/json" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<UserDTO> updateUser(@DecimalMin("1")@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") UUID id, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody UserDTO body);
+    ResponseEntity<UserDTO> updateUser(/*@DecimalMin("1")*/@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") UUID id, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody UserDTO body);
 
 }
 

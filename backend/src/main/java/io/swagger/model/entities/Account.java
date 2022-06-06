@@ -103,8 +103,10 @@ public class Account<Users> {
     dto.setActive(accountactive_value);
     dto.setBalance(balance);
     dto.setIBAN(IBAN);
+
     //dto.setUser(user.toUserDTO());
     //Set userId from user
+
     return dto;
   }
 
