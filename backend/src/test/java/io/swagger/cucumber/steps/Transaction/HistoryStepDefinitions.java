@@ -9,6 +9,7 @@ import io.swagger.model.dto.LoginDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -20,8 +21,10 @@ import java.util.List;
 public class HistoryStepDefinitions  extends BaseStepDefinitions implements En {
 
     // Token is valid for one a rly short time apparently
-    private static final String VALID_TOKEN_USER = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiYXV0aCI6W3siYXV0aG9yaXR5IjoiUk9MRV9BRE1JTiJ9XSwiaWF0IjoxNjU0NTIzMDUwLCJleHAiOjE2NTQ1MjY2NTB9.N0-U8GlkNxeHG8pR9IiqJVbVopgAMEvKBRbMwmzGCQk";
-    private static final String VALID_TOKEN_ADMIN = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCYW5rIiwiYXV0aCI6W3siYXV0aG9yaXR5IjoiUk9MRV9BRE1JTiJ9XSwiaWF0IjoxNjU0NTIzMTAzLCJleHAiOjE2NTQ1MjY3MDN9.H3t7QDx2s-L_bOSSojujupT-i8stdq0cZcjBxcOI0vY";
+    @Value("${io.swagger.api.token_USER}")
+    private String VALID_TOKEN_USER;
+    @Value("${io.swagger.api.token_ADMIN}")
+    private String VALID_TOKEN_ADMIN;
     private static final String INVALID_TOKEN = "invalid";
     private static final String USER_IBAN = "NL01INHO0000000002";
     private static final String ADMIN_IBAN = "NL01INHO0000000001";
@@ -44,7 +47,7 @@ public class HistoryStepDefinitions  extends BaseStepDefinitions implements En {
 
         When("^I call the transaction history endpoint$", () -> {
             httpHeaders.clear();
-            httpHeaders.add("Authorization", "Bearer " + token);
+            httpHeaders.add("Authorization", "Bearer " +  token);
             request = new HttpEntity<>(null, httpHeaders);
             response = restTemplate.exchange(getBaseUrl() + "/Transactions/" + IBAN, HttpMethod.GET, new HttpEntity<>(null, httpHeaders), String.class);
             status = response.getStatusCode().value();
