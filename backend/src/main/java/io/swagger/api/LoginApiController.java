@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -36,6 +38,9 @@ public class LoginApiController implements LoginApi {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
     @org.springframework.beans.factory.annotation.Autowired
     public LoginApiController(ObjectMapper objectMapper, HttpServletRequest request) {
         this.objectMapper = objectMapper;
@@ -56,7 +61,7 @@ public class LoginApiController implements LoginApi {
                         // checks if user exists
                         return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Bad request: user does not exist", HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
                     } else {
-                        if (userService.login(loginDTO.getUsername(), loginDTO.getPassword()) != null) {
+                        if (authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword())).isAuthenticated()) {
                             // logs the user in and returns a JWT
                             JWT_DTO jwt_dto = userService.login(loginDTO.getUsername(), loginDTO.getPassword());
                             return new ResponseEntity<JWT_DTO>(jwt_dto, HttpStatus.OK);

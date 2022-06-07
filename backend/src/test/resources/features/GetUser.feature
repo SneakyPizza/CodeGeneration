@@ -9,3 +9,8 @@ Feature: Everything GetUser related
         Given I have an invalid user id
         When I call the GetUser endpoint
         Then I should see a user status code of 404
+
+    Scenario: Getting user but id is null
+        Given I have a null user id
+        When I call the GetUser endpoint
+        Then I should see a user status code of 400
