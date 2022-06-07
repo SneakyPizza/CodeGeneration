@@ -27,7 +27,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/login",
             "/home",
             "/h2-console/**/**",
-//            "/Users/**",
 
             //swagger uls
             // -- Swagger UI v3 (OpenAPI)

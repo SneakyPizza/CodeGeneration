@@ -5,6 +5,7 @@ import io.swagger.model.entities.User;
 import io.swagger.repositories.UserRepository;
 import io.swagger.jwt.JwtTokenProvider;
 
+import java.awt.print.Pageable;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,11 +42,12 @@ public class UserService {
         return userRepository.findById(id).get();
     }
 
-    public List<User> getAllUsers(/*int limit, int offset*/) {
-        return userRepository.findAll(/*limit, offset*/); // doesnt work properly yet
+    public List<User> getAllUsers() {
+        return userRepository.findAll(); // doesnt work properly yet
     }
 
     public User createUser(User user) {
+        user.setId(UUID.randomUUID());
         user.setPincode(pincodeGenerator.generatePincode());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
