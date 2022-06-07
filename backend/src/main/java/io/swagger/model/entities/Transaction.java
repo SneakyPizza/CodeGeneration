@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -28,6 +29,7 @@ public class Transaction   {
 
   @Id
   @GeneratedValue
+  @Type(type="uuid-char")
   @NonNull
   private UUID id;
   @NonNull()
