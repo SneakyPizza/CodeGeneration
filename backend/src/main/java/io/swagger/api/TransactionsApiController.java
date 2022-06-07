@@ -167,6 +167,10 @@ public class TransactionsApiController implements TransactionsApi {
                 return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "You do not have acces!", 401, "UNAUTHORIZED"), HttpStatus.UNAUTHORIZED);
             }
         }
+        catch (IllegalArgumentException e){
+            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Ellegal argument in transaction", 400,  "NOT_ALLOWED"), HttpStatus.BAD_REQUEST);
+
+        }
         catch (Exception e) {
             log.error("Internal server error", e);
             return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "An internal server error had occured!", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);

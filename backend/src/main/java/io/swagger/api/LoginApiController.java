@@ -71,7 +71,6 @@ public class LoginApiController implements LoginApi {
         }
         catch (BadCredentialsException e){
             return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Unauthorized: login credentials were invalid", HttpStatus.UNAUTHORIZED.value(), "UNAUTHORIZED"), HttpStatus.UNAUTHORIZED);
-
         }
         catch (Exception e) {
             log.error("Internal server error", e);

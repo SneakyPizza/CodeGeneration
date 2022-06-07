@@ -78,9 +78,16 @@ public class transactionService {
         else if(!validateDayLimit(transaction) && transaction.getType() != TransactionType.DEPOSIT){
             return new TransactionValidation(false, "Day limit exceeded", TransactionValidation.TransactionValidationStatus.DAILY_LIMIT_EXCEEDED);
         }
+        else if(!validateNotNegative(transaction)){
+            return new TransactionValidation(false, "Amount can not be negative!", TransactionValidation.TransactionValidationStatus.NOT_ALLOWED);
+        }
         else{
             return new TransactionValidation(true, "Transaction is valid", TransactionValidation.TransactionValidationStatus.VALID);
         }
+    }
+
+    public boolean validateNotNegative(Transaction transaction){
+        return transaction.getAmount().doubleValue() > 0;
     }
     //validate that origin and target are active accounts
     private boolean validateIsActive(Transaction transaction){
