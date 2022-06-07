@@ -1,29 +1,30 @@
-package io.swagger.model.entities;
+package io.swagger.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
 /**
- * TransactionDTO
+ * GetTransactionDTO
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-04T11:04:07.506Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-28T11:30:29.125Z[GMT]")
 
 
-public class TransactionDTO   {
+public class GetTransactionDTO   {
   @JsonProperty("fromIBAN")
   private String fromIBAN = null;
 
-  @JsonProperty("pincode")
-  private String pincode = null;
+  @JsonProperty("toIBAN")
+  private String toIBAN = null;
 
   @JsonProperty("amount")
-  private Integer amount = null;
+  private BigDecimal amount = null;
 
   @JsonProperty("timestamp")
   private String timestamp = null;
@@ -31,7 +32,7 @@ public class TransactionDTO   {
   @JsonProperty("fromUserId")
   private UUID fromUserId = null;
 
-  public TransactionDTO fromIBAN(String fromIBAN) {
+  public GetTransactionDTO fromIBAN(String fromIBAN) {
     this.fromIBAN = fromIBAN;
     return this;
   }
@@ -50,26 +51,26 @@ public class TransactionDTO   {
     this.fromIBAN = fromIBAN;
   }
 
-  public TransactionDTO pincode(String pincode) {
-    this.pincode = pincode;
+  public GetTransactionDTO toIBAN(String toIBAN) {
+    this.toIBAN = toIBAN;
     return this;
   }
 
   /**
-   * Get pincode
-   * @return pincode
+   * Get toIBAN
+   * @return toIBAN
    **/
   @Schema(description = "")
   
-    public String getPincode() {
-    return pincode;
+    public String getToIBAN() {
+    return toIBAN;
   }
 
-  public void setPincode(String pincode) {
-    this.pincode = pincode;
+  public void setToIBAN(String toIBAN) {
+    this.toIBAN = toIBAN;
   }
 
-  public TransactionDTO amount(Integer amount) {
+  public GetTransactionDTO amount(BigDecimal amount) {
     this.amount = amount;
     return this;
   }
@@ -80,15 +81,15 @@ public class TransactionDTO   {
    **/
   @Schema(description = "")
   
-    public Integer getAmount() {
+    public BigDecimal getAmount() {
     return amount;
   }
 
-  public void setAmount(Integer amount) {
+  public void setAmount(BigDecimal amount) {
     this.amount = amount;
   }
 
-  public TransactionDTO timestamp(String timestamp) {
+  public GetTransactionDTO timestamp(String timestamp) {
     this.timestamp = timestamp;
     return this;
   }
@@ -107,7 +108,7 @@ public class TransactionDTO   {
     this.timestamp = timestamp;
   }
 
-  public TransactionDTO fromUserId(UUID fromUserId) {
+  public GetTransactionDTO fromUserId(UUID fromUserId) {
     this.fromUserId = fromUserId;
     return this;
   }
@@ -136,26 +137,26 @@ public class TransactionDTO   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    TransactionDTO transactionDTO = (TransactionDTO) o;
-    return Objects.equals(this.fromIBAN, transactionDTO.fromIBAN) &&
-        Objects.equals(this.pincode, transactionDTO.pincode) &&
-        Objects.equals(this.amount, transactionDTO.amount) &&
-        Objects.equals(this.timestamp, transactionDTO.timestamp) &&
-        Objects.equals(this.fromUserId, transactionDTO.fromUserId);
+    GetTransactionDTO getTransactionDTO = (GetTransactionDTO) o;
+    return Objects.equals(this.fromIBAN, getTransactionDTO.fromIBAN) &&
+        Objects.equals(this.toIBAN, getTransactionDTO.toIBAN) &&
+        Objects.equals(this.amount, getTransactionDTO.amount) &&
+        Objects.equals(this.timestamp, getTransactionDTO.timestamp) &&
+        Objects.equals(this.fromUserId, getTransactionDTO.fromUserId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(fromIBAN, pincode, amount, timestamp, fromUserId);
+    return Objects.hash(fromIBAN, toIBAN, amount, timestamp, fromUserId);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class TransactionDTO {\n");
+    sb.append("class GetTransactionDTO {\n");
     
     sb.append("    fromIBAN: ").append(toIndentedString(fromIBAN)).append("\n");
-    sb.append("    pincode: ").append(toIndentedString(pincode)).append("\n");
+    sb.append("    toIBAN: ").append(toIndentedString(toIBAN)).append("\n");
     sb.append("    amount: ").append(toIndentedString(amount)).append("\n");
     sb.append("    timestamp: ").append(toIndentedString(timestamp)).append("\n");
     sb.append("    fromUserId: ").append(toIndentedString(fromUserId)).append("\n");

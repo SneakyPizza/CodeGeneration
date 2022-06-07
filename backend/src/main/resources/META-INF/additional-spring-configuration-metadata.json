@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "server.bankAccount.iban",
+      "type": "java.lang.String",
+      "description": "Description for server.bankAccount.iban."
+  }
+] }
