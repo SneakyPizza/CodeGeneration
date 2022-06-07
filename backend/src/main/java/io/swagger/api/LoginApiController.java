@@ -1,7 +1,7 @@
 package io.swagger.api;
 
 import io.swagger.annotations.Api;
-import io.swagger.model.UserDTO;
+import io.swagger.model.dto.ErrorDTO;
 import io.swagger.model.dto.JWT_DTO;
 import io.swagger.model.dto.LoginDTO;
 
@@ -17,12 +17,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.server.ResponseStatusException;
 
-import javax.naming.AuthenticationException;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-04T11:04:07.506Z[GMT]")
 @RestController
@@ -44,18 +42,34 @@ public class LoginApiController implements LoginApi {
         this.request = request;
     }
 
-    public ResponseEntity<JWT_DTO> login(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody LoginDTO loginDTO) {
+    public ResponseEntity<? extends Object> login(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody LoginDTO loginDTO) {
         try {
             if (loginDTO == null) {
-                log.error("Bad request: id is null");
-                return new ResponseEntity<JWT_DTO>(HttpStatus.BAD_REQUEST);
+                // checks if loginDTO is null
+                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Bad request: login credentials were null", HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
             } else {
-                JWT_DTO jwt_dto = userService.login(loginDTO.getUsername(), loginDTO.getPassword());
-                return new ResponseEntity<JWT_DTO>(jwt_dto, HttpStatus.OK);
+                if (loginDTO.getUsername() == null || loginDTO.getPassword() == null) {
+                    // checks if username or password is null
+                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Bad request: login credentials were null", HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
+                } else {
+                    if (userService.findByUsername(loginDTO.getUsername()) == null) {
+                        // checks if user exists
+                        return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Bad request: user does not exist", HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
+                    } else {
+                        if (userService.login(loginDTO.getUsername(), loginDTO.getPassword()) != null) {
+                            // logs the user in and returns a JWT
+                            JWT_DTO jwt_dto = userService.login(loginDTO.getUsername(), loginDTO.getPassword());
+                            return new ResponseEntity<JWT_DTO>(jwt_dto, HttpStatus.OK);
+                        } else {
+                            // if login fails
+                            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Unauthorized: login credentials were invalid", HttpStatus.UNAUTHORIZED.value(), "UNAUTHORIZED"), HttpStatus.UNAUTHORIZED);
+                        }
+                    }
+                }
             }
         } catch (Exception e) {
-            log.error("Username/password incorrect", e);
-            return new ResponseEntity<JWT_DTO>(HttpStatus.UNAUTHORIZED);
+            log.error("Internal server error", e);
+            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "An internal server error had occured!", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

@@ -47,6 +47,7 @@ public class UserService {
     }
 
     public User createUser(User user) {
+        user.setId(UUID.randomUUID());
         user.setPincode(pincodeGenerator.generatePincode());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
