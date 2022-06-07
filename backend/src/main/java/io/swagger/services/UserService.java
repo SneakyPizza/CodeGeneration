@@ -63,7 +63,6 @@ public class UserService {
     }
 
     public JWT_DTO login(String username, String password) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         JWT_DTO jwt_dto = new JWT_DTO();
         User user = userRepository.findByUsername(username);
         jwt_dto.setJwTtoken(tokenProvider.createToken(username, user.getRoles()));
