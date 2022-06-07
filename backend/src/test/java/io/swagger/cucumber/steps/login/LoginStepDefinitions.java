@@ -46,6 +46,10 @@ public class LoginStepDefinitions extends BaseStepDefinitions implements En {
         Given("^I have an invalid user object$", () -> {
             dto = new LoginDTO("c", "c");
         });
+
+        Given("^My password is invalid$", () -> {
+            dto = new LoginDTO("test", "c");
+        });
     }
 
 
