@@ -117,7 +117,7 @@ public class Account<Users> {
   }
 
   public void setBalance(BigDecimal balance){
-    if(balance.compareTo(BigDecimal.ZERO) <= 0){
+    if(balance.compareTo(BigDecimal.ZERO) < 0){
       throw new IllegalArgumentException("Balance must be postive");
     } else {
       this.balance = balance;
@@ -125,7 +125,7 @@ public class Account<Users> {
   }
 
   public void setAbsoluteLimit(BigDecimal limit){
-    if(limit.compareTo(BigDecimal.ZERO) <= 0){
+    if(limit.compareTo(BigDecimal.ZERO) < 0){
       throw new IllegalArgumentException("Balance must be postive");
     } else {
       this.absoluteLimit = limit;
