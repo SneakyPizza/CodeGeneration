@@ -1,6 +1,8 @@
 package io.swagger.model.entities;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import javax.persistence.*;
 
@@ -14,6 +16,7 @@ import java.util.UUID;
 
 @Entity
 @Data
+@NoArgsConstructor
 public class Account<Users> {
 
   public enum ActiveEnum {
@@ -73,6 +76,7 @@ public class Account<Users> {
   @Id
   @GeneratedValue
   @Type(type="uuid-char")
+  @NonNull
   private UUID id;
 
   private AccountTypeEnum accountType;
@@ -80,12 +84,14 @@ public class Account<Users> {
   @ManyToOne
   private User user;
 
+  @NonNull
   private String IBAN;
-
+  @NonNull
   private BigDecimal balance;
 
   private ActiveEnum active;
 
+  @NonNull
   private BigDecimal absoluteLimit;
 
 
@@ -108,6 +114,22 @@ public class Account<Users> {
     //Set userId from user
 
     return dto;
+  }
+
+  public void setBalance(BigDecimal balance){
+    if(balance.compareTo(BigDecimal.ZERO) < 0){
+      throw new IllegalArgumentException("Balance must be postive");
+    } else {
+      this.balance = balance;
+    }
+  }
+
+  public void setAbsoluteLimit(BigDecimal limit){
+    if(limit.compareTo(BigDecimal.ZERO) < 0){
+      throw new IllegalArgumentException("Balance must be postive");
+    } else {
+      this.absoluteLimit = limit;
+    }
   }
 
 }
