@@ -74,8 +74,11 @@ export default {
         })
         .then((response) => {
           // login successful
-          //   this.store.mutations.setToken(response.data.JWTtoken);
-          //   this.store.mutations.setUser(response.data.id);
+            this.store.mutations.setToken(response.data.JWTtoken);
+            this.store.mutations.setUser(response.data.id);
+            //set local storage token
+            localStorage.setItem("token", response.data.JWTtoken);
+            localStorage.setItem("user", response.data.id);
             // redirect to the home page
           console.log(response.data);
             this.$router.push("/");
