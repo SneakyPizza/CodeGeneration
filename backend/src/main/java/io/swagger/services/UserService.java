@@ -66,6 +66,7 @@ public class UserService {
         JWT_DTO jwt_dto = new JWT_DTO();
         User user = userRepository.findByUsername(username);
         jwt_dto.setJwTtoken(tokenProvider.createToken(username, user.getRoles()));
+        jwt_dto.setId(user.getId().toString());
         return jwt_dto;
     }
 }

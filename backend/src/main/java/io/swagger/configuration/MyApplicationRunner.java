@@ -1,9 +1,6 @@
 package io.swagger.configuration;
 
-import io.swagger.model.entities.Account;
-import io.swagger.model.entities.Role;
-import io.swagger.model.entities.Transaction;
-import io.swagger.model.entities.User;
+import io.swagger.model.entities.*;
 import io.swagger.repositories.AccountRepository;
 import io.swagger.repositories.UserRepository;
 import io.swagger.services.UserService;
@@ -55,9 +52,25 @@ public class MyApplicationRunner implements ApplicationRunner {
         testUser.setStreet("test");
         testUser.setCity("test");
         testUser.setZipcode("test");
+        testUser.setUserstatus(UserStatus.ACTIVE);
         testUser.setDayLimit(new BigDecimal(10000));
         testUser.setTransactionLimit(new BigDecimal(500));
         testUser.setRoles(new ArrayList<>(List.of(Role.ROLE_ADMIN)));
+
+        User testUser2 = new User();
+        testUser2.setUsername("test2");
+        testUser2.setPincode("1234");
+        testUser2.setPassword(passwordEncoder.encode("test2"));
+        testUser2.setEmail("test2@test2.nl");
+        testUser2.setFirstName("test2");
+        testUser2.setLastName("test2");
+        testUser2.setStreet("test2");
+        testUser2.setCity("test2");
+        testUser2.setZipcode("test2");
+        testUser2.setUserstatus(UserStatus.DISABLED);
+        testUser2.setDayLimit(new BigDecimal(10000));
+        testUser2.setTransactionLimit(new BigDecimal(500));
+        testUser2.setRoles(new ArrayList<>(List.of(Role.ROLE_USER)));
 
         User Bank = new User();
         Bank.setUsername("Bank");
@@ -69,6 +82,7 @@ public class MyApplicationRunner implements ApplicationRunner {
         Bank.setStreet("Bank");
         Bank.setCity("Bank");
         Bank.setZipcode("Bank");
+        Bank.setUserstatus(UserStatus.ACTIVE);
         Bank.setDayLimit(new BigDecimal(String.valueOf(BigDecimal.valueOf(900000000000000L))));
         Bank.setTransactionLimit(new BigDecimal(0));
         Bank.setRoles(new ArrayList<>(List.of(Role.ROLE_ADMIN)));
