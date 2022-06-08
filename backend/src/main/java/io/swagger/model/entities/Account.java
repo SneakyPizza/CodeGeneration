@@ -1,23 +1,23 @@
 package io.swagger.model.entities;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import org.springframework.validation.annotation.Validated;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.validation.Valid;
+import javax.persistence.*;
+
+import io.swagger.model.AccountDTO;
+import io.swagger.model.AccountDTO.AccountTypeEnum;
+import org.hibernate.annotations.Type;
+
 import java.math.BigDecimal;
-import java.util.Objects;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Data
-public class Account {
+@NoArgsConstructor
+public class Account<Users> {
 
   public enum ActiveEnum {
     ACTIVE("active"),
@@ -33,6 +33,15 @@ public class Account {
     @Override
     public String toString() {
       return String.valueOf(value);
+    }
+
+    public static ActiveEnum fromValue(String text) {
+      for (ActiveEnum b : ActiveEnum.values()) {
+        if (String.valueOf(b.value).equals(text)) {
+          return b;
+        }
+      }
+      return null;
     }
 
   }
@@ -53,24 +62,74 @@ public class Account {
       return String.valueOf(value);
     }
 
+    public static AccountTypeEnum fromValue(String text) {
+      for (AccountTypeEnum b : AccountTypeEnum.values()) {
+        if (String.valueOf(b.value).equals(text)) {
+          return b;
+        }
+      }
+      return null;
+    }
+
   }
 
   @Id
   @GeneratedValue
+  @Type(type="uuid-char")
+  @NonNull
   private UUID id;
 
   private AccountTypeEnum accountType;
 
-  private UUID userid = null;
+  @ManyToOne(cascade = CascadeType.ALL)
+  private User user;
 
-  private String IBAN = null;
-
-  private BigDecimal balance = null;
+  @NonNull
+  private String IBAN;
+  @NonNull
+  private BigDecimal balance;
 
   private ActiveEnum active;
 
+  @NonNull
   private BigDecimal absoluteLimit;
 
-//  private UserDTO user;
+
+  public AccountDTO toAccountDTO(){
+    AccountDTO dto = new AccountDTO();
+    dto.setAbsoluteLimit(absoluteLimit);
+    //String acct = accountType.value;
+    AccountDTO.AccountTypeEnum accounttype_value = AccountDTO.AccountTypeEnum.fromValue(accountType.value);
+    //= AccountDTO.AccountTypeEnum.valueOf(accountType.toString());
+    dto.setAccountType(accounttype_value);
+
+    String acct = active.value;
+    AccountDTO.ActiveEnum accountactive_value = AccountDTO.ActiveEnum.fromValue(acct);
+
+    dto.setActive(accountactive_value);
+    dto.setBalance(balance);
+    dto.setIBAN(IBAN);
+
+    //dto.setUser(user.toUserDTO());
+    //Set userId from user
+
+    return dto;
+  }
+
+  public void setBalance(BigDecimal balance){
+    if(balance.compareTo(BigDecimal.ZERO) < 0){
+      throw new IllegalArgumentException("Balance must be postive");
+    } else {
+      this.balance = balance;
+    }
+  }
+
+  public void setAbsoluteLimit(BigDecimal limit){
+    if(limit.compareTo(BigDecimal.ZERO) < 0){
+      throw new IllegalArgumentException("Balance must be postive");
+    } else {
+      this.absoluteLimit = limit;
+    }
+  }
 
 }

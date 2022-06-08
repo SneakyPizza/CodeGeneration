@@ -1,10 +1,12 @@
-package io.swagger.model;
+package io.swagger.model.dto;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import io.swagger.model.UserDTO;
+
+import io.swagger.model.entities.Account;
+import io.swagger.model.entities.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -16,7 +18,7 @@ import javax.validation.constraints.*;
  * PostAccountDTO
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-04T11:04:07.506Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-06-01T12:08:14.492Z[GMT]")
 
 
 public class PostAccountDTO   {
@@ -56,9 +58,6 @@ public class PostAccountDTO   {
   @JsonProperty("userid")
   private UUID userid = null;
 
-  @JsonProperty("balance")
-  private BigDecimal balance = null;
-
   /**
    * Gets or Sets active
    */
@@ -94,9 +93,6 @@ public class PostAccountDTO   {
 
   @JsonProperty("absoluteLimit")
   private BigDecimal absoluteLimit = null;
-
-  @JsonProperty("user")
-  private UserDTO user = null;
 
   public PostAccountDTO accountType(AccountTypeEnum accountType) {
     this.accountType = accountType;
@@ -135,26 +131,6 @@ public class PostAccountDTO   {
 
   public void setUserid(UUID userid) {
     this.userid = userid;
-  }
-
-  public PostAccountDTO balance(BigDecimal balance) {
-    this.balance = balance;
-    return this;
-  }
-
-  /**
-   * Get balance
-   * @return balance
-   **/
-  @Schema(description = "")
-  
-    @Valid
-    public BigDecimal getBalance() {
-    return balance;
-  }
-
-  public void setBalance(BigDecimal balance) {
-    this.balance = balance;
   }
 
   public PostAccountDTO active(ActiveEnum active) {
@@ -196,29 +172,9 @@ public class PostAccountDTO   {
     this.absoluteLimit = absoluteLimit;
   }
 
-  public PostAccountDTO user(UserDTO user) {
-    this.user = user;
-    return this;
-  }
-
-  /**
-   * Get user
-   * @return user
-   **/
-  @Schema(description = "")
-  
-    @Valid
-    public UserDTO getUser() {
-    return user;
-  }
-
-  public void setUser(UserDTO user) {
-    this.user = user;
-  }
-
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(java.lang.Object o) {
     if (this == o) {
       return true;
     }
@@ -228,15 +184,13 @@ public class PostAccountDTO   {
     PostAccountDTO postAccountDTO = (PostAccountDTO) o;
     return Objects.equals(this.accountType, postAccountDTO.accountType) &&
         Objects.equals(this.userid, postAccountDTO.userid) &&
-        Objects.equals(this.balance, postAccountDTO.balance) &&
         Objects.equals(this.active, postAccountDTO.active) &&
-        Objects.equals(this.absoluteLimit, postAccountDTO.absoluteLimit) &&
-        Objects.equals(this.user, postAccountDTO.user);
+        Objects.equals(this.absoluteLimit, postAccountDTO.absoluteLimit);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(accountType, userid, balance, active, absoluteLimit, user);
+    return Objects.hash(accountType, userid, active, absoluteLimit);
   }
 
   @Override
@@ -246,10 +200,8 @@ public class PostAccountDTO   {
     
     sb.append("    accountType: ").append(toIndentedString(accountType)).append("\n");
     sb.append("    userid: ").append(toIndentedString(userid)).append("\n");
-    sb.append("    balance: ").append(toIndentedString(balance)).append("\n");
     sb.append("    active: ").append(toIndentedString(active)).append("\n");
     sb.append("    absoluteLimit: ").append(toIndentedString(absoluteLimit)).append("\n");
-    sb.append("    user: ").append(toIndentedString(user)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -258,7 +210,7 @@ public class PostAccountDTO   {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
+  private String toIndentedString(java.lang.Object o) {
     if (o == null) {
       return "null";
     }

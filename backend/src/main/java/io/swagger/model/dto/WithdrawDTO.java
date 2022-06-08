@@ -1,22 +1,25 @@
-package io.swagger.model;
+package io.swagger.model.dto;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.UUID;
+
+import lombok.Data;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * TransactionDTO
+ * WithdrawDTO
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-04T11:04:07.506Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-06-01T14:27:29.019Z[GMT]")
 
-
-public class TransactionDTO   {
+@Data
+public class WithdrawDTO   {
   @JsonProperty("fromIBAN")
   private String fromIBAN = null;
 
@@ -24,7 +27,7 @@ public class TransactionDTO   {
   private String pincode = null;
 
   @JsonProperty("amount")
-  private Integer amount = null;
+  private BigDecimal amount = null;
 
   @JsonProperty("timestamp")
   private String timestamp = null;
@@ -32,7 +35,7 @@ public class TransactionDTO   {
   @JsonProperty("fromUserId")
   private UUID fromUserId = null;
 
-  public TransactionDTO fromIBAN(String fromIBAN) {
+  public WithdrawDTO fromIBAN(String fromIBAN) {
     this.fromIBAN = fromIBAN;
     return this;
   }
@@ -51,7 +54,7 @@ public class TransactionDTO   {
     this.fromIBAN = fromIBAN;
   }
 
-  public TransactionDTO pincode(String pincode) {
+  public WithdrawDTO pincode(String pincode) {
     this.pincode = pincode;
     return this;
   }
@@ -70,7 +73,7 @@ public class TransactionDTO   {
     this.pincode = pincode;
   }
 
-  public TransactionDTO amount(Integer amount) {
+  public WithdrawDTO amount(BigDecimal amount) {
     this.amount = amount;
     return this;
   }
@@ -81,15 +84,15 @@ public class TransactionDTO   {
    **/
   @Schema(description = "")
   
-    public Integer getAmount() {
+    public BigDecimal getAmount() {
     return amount;
   }
 
-  public void setAmount(Integer amount) {
+  public void setAmount(BigDecimal amount) {
     this.amount = amount;
   }
 
-  public TransactionDTO timestamp(String timestamp) {
+  public WithdrawDTO timestamp(String timestamp) {
     this.timestamp = timestamp;
     return this;
   }
@@ -108,7 +111,7 @@ public class TransactionDTO   {
     this.timestamp = timestamp;
   }
 
-  public TransactionDTO fromUserId(UUID fromUserId) {
+  public WithdrawDTO fromUserId(UUID fromUserId) {
     this.fromUserId = fromUserId;
     return this;
   }
@@ -130,19 +133,19 @@ public class TransactionDTO   {
 
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(java.lang.Object o) {
     if (this == o) {
       return true;
     }
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    TransactionDTO transactionDTO = (TransactionDTO) o;
-    return Objects.equals(this.fromIBAN, transactionDTO.fromIBAN) &&
-        Objects.equals(this.pincode, transactionDTO.pincode) &&
-        Objects.equals(this.amount, transactionDTO.amount) &&
-        Objects.equals(this.timestamp, transactionDTO.timestamp) &&
-        Objects.equals(this.fromUserId, transactionDTO.fromUserId);
+    WithdrawDTO withdrawDTO = (WithdrawDTO) o;
+    return Objects.equals(this.fromIBAN, withdrawDTO.fromIBAN) &&
+        Objects.equals(this.pincode, withdrawDTO.pincode) &&
+        Objects.equals(this.amount, withdrawDTO.amount) &&
+        Objects.equals(this.timestamp, withdrawDTO.timestamp) &&
+        Objects.equals(this.fromUserId, withdrawDTO.fromUserId);
   }
 
   @Override
@@ -153,7 +156,7 @@ public class TransactionDTO   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class TransactionDTO {\n");
+    sb.append("class WithdrawDTO {\n");
     
     sb.append("    fromIBAN: ").append(toIndentedString(fromIBAN)).append("\n");
     sb.append("    pincode: ").append(toIndentedString(pincode)).append("\n");
@@ -168,7 +171,7 @@ public class TransactionDTO   {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
+  private String toIndentedString(java.lang.Object o) {
     if (o == null) {
       return "null";
     }
