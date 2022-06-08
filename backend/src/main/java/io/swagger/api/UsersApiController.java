@@ -62,10 +62,10 @@ public class UsersApiController implements UsersApi {
                 // checks if null
                 return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Bad request: given user is null", HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
             }
-            // checks if all fields are filled
+            /*// checks if all fields are filled
             else if (userDTO.getUserid() == null || userDTO.getUsername() == null || userDTO.getPassword() == null || userDTO.getEmail() == null || userDTO.getFirstName() == null || userDTO.getLastName() == null || userDTO.getStreet() == null || userDTO.getCity() == null || userDTO.getZipcode() == null || userDTO.getUserstatus() == null || userDTO.getDayLimit() == null || userDTO.getTransactionLimit() == null || userDTO.getRoles() == null) {
                 return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Bad request: given user is incomplete", HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
-            }
+            }*/
             else {
                 if (userService.findByUsername(userDTO.getUsername()) != null) {
                     return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Bad request: given user already exists", HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
@@ -75,10 +75,7 @@ public class UsersApiController implements UsersApi {
                     user = user.getUserModel(userDTO);
                     // creates user in db
                     User createdUser = userService.createUser(user);
-                    // puts userdto in list and sends it back
-                    List<UserDTO> userDTOs = new ArrayList<>(1);
-                    userDTOs.add(createdUser.getUserDTO());
-                    return new ResponseEntity<List<UserDTO>>(userDTOs, HttpStatus.OK);
+                    return new ResponseEntity<UserDTO>(createdUser.getUserDTO(), HttpStatus.OK);
                 }
             }
         } catch (Exception e) { // no IOException because object mapper does not work
