@@ -1,6 +1,8 @@
 package io.swagger.utils;
 
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ibanGenerator {
     
@@ -18,6 +20,8 @@ public class ibanGenerator {
     }
 
     public boolean ValidateIban(String iban){
-        return false;
+        Pattern pattern = Pattern.compile("NL[0-9]{2}INHO0[0-9]{9}");
+        Matcher matcher = pattern.matcher(iban);
+        return matcher.matches();
     }
 }

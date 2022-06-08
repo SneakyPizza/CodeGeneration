@@ -43,6 +43,10 @@ public class accountService {
         a.setIBAN(ibanGen.GenerateIban());
         accountRepository.save(a);
     }
+
+    public boolean validateIban(String IBAN){
+        return ibanGen.ValidateIban(IBAN);
+    }
     
 
     //Get all accounts (GET)
