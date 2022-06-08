@@ -41,3 +41,9 @@ Feature: Everything transaction related
         And IBAN does not exist
         When I perform a transaction
         Then I should see a transaction status code of 401
+
+      Scenario: Preformatted transaction as user
+        Given I provide valid user credentials
+        And I filled in a negative amount
+        When I perform a transaction
+        Then I should see a transaction status code of 400

@@ -52,7 +52,7 @@ public interface TransactionsApi {
     @RequestMapping(value = "/Transactions/{IBAN}",
         produces = { "application/json" },
         method = RequestMethod.GET)
-    ResponseEntity<? extends Object> getTransactionHistory(@Parameter(in = ParameterIn.PATH, description = "IBAN of a user.", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN);
+    ResponseEntity<? extends Object> getTransactionHistory(@Parameter(in = ParameterIn.PATH, description = "IBAN of a user.", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "dateONE", required = false) String dateONE, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "dateTWO", required = false) String dateTWO);
 
 
     @Operation(summary = "Transfer money from account to account.", description = "", security = {

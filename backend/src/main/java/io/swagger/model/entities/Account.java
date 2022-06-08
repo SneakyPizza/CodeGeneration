@@ -77,7 +77,7 @@ public class Account<Users> {
 
   private AccountTypeEnum accountType;
 
-  @ManyToOne
+  @ManyToOne(cascade = CascadeType.ALL)
   private User user;
 
   private String IBAN;
