@@ -8,7 +8,7 @@
 
 <script>
 import Navigation from './components/Navigation.vue';
-import {useStore} from "vuex";
+
 
 export default {
   name: "App",
@@ -16,9 +16,7 @@ export default {
     Navigation,
   },
   data() {
-    return {
-      store: useStore(),
-    }
+
   },
 
 };

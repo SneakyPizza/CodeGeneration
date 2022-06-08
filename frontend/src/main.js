@@ -5,8 +5,7 @@ import Home from './components/Home.vue';
 import AccountSearch from './components/AccountSearch.vue';
 import UserOverview from './components/UserOverview.vue';
 import Login from "@/components/Login";
-import Vuex, {useStore} from 'vuex'
-import store from "@/store";
+
 
 const routes = [
     { path: '/', component: Home },
@@ -22,19 +21,27 @@ const router = createRouter({
 })
 //router.push('/login'); if not authenticated
 router.beforeEach((to, from, next) => {
-    if (!store.getters.getAuthentication) {
-        if (to.path === '/login') {
-            next();
-        } else {
-            next('/login');
+    //if jwt token is not present, redirect to login page
+    if (localStorage.getItem('token') == null && localStorage.getItem('user') == null && to.path !== '/login') {
+        next("/login");
+    }
+    else{
+        //if token is expired, redirect to login page
+        if(new Date(localStorage.getItem("expires")) < new Date() && to.path !== '/login') {
+            //delete token and user and expires from local storage
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            localStorage.removeItem('expires');
+            //redirect to login page
+            next("/login");
         }
-    } else {
-        next();
+        else{
+            next();
+        }
     }
 })
 
+
 const app = createApp(App);
 app.use(router);
-app.use(Vuex);
-app.use(useStore());
 app.mount('#app');

@@ -24,14 +24,11 @@
 </template>
 
 <script>
-import {useStore} from "vuex";
 
 export default {
   name: "Navigation",
   data() {
-    return {
-      store: useStore(),
-    }
+
   },
 }
 </script>

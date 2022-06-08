@@ -46,7 +46,7 @@
 
 <script>
 import axios from "axios";
-import {useStore} from "vuex";
+
 
 export default {
   name: "Login",
@@ -59,9 +59,7 @@ export default {
   },
   methods: {
     data() {
-      return {
-        store: useStore(),
-      }
+
     },
     // login through a store action
     login() {
@@ -73,14 +71,17 @@ export default {
           password: this.password,
         })
         .then((response) => {
-          // login successful
-            this.store.mutations.setToken(response.data.JWTtoken);
-            this.store.mutations.setUser(response.data.id);
+
             //set local storage token
             localStorage.setItem("token", response.data.JWTtoken);
-            localStorage.setItem("user", response.data.id);
+            localStorage.setItem("user", response.data.Id);
+            //set dateTime to expire today plus 1 hour
+            var date = new Date();
+            date.setHours(date.getHours() + 1);
+            localStorage.setItem("expires", date);
+
             // redirect to the home page
-          console.log(response.data);
+
             this.$router.push("/");
 
         })
