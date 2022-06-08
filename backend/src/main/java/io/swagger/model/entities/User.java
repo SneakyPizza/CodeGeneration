@@ -5,6 +5,7 @@ import javax.xml.bind.DatatypeConverter;
 
 import io.swagger.model.GetUserDTO;
 import io.swagger.model.UserDTO;
+import io.swagger.model.dto.NameSearchAccountDTO;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -93,6 +94,23 @@ public class User {
         }
     }
 
+    public UserDTO toUserDTO(){
+        UserDTO dto = new UserDTO();
+        //missing username
+        dto.setEmail(email);
+        dto.setPassword(password);
+        dto.setFirstName(firstName);
+        dto.setLastName(lastName);
+        dto.setStreet(street);
+        dto.setCity(city);
+        dto.setZipcode(zipcode);
+        dto.setDayLimit(dayLimit);
+        dto.setTransactionLimit(transactionLimit);
+        return dto;
+    }
+
+
+    
     public UserDTO getUserDTO() {
     	UserDTO userDTO = new UserDTO();
     	userDTO.setUserid(this.id);
@@ -167,4 +185,12 @@ public class User {
         }
         return user;
     }
+
+    public NameSearchAccountDTO toNameSearchAccountDTO(String iban){
+        NameSearchAccountDTO dto = new NameSearchAccountDTO();
+        dto.setFirstName(this.getFirstName());
+        dto.setLastName(this.getLastName());
+        dto.setIBAN(iban);
+        return dto;
+      }
 }

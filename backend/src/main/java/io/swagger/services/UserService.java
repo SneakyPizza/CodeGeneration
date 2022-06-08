@@ -7,6 +7,7 @@ import io.swagger.jwt.JwtTokenProvider;
 
 import java.awt.print.Pageable;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import io.swagger.utils.PincodeGenerator;
@@ -62,6 +63,13 @@ public class UserService {
         return userRepository.findByUsername(userName);
     }
 
+    public List<User> findByFirstName(String firstname){
+        return userRepository.findByFirstName(firstname);
+    }
+
+    public List<User> findByLastName(String lastname){
+        return userRepository.findByLastName(lastname);
+    }
     public JWT_DTO login(String username, String password) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         JWT_DTO jwt_dto = new JWT_DTO();

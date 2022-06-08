@@ -109,9 +109,10 @@ public class MyApplicationRunner implements ApplicationRunner {
         System.out.println(transaction.getOrigin().getBalance());
         System.out.println(transaction.getTarget().getBalance());
         transactionService.addTransaction(transaction);
+        /*
         if(transactionService.transactionExists(transaction.getId())){
             accountRepo.save(transaction.getOrigin());
             accountRepo.save(transaction.getTarget());
-        }
+        }*/
     }
 }
