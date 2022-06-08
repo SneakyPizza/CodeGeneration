@@ -8,6 +8,7 @@ import io.swagger.model.entities.User;
 import io.swagger.jwt.JwtTokenProvider;
 
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -174,7 +175,8 @@ public class UsersApiController implements UsersApi {
                 else {
                     User user = new User();
                     User user2 = user.getUserModel(userDTO);
-                    return new ResponseEntity<GetUserDTO>(userService.updateUser(user2).getGetUserDTO(), HttpStatus.OK);
+                    UserDTO userDTO1 = userService.updateUser(user2).getUserDTO();
+                    return new ResponseEntity<UserDTO>(userDTO1, HttpStatus.OK);
                 }
             }
         } catch (Exception e) { // no IOException because object mapper does not work

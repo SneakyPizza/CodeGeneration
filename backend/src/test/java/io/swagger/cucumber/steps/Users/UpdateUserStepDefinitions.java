@@ -5,6 +5,7 @@ import io.cucumber.java8.En;
 import io.swagger.cucumber.steps.BaseStepDefinitions;
 import io.swagger.model.GetUserDTO;
 import io.swagger.model.UserDTO;
+import io.swagger.model.entities.UserStatus;
 import org.aspectj.weaver.ast.And;
 import org.springframework.beans.factory.annotation.Value;
 import org.junit.jupiter.api.Assertions;
@@ -14,8 +15,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
-import java.util.List;
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.util.*;
 
 import static org.h2.value.DataType.readValue;
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,46 +47,69 @@ public class UpdateUserStepDefinitions extends BaseStepDefinitions implements En
     private Integer status;
 
     private UserDTO userDTO;
-    private String id;
+    private String id = "89ec545a-43f1-4a45-8b35-6475681d8354";
 
     public UpdateUserStepDefinitions() {
         Given("^I give valid user information", () -> {
-            token = VALID_TOKEN_ADMIN;
-        });
-
-        When("^I call the UpdateUser endpoint", () -> {
-            // gives json user
-            /*userDTO = new UserDTO();
-            userDTO.setId(UUID.randomUUID().toString());
+            userDTO = new UserDTO();
+            userDTO.setUserid(UUID.randomUUID());
             userDTO.setFirstName("Test");
             userDTO.setLastName("Test");
             userDTO.setEmail("test@test.nl");
             userDTO.setPassword("test");
-            userDTO.setRole("USER");
-            userDTO.setActive(true);*/
+            userDTO.setStreet("Test");
+            userDTO.setCity("Test");
+            userDTO.setZipcode("Test");
+            userDTO.setUserstatus(UserDTO.UserstatusEnum.DISABLED);
+            userDTO.setDayLimit(BigDecimal.valueOf(10));
+            userDTO.setTransactionLimit(BigDecimal.valueOf(10));
+            userDTO.setRoles(Collections.singletonList(UserDTO.Role.ADMIN));
+        });
+
+        Given("^I give invalid user information", () -> {
+            userDTO = new UserDTO();
+            userDTO.setUserid(UUID.randomUUID());
+            userDTO.setFirstName("");
+            userDTO.setEmail("test@test.nl");
+            userDTO.setPassword("test");
+            userDTO.setStreet("");
+            userDTO.setZipcode("Test");
+            userDTO.setUserstatus(UserDTO.UserstatusEnum.DISABLED);
+            userDTO.setRoles(Collections.singletonList(UserDTO.Role.ADMIN));
+        });
+
+        When("^I call the UpdateUser endpoint", () -> {
             httpHeaders.clear();
+            // first set userdto to json
+            String json = objectMapper.writeValueAsString(userDTO);
+            // then set the token
             httpHeaders.set("Authorization", "Bearer " + token);
+            // then set the content type
+            httpHeaders.set("Content-Type", "application/json");
+            // then set the request
+            request = new HttpEntity<>(json, httpHeaders);
+            // then call the endpoint
+            response = restTemplate.exchange("/users/{id}", HttpMethod.PUT, request, UserDTO.class, id);
+            // then get the status
+            status = response.getStatusCodeValue();
+            // then set the userdto from response
+            userDTO = response.getBody();
+            /*httpHeaders.clear();
+            httpHeaders.set("Authorization", "Bearer " + token);
+            httpHeaders.add("Content-Type", "application/json");
             request = new HttpEntity<>(objectMapper.writeValueAsString(userDTO), httpHeaders);
             response = restTemplate.exchange(getBaseUrl() + "/Users/" + userDTO.getUserid(), HttpMethod.PUT, request, UserDTO.class);
             status = response.getStatusCode().value();
-            userDTO = response.getBody();
+            userDTO = objectMapper.readValue(Objects.requireNonNull(response.getBody()).toString(), UserDTO.class);*/
         });
 
         Then("^I should get my updated user and get a status code of (\\d+)", (Integer statusCode) -> {
-            // checks if user is received and if status code is correct
-            assertNotNull(userDTO.getUserid());
-            assertNotNull(userDTO.getUsername());
-            assertNotNull(userDTO.getPassword());
-            assertNotNull(userDTO.getEmail());
-            assertNotNull(userDTO.getFirstName());
-            assertNotNull(userDTO.getLastName());
-            assertNotNull(userDTO.getStreet());
-            assertNotNull(userDTO.getCity());
-            assertNotNull(userDTO.getZipcode());
-            assertNotNull(userDTO.getUserstatus());
-            assertNotNull(userDTO.getDayLimit());
-            assertNotNull(userDTO.getTransactionLimit());
-            assertNotNull(userDTO.getRoles());
+            // checks if userdto is defined
+            assertNotNull(userDTO);
+            Assertions.assertEquals(statusCode, status);
+        });
+
+        Then("^I should get an error message and get a status code of (\\d+)", (Integer statusCode) -> {
             Assertions.assertEquals(statusCode, status);
         });
 
