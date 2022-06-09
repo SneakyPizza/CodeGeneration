@@ -1,34 +1,106 @@
 <template>
-<!-- login form -->
-<div class="login-form">
-  <div class="login-form__header">
-    <h1 class="login-form__title">
-      <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/142996/logo.svg" alt="Logo" />
-    </h1>
-    <p class="login-form__subtitle">
-      Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-    </p>
-  </div>
-  <form class="login-form__form" @submit.prevent="login">
-    <div class="login-form__input-wrapper">
-      <label class="login-form__label" for="email">Email</label>
-      <input class="login-form__input" type="email" id="email" v-model="email" />
+  <section>
+
+    <div class="container-lg">
+      <div class="row">
+        <div class="card main">
+          <div class="card-body">
+            <h1 class="card-title">Login</h1>
+            <div class="row">
+              <div class="col">
+                <div v-if="errorMessage" class="alert alert-danger" role="alert">
+                  {{ errorMessage }}
+                </div>
+                <form>
+                  <div class="mb-3">
+                    <label for="inputUsername" class="form-label">Username</label>
+                    <input
+                        id="inputUsername"
+                        type="text"
+                        class="form-control"
+                        v-model="username"
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="inputPassword" class="form-label">Password</label>
+                    <input
+                        type="password"
+                        class="form-control"
+                        id="inputPassword"
+                        v-model="password"
+                    />
+                  </div>
+                  <button type="button" @click="login()" class="btn btn-primary">
+                    Login
+                  </button>
+                </form>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="login-form__input-wrapper">
-      <label class="login-form__label" for="password">Password</label>
-      <input class="login-form__input" type="password" id="password" v-model="password" />
-    </div>
-    <button class="login-form__button" type="submit">Login</button>
-  </form>
-</div>
+  </section>
 </template>
 
 <script>
+import axios from "axios";
+
+
 export default {
-  name: "login",
+  name: "Login",
+  data() {
+    return {
+      username: "",
+      password: "",
+      errorMessage: null,
+    };
+  },
+  methods: {
+    data() {
+
+    },
+    // login through a store action
+    login() {
+      //log in with axios
+      // with a aplication json header
+      axios
+        .post("http://localhost:8080/login", {
+          username: this.username,
+          password: this.password,
+        })
+        .then((response) => {
+
+            //set local storage token
+            localStorage.setItem("token", response.data.JWTtoken);
+            localStorage.setItem("user", response.data.Id);
+            //set dateTime to expire today plus 1 hour
+            var date = new Date();
+            date.setHours(date.getHours() + 1);
+            localStorage.setItem("expires", date);
+
+            // redirect to the home page
+
+            this.$router.push("/");
+
+        })
+        .catch((error) => {
+          // login was not successful
+          // set the error message
+          this.errorMessage = error.response.data.message;
+        });
+
+    },
+  },
 };
 </script>
 
-<style scoped>
+<style>
+/*center .main */
+.main {
+  margin: 0 auto;
+  max-width: 600px;
+}
 
 </style>
