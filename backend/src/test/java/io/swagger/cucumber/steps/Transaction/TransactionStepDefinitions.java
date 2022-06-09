@@ -33,6 +33,9 @@ public class TransactionStepDefinitions extends BaseStepDefinitions implements E
     private static final String INVALID_TARGET_TRANSACTION_ADMIN = "{\n  \"amount\": 500,\n  \"fromIBAN\": \"NL01INHO0000000001\",\n  \"fromUserId\": \"d36dc67d-ed99-404f-9f0b-f66497e67983\",\n  \"pincode\": \"1234\",\n  \"toIBAN\": \"NL01INHO0000000001\"\n}";
     private static final String INVALID_AMOUNT_TRANSACTION_USER = "{\n  \"amount\": 5000,\n  \"fromIBAN\": \"NL01INHO0000000002\",\n  \"fromUserId\": \"d36dc67d-ed99-404f-9f0b-f66497e67983\",\n  \"pincode\": \"1234\",\n  \"toIBAN\": \"NL01INHO0000000001\"\n}";
     private static final String NO_ACCESS_TRANSACTION_USER = "{\n  \"amount\": 500,\n  \"fromIBAN\": \"NL01INHO0000000001\",\n  \"fromUserId\": \"d36dc67d-ed99-404f-9f0b-f66497e67983\",\n  \"pincode\": \"1234\",\n  \"toIBAN\": \"NL01INHO0000000002\"\n}";
+    private static final String NEGATIVE_TRANSACTION_USER = "{\n  \"amount\": -500,\n  \"fromIBAN\": \"NL01INHO0000000002\",\n  \"fromUserId\": \"d36dc67d-ed99-404f-9f0b-f66497e67983\",\n  \"pincode\": \"1234\",\n  \"toIBAN\": \"NL01INHO0000000001\"\n}";
+
+
 
     private final HttpHeaders httpHeaders = new HttpHeaders();
     private final TestRestTemplate restTemplate = new TestRestTemplate();
@@ -109,6 +112,10 @@ public class TransactionStepDefinitions extends BaseStepDefinitions implements E
 
         And("^I am not the owner of the account", () -> {
             transaction = NO_ACCESS_TRANSACTION_USER;
+        });
+
+        And("^I filled in a negative amount", () -> {
+            transaction = NEGATIVE_TRANSACTION_USER;
         });
 
     }

@@ -8,6 +8,7 @@ import io.swagger.model.entities.User;
 import io.swagger.jwt.JwtTokenProvider;
 
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -59,25 +60,22 @@ public class UsersApiController implements UsersApi {
         try {
             if (userDTO == null) {
                 // checks if null
-                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Bad request: given user is null", 400, "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Bad request: given user is null", HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
             }
-            // checks if all fields are filled
+            /*// checks if all fields are filled
             else if (userDTO.getUserid() == null || userDTO.getUsername() == null || userDTO.getPassword() == null || userDTO.getEmail() == null || userDTO.getFirstName() == null || userDTO.getLastName() == null || userDTO.getStreet() == null || userDTO.getCity() == null || userDTO.getZipcode() == null || userDTO.getUserstatus() == null || userDTO.getDayLimit() == null || userDTO.getTransactionLimit() == null || userDTO.getRoles() == null) {
-                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Bad request: given user is incomplete", 400, "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
-            }
+                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Bad request: given user is incomplete", HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
+            }*/
             else {
                 if (userService.findByUsername(userDTO.getUsername()) != null) {
-                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Bad request: given user already exists", 400, "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Bad request: given user already exists", HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
                 }
                 else {
                     User user = new User();
                     user = user.getUserModel(userDTO);
                     // creates user in db
                     User createdUser = userService.createUser(user);
-                    // puts userdto in list and sends it back
-                    List<UserDTO> userDTOs = new ArrayList<>(1);
-                    userDTOs.add(createdUser.getUserDTO());
-                    return new ResponseEntity<List<UserDTO>>(userDTOs, HttpStatus.OK);
+                    return new ResponseEntity<UserDTO>(createdUser.getUserDTO(), HttpStatus.OK);
                 }
             }
         } catch (Exception e) { // no IOException because object mapper does not work
@@ -93,7 +91,7 @@ public class UsersApiController implements UsersApi {
         try {
             // if unset or too low set to default value
             if (limit == null || limit < 1) {
-                limit = 20;
+                limit = 1;
             }
 
             // if unset or too low set to default value
@@ -101,17 +99,19 @@ public class UsersApiController implements UsersApi {
                 offset = 0;
             }
 
+            // checks if user is admin
+
             // checks if request is within limits
             if (limit >= 50) {
                 // checks if too high of a value
-                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "The limit is too high!", 400, "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
-            } else if (offset > 2000000000) {
+                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "The limit is too high!", HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
+            } else if (offset > userService.getAllUsers().size() - 1) {
                 // checks if too high of a value
-                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "The offset is too high!", 400, "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "The offset is too high!", HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
             } else {
                 if (userService.getAllUsers().size() == 0) {
                     // checks if there are no users
-                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "There are no users!", 404, "NOT_FOUND"), HttpStatus.NOT_FOUND);
+                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "There are no users!", HttpStatus.NOT_FOUND.value(), "NOT_FOUND"), HttpStatus.NOT_FOUND);
                 } else {
                     // get all users
                     List<User> users = (List<User>) userService.getAllUsers();
@@ -132,16 +132,19 @@ public class UsersApiController implements UsersApi {
 
     public ResponseEntity<? extends Object> getUser(/*@DecimalMin("1")*/@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") UUID id) {
         try {
-            if (id == null) {
-                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Bad request: id is null", 400, "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
+            // checks if id is in uuid format
+            if (id == null || id.toString().length() != 36) {
+                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Bad request: id is wrong", HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
             }
             else {
+                // checks if user exists
                 if (userService.getUser(id) == null) {
-                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Not found", 404, "NOT_FOUND"), HttpStatus.NOT_FOUND);
+                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Not found", HttpStatus.NOT_FOUND.value(), "NOT_FOUND"), HttpStatus.NOT_FOUND);
                 }
                 else {
                     User user = userService.getUser(id);
-                    return new ResponseEntity<GetUserDTO>(user.getGetUserDTO(), HttpStatus.OK);
+                    GetUserDTO getUserDTO = user.getGetUserDTO();
+                    return new ResponseEntity<GetUserDTO>(getUserDTO, HttpStatus.OK);
                 }
             }
 
@@ -153,23 +156,20 @@ public class UsersApiController implements UsersApi {
 
     public ResponseEntity<? extends Object> updateUser(/*@DecimalMin("1")*/@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") UUID id, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody UserDTO userDTO) {
         try {
-            // checks if userdto is null
-            if (userDTO == null) {
-                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Bad request: given user is null", 400, "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
-            }
-            // checks if every value is set
-            else if (userDTO.getUserid() == null || userDTO.getUsername() == null || userDTO.getPassword() == null || userDTO.getEmail() == null || userDTO.getFirstName() == null || userDTO.getLastName() == null || userDTO.getStreet() == null || userDTO.getCity() == null || userDTO.getZipcode() == null || userDTO.getUserstatus() == null || userDTO.getDayLimit() == null || userDTO.getTransactionLimit() == null || userDTO.getRoles() == null) {
-                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Bad request: given user is incomplete", 400, "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
+            if (userDTO.getUserid() == null || userDTO.getUsername() == null || userDTO.getPassword() == null || userDTO.getEmail() == null || userDTO.getFirstName() == null || userDTO.getLastName() == null || userDTO.getStreet() == null || userDTO.getCity() == null || userDTO.getZipcode() == null || userDTO.getUserstatus() == null || userDTO.getDayLimit() == null || userDTO.getTransactionLimit() == null || userDTO.getRoles() == null) {
+                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Bad request: user is incomplete", HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
             }
             else {
                 // checks if user exists
-                if (userService.getUser(id) == null) {
-                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Not found", 404, "NOT_FOUND"), HttpStatus.NOT_FOUND);
+                List<User> users = userService.getUserAsList(id);
+                if (users.get(0) == null) {
+                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Not found: user not found", HttpStatus.NOT_FOUND.value(), "NOT_FOUND"), HttpStatus.NOT_FOUND);
                 }
                 else {
                     User user = new User();
                     User user2 = user.getUserModel(userDTO);
-                    return new ResponseEntity<GetUserDTO>(userService.updateUser(user2).getGetUserDTO(), HttpStatus.OK);
+                    UserDTO userDTO1 = userService.updateUser(user2).getUserDTO();
+                    return new ResponseEntity<UserDTO>(userDTO1, HttpStatus.OK);
                 }
             }
         } catch (Exception e) { // no IOException because object mapper does not work

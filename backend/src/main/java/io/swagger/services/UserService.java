@@ -6,6 +6,7 @@ import io.swagger.repositories.UserRepository;
 import io.swagger.jwt.JwtTokenProvider;
 
 import java.awt.print.Pageable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -43,6 +44,12 @@ public class UserService {
         return userRepository.findById(id).get();
     }
 
+    public List<User> getUserAsList(UUID id) {
+        List<UUID> userIds = new ArrayList<>(1);
+        userIds.add(id);
+        return (List<User>) userRepository.findAllById(userIds);
+    }
+
     public List<User> getAllUsers() {
         return userRepository.findAll(); // doesnt work properly yet
     }
@@ -71,10 +78,10 @@ public class UserService {
         return userRepository.findByLastName(lastname);
     }
     public JWT_DTO login(String username, String password) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         JWT_DTO jwt_dto = new JWT_DTO();
         User user = userRepository.findByUsername(username);
         jwt_dto.setJwTtoken(tokenProvider.createToken(username, user.getRoles()));
+        jwt_dto.setId(user.getId().toString());
         return jwt_dto;
     }
 }

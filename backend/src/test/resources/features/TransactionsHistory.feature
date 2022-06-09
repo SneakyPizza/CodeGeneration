@@ -23,7 +23,7 @@ Feature: Everything transaction history
     Given I have an valid admin token
     And I provide the incorrect IBAN
     When I call the transaction history endpoint
-    Then  History the result is a status of 401
+    Then  History the result is a status of 404
 
     Scenario: Getting transaction history with correct IBAN and invalid token
     Given I have an invalid token
