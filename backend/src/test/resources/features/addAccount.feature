@@ -26,4 +26,4 @@ Feature: Add a account to the database
        And 'add-account' My accept header is invalid
        And 'add-account' My account object is valid
        When 'add-account' I perform a add account operation
-       Then I should see a add account status code of 403
+       Then I should see a add account status code of 415

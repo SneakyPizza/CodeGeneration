@@ -22,8 +22,8 @@ public class UpdateAccountStatusDefinitions extends BaseStepDefinitions implemen
     @Value("${io.swagger.api.token_USER}")
     private String INVALID_TOKEN;
 
-    private static final String VALID_HEADER = "Accept";
-    private static final String INVALID_HEADER = "";
+    private static final String VALID_HEADER = "Add";
+    private static final String INVALID_HEADER = "Accept";
 
     private static final String VALID_IBAN = "NL01INHO0000000001";
     private static final String INVALID_IBAN = "DE01INHO0000000001";
@@ -91,7 +91,7 @@ public class UpdateAccountStatusDefinitions extends BaseStepDefinitions implemen
         });
 
         And("^'update-account' My header is invalid", () -> {
-            header = VALID_HEADER;
+            header = INVALID_HEADER;
         });
 
         And("^'update-account' I provide invalid admin credentials", () -> {
