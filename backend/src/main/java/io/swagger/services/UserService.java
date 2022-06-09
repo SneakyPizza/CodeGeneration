@@ -43,12 +43,6 @@ public class UserService {
         return userRepository.findById(id).get();
     }
 
-    public List<User> getUserAsList(UUID id) {
-        List<UUID> userIds = new ArrayList<>(1);
-        userIds.add(id);
-        return (List<User>) userRepository.findAllById(userIds);
-    }
-
     public List<User> getAllUsers() {
         return userRepository.findAll(); // doesnt work properly yet
     }
@@ -58,6 +52,14 @@ public class UserService {
         user.setPincode(pincodeGenerator.generatePincode());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
+    }
+
+    public boolean checkIfUserExists(UUID id) {
+        return userRepository.existsById(id);
+    }
+
+    public boolean checkIfUserExistsByUsername(String username) {
+        return userRepository.existsByUsername(username);
     }
 
     public User updateUser(User user) {
