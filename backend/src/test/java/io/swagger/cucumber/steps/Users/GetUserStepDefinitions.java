@@ -29,7 +29,7 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
 
     private static final String INVALID_TOKEN = "invalid";
 
-    private static final String INVALID_USER_ID = "kaaskaas-kaas-kaas-kaas-kaaskaaskaas";
+    private static final String INVALID_USER_ID = "3fa85f64-5717-4562-b3fc-2c963f66afa6";
 
     private final HttpHeaders httpHeaders = new HttpHeaders();
     private final TestRestTemplate restTemplate = new TestRestTemplate();
@@ -54,11 +54,15 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
             token = VALID_TOKEN_ADMIN;
         });
 
-        /*Given("^The limit is higher than 50", () -> {
+        Given("^I have a valid token for a user", () -> {
+            token = VALID_TOKEN_USER;
+        });
+
+        Given("^The limit is higher than 50", () -> {
             limit = 51;
         });
 
-        Given("^The limit is lower than 1", () -> {
+        /*Given("^The limit is lower than 1", () -> {
             limit = -10;
         });*/
 
@@ -68,8 +72,12 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
             request = new HttpEntity<>(null, httpHeaders);
             getAllResponse = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.GET, request, String.class);
             status = getAllResponse.getStatusCode().value();
-            userList = objectMapper.readValue(getAllResponse.getBody(), objectMapper.getTypeFactory().constructCollectionType(List.class, GetUserDTO.class));
+
+            if (token == VALID_TOKEN_ADMIN) {
+                userList = objectMapper.readValue(getAllResponse.getBody(), objectMapper.getTypeFactory().constructCollectionType(List.class, GetUserDTO.class));
+            }
         });
+
 
         /*Then("^I should get a status code of (\\d+)", (Integer statusCode) -> {
             assertEquals(statusCode, status);
@@ -115,7 +123,7 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
 
         When("^I call the GetAllUser endpoint i get all users and use the id of the first user to get a user from GetUser", () -> {
             httpHeaders.clear();
-            httpHeaders.add("Authorization", "Bearer " +  token);
+            httpHeaders.add("Authorization", "Bearer " +  VALID_TOKEN_ADMIN);
             request = new HttpEntity<>(null, httpHeaders);
             getAllResponse = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.GET, request, String.class);
             status = getAllResponse.getStatusCode().value();
@@ -140,14 +148,16 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
             status = response.getStatusCode().value();
         });
 
-        Then("^I should see a user status code of (\\d+)", (Integer statusCode) -> {
+        Then("^I should see a status code of (\\d+)", (Integer statusCode) -> {
             Assertions.assertEquals(statusCode, status);
-            System.out.println("\u001B[32m" +"Status code: " + response.getStatusCode() + "\u001B[0m");
-            System.out.println("\u001B[32m" +"Response: " + response.getBody() + "\u001B[0m");
         });
 
-        And("^I have a valid token", () -> {
+        And("^I have a valid user token", () -> {
             token = VALID_TOKEN_USER;
+        });
+
+        And("^I have a valid admin token", () -> {
+            token = VALID_TOKEN_ADMIN;
         });
     }
 }

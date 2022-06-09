@@ -14,6 +14,7 @@ import org.hibernate.annotations.Type;
 import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -157,7 +158,7 @@ public class User {
         getUserDTO.setCity(this.city);
         getUserDTO.setZipcode(this.zipcode);
 
-        List<String> list = getUserDTO.getAccounts();
+        List<String> list = new ArrayList<String>();
         for (Account account : this.accounts) {
             list.add(account.getIBAN());
         }

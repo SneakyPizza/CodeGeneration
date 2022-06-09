@@ -103,12 +103,23 @@ public class MyApplicationRunner implements ApplicationRunner {
         testAccount.setAbsoluteLimit(new BigDecimal(0));
         testAccount.setActive(Account.ActiveEnum.ACTIVE);
 
+        Account testAccount2 = new Account();
+        testAccount2.setIBAN("NL01INHO0000000003");
+        testAccount2.setBalance(new BigDecimal(0));
+        testAccount2.setUser(testUser2);
+        testAccount2.setAccountType(Account.AccountTypeEnum.CURRENT);
+        testAccount2.setAbsoluteLimit(new BigDecimal(0));
+        testAccount2.setActive(Account.ActiveEnum.ACTIVE);
+
         testUser.setAccounts(new ArrayList<>(List.of(testAccount)));
+        testUser2.setAccounts(new ArrayList<>(List.of(testAccount2)));
         Bank.setAccounts(new ArrayList<>(List.of(BankAccount)));
         userRepository.save(testUser);
+        userRepository.save(testUser2);
         userRepository.save(Bank);
         accountRepo.save(BankAccount);
         accountRepo.save(testAccount);
+        accountRepo.save(testAccount2);
 
         //test transaction
         Transaction transaction = new Transaction();
