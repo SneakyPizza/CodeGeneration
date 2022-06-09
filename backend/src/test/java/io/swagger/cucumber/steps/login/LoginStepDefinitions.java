@@ -41,7 +41,7 @@ public class LoginStepDefinitions extends BaseStepDefinitions implements En {
             Assertions.assertTrue(token.startsWith("ey"));
         });
         Given("^I have a valid user object$", () -> {
-            dto = new LoginDTO("test", "test");
+            dto = new LoginDTO("test2", "test2");
         });
         Given("^I have an invalid user object$", () -> {
             dto = new LoginDTO("c", "c");

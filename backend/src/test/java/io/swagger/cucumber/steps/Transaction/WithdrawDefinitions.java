@@ -19,10 +19,10 @@ public class WithdrawDefinitions extends BaseStepDefinitions implements En {
     @Value("${io.swagger.api.token_ADMIN}")
     private String VALID_TOKEN_ADMIN;
     private static final String INVALID_TOKEN = "invalid";
-    private static final String VALID_TRANSACTION_USER = "{\n  \"amount\": 500,\n  \"fromIBAN\": \"NL01INHO0000000002\",\n  \"fromUserId\": \"d36dc11d-ed99-404f-9f0b-f6649ee61983\",\n  \"pincode\": \"1234\"\n}";
-    private static final String INVALID_PIN_TRANSACTION_USER = "{\n  \"amount\": 500,\n  \"fromIBAN\": \"NL01INHO0000000002\",\n  \"fromUserId\": \"d36dc11d-ed99-404f-9f0b-f6649ee61983\",\n  \"pincode\": \"5981\"\n}";
+    private static final String VALID_TRANSACTION_USER = "{\n  \"amount\": 500,\n  \"fromIBAN\": \"NL01INHO0000000003\",\n  \"fromUserId\": \"d36dc67d-ed99-404f-9f0b-f66497e67983\",\n  \"pincode\": \"1234\"\n}";
+    private static final String INVALID_PIN_TRANSACTION_USER = "{\n  \"amount\": 500,\n  \"fromIBAN\": \"NL01INHO0000000003\",\n  \"fromUserId\": \"d36dc11d-ed99-404f-9f0b-f6649ee61983\",\n  \"pincode\": \"5981\"\n}";
     private static final String INVALID_IBAN_TRANSACTION_USER = "{\n  \"amount\": 500,\n  \"fromIBAN\": \"NL01INHO0000000004\",\n  \"fromUserId\": \"d36dc11d-ed99-404f-9f0b-f6649ee61983\",\n  \"pincode\": \"1234\"\n}";
-    private static final String LIMIT_EXCEEDED_TRANSACTION_USER = "{\n  \"amount\": 5000,\n  \"fromIBAN\": \"NL01INHO0000000002\",\n  \"fromUserId\": \"d36dc11d-ed99-404f-9f0b-f6649ee61983\",\n  \"pincode\": \"1234\"\n}";
+    private static final String LIMIT_EXCEEDED_TRANSACTION_USER = "{\n  \"amount\": 5000,\n  \"fromIBAN\": \"NL01INHO0000000003\",\n  \"fromUserId\": \"d36dc11d-ed99-404f-9f0b-f6649ee61983\",\n  \"pincode\": \"1234\"\n}";
 
     private final HttpHeaders httpHeaders = new HttpHeaders();
     private final TestRestTemplate restTemplate = new TestRestTemplate();
