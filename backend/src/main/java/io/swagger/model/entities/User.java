@@ -156,6 +156,13 @@ public class User {
         getUserDTO.setStreet(this.street);
         getUserDTO.setCity(this.city);
         getUserDTO.setZipcode(this.zipcode);
+
+        List<String> list = getUserDTO.getAccounts();
+        for (Account account : this.accounts) {
+            list.add(account.getIBAN());
+        }
+        getUserDTO.setAccounts(list);
+
         if (this.userstatus == UserStatus.ACTIVE) {
             getUserDTO.setUserstatus(GetUserDTO.UserstatusEnum.ACTIVE);
         }

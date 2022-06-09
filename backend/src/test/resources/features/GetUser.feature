@@ -1,7 +1,7 @@
 Feature: Everything GetUser and GetAllUsers related
 
     # GetAllUsers
-    Scenario: Getting all users to get the user id
+    Scenario: Getting all users
         Given I have a valid token for an admin
         When I call the GetAllUsers endpoint
         Then I should see all the users in a list and return a 200 status code
@@ -20,9 +20,9 @@ Feature: Everything GetUser and GetAllUsers related
 
     # GetUser
     Scenario: Getting user with valid id
-        Given I have a valid user id
+        Given I provide a correct user id
         And I have a valid token
-        When I call the GetUser endpoint
+        When I call the GetAllUser endpoint i get all users and use the id of the first user to get a user from GetUser
         Then I should see a user status code of 200
 
     Scenario: Getting user with invalid id
