@@ -1,31 +1,34 @@
 package io.swagger.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.springframework.validation.annotation.Validated;
-
-import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
+import org.springframework.validation.annotation.Validated;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 
 /**
  * UserDTO
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-31T10:41:25.283Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-06-09T15:58:08.190Z[GMT]")
 
 
-public class GetUserDTO {
+public class GetUserDTO   {
   @JsonProperty("userid")
   private UUID userid = null;
 
   @JsonProperty("username")
   private String username = null;
+
+  @JsonProperty("password")
+  private String password = null;
 
   @JsonProperty("email")
   private String email = null;
@@ -44,6 +47,10 @@ public class GetUserDTO {
 
   @JsonProperty("zipcode")
   private String zipcode = null;
+
+  @JsonProperty("Accounts")
+  @Valid
+  private List<String> accounts = null;
 
   /**
    * Gets or Sets userstatus
@@ -157,6 +164,24 @@ public class GetUserDTO {
     this.username = username;
   }
 
+  public GetUserDTO password(String password) {
+    this.password = password;
+    return this;
+  }
+
+  /**
+   * Get password
+   * @return password
+   **/
+  @Schema(description = "")
+
+  public String getPassword() {
+    return password;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
+  }
 
   public GetUserDTO email(String email) {
     this.email = email;
@@ -272,6 +297,33 @@ public class GetUserDTO {
     this.zipcode = zipcode;
   }
 
+  public GetUserDTO accounts(List<String> accounts) {
+    this.accounts = accounts;
+    return this;
+  }
+
+  public GetUserDTO addAccountsItem(String accountsItem) {
+    if (this.accounts == null) {
+      this.accounts = new ArrayList<String>();
+    }
+    this.accounts.add(accountsItem);
+    return this;
+  }
+
+  /**
+   * Get accounts
+   * @return accounts
+   **/
+  @Schema(description = "")
+
+  public List<String> getAccounts() {
+    return accounts;
+  }
+
+  public void setAccounts(List<String> accounts) {
+    this.accounts = accounts;
+  }
+
   public GetUserDTO userstatus(UserstatusEnum userstatus) {
     this.userstatus = userstatus;
     return this;
@@ -360,46 +412,50 @@ public class GetUserDTO {
 
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(java.lang.Object o) {
     if (this == o) {
       return true;
     }
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    GetUserDTO userDTO = (GetUserDTO) o;
-    return Objects.equals(this.userid, userDTO.userid) &&
-            Objects.equals(this.username, userDTO.username) &&
-            Objects.equals(this.email, userDTO.email) &&
-            Objects.equals(this.firstName, userDTO.firstName) &&
-            Objects.equals(this.lastName, userDTO.lastName) &&
-            Objects.equals(this.street, userDTO.street) &&
-            Objects.equals(this.city, userDTO.city) &&
-            Objects.equals(this.zipcode, userDTO.zipcode) &&
-            Objects.equals(this.userstatus, userDTO.userstatus) &&
-            Objects.equals(this.dayLimit, userDTO.dayLimit) &&
-            Objects.equals(this.transactionLimit, userDTO.transactionLimit) &&
-            Objects.equals(this.roles, userDTO.roles);
+    GetUserDTO getUserDTO = (GetUserDTO) o;
+    return Objects.equals(this.userid, getUserDTO.userid) &&
+            Objects.equals(this.username, getUserDTO.username) &&
+            Objects.equals(this.password, getUserDTO.password) &&
+            Objects.equals(this.email, getUserDTO.email) &&
+            Objects.equals(this.firstName, getUserDTO.firstName) &&
+            Objects.equals(this.lastName, getUserDTO.lastName) &&
+            Objects.equals(this.street, getUserDTO.street) &&
+            Objects.equals(this.city, getUserDTO.city) &&
+            Objects.equals(this.zipcode, getUserDTO.zipcode) &&
+            Objects.equals(this.accounts, getUserDTO.accounts) &&
+            Objects.equals(this.userstatus, getUserDTO.userstatus) &&
+            Objects.equals(this.dayLimit, getUserDTO.dayLimit) &&
+            Objects.equals(this.transactionLimit, getUserDTO.transactionLimit) &&
+            Objects.equals(this.roles, getUserDTO.roles);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(userid, username, email, firstName, lastName, street, city, zipcode, userstatus, dayLimit, transactionLimit, roles);
+    return Objects.hash(userid, username, password, email, firstName, lastName, street, city, zipcode, accounts, userstatus, dayLimit, transactionLimit, roles);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class UserDTO {\n");
+    sb.append("class GetUserDTO {\n");
 
     sb.append("    userid: ").append(toIndentedString(userid)).append("\n");
     sb.append("    username: ").append(toIndentedString(username)).append("\n");
+    sb.append("    password: ").append(toIndentedString(password)).append("\n");
     sb.append("    email: ").append(toIndentedString(email)).append("\n");
     sb.append("    firstName: ").append(toIndentedString(firstName)).append("\n");
     sb.append("    lastName: ").append(toIndentedString(lastName)).append("\n");
     sb.append("    street: ").append(toIndentedString(street)).append("\n");
     sb.append("    city: ").append(toIndentedString(city)).append("\n");
     sb.append("    zipcode: ").append(toIndentedString(zipcode)).append("\n");
+    sb.append("    accounts: ").append(toIndentedString(accounts)).append("\n");
     sb.append("    userstatus: ").append(toIndentedString(userstatus)).append("\n");
     sb.append("    dayLimit: ").append(toIndentedString(dayLimit)).append("\n");
     sb.append("    transactionLimit: ").append(toIndentedString(transactionLimit)).append("\n");
@@ -412,7 +468,7 @@ public class GetUserDTO {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(Object o) {
+  private String toIndentedString(java.lang.Object o) {
     if (o == null) {
       return "null";
     }

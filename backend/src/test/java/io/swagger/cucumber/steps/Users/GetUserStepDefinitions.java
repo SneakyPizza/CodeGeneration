@@ -102,8 +102,7 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
             token = VALID_TOKEN_ADMIN;
         });*/
 
-        Given("^I have a valid user id", () -> {
-            id = String.valueOf(userList.get(0).getUserid());
+        Given("^I provide a correct user id", () -> {
         });
 
         Given("^I have an invalid user id", () -> {
@@ -112,6 +111,24 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
 
         Given("I have a user id that is null", () -> {
             id = null;
+        });
+
+        When("^I call the GetAllUser endpoint i get all users and use the id of the first user to get a user from GetUser", () -> {
+            httpHeaders.clear();
+            httpHeaders.add("Authorization", "Bearer " +  token);
+            request = new HttpEntity<>(null, httpHeaders);
+            getAllResponse = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.GET, request, String.class);
+            status = getAllResponse.getStatusCode().value();
+            userList = objectMapper.readValue(getAllResponse.getBody(), objectMapper.getTypeFactory().constructCollectionType(List.class, GetUserDTO.class));
+
+            id = String.valueOf(userList.get(0).getUserid());
+
+            httpHeaders.clear();
+            // get id from /Users/{id}
+            httpHeaders.add("Authorization", "Bearer " +  token);
+            request = new HttpEntity<>(id, httpHeaders);
+            response = restTemplate.exchange(getBaseUrl() + "/Users/" + id, HttpMethod.GET, request, GetUserDTO.class);
+            status = response.getStatusCode().value();
         });
 
         When("^I call the GetUser endpoint", () -> {
