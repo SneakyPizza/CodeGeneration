@@ -233,10 +233,14 @@ public class AccountsApiController implements AccountsApi {
 )) @Valid @RequestParam(value = "offset", required = false) Integer offset,@Min(1) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return." ,schema=@Schema(allowableValues={  }, minimum="1", maximum="50"
 , defaultValue="20")) @Valid @RequestParam(value = "limit", required = false, defaultValue="20") Integer limit) {
         String accept = request.getHeader("Search");
+
         if (accept != null && accept.contains("application/json")) {
             try {
-                List<User> users = new ArrayList<User>();
+                User logged_user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+                if(logged_user.getRoles().contains(Role.ROLE_ADMIN) || logged_user.getRoles().contains(Role.ROLE_USER)){
+                    List<User> users = new ArrayList<User>();
                 if(fullName.contains("-")){
+                    //add both parts of the string to array
                     String[] split = fullName.toLowerCase().split("-");
                     for(int i = 0; i < split.length;i++){
                         if(!split[i].isEmpty()){
@@ -244,7 +248,7 @@ public class AccountsApiController implements AccountsApi {
                             List<User> user_fname = userService.findByFirstName(split[i]);
                             //search once on lastname inside user -> return list
                             List<User> user_lname = userService.findByLastName(split[i]);
-                            //voeg de 2 lists samen
+                            //Add everything from both lists to
                             users.addAll(user_fname);
                             users.addAll(user_lname);
                         }
@@ -258,6 +262,8 @@ public class AccountsApiController implements AccountsApi {
                     List<Account> user_accounts = accountservice.findByUserId(user.getId());
                     for (Account account : user_accounts){
                         NameSearchAccountDTO dto = user.toNameSearchAccountDTO(account.getIBAN());
+
+                        //filter duplicates
                         if(!dtos.contains(dto)){
                             System.out.println(dto.toString());
                             dtos.add(dto);
@@ -265,6 +271,9 @@ public class AccountsApiController implements AccountsApi {
                     }
                 }
                 return new ResponseEntity<List<NameSearchAccountDTO>>(dtos ,HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "User role is invalid", 401, "FORBIDDEN"), HttpStatus.FORBIDDEN);
+                }
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Couldn't serialize response for content type application/json", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -278,9 +287,17 @@ public class AccountsApiController implements AccountsApi {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                accountservice.updateAccount(IBAN, body);
-
-                return new ResponseEntity<AccountDTO>(HttpStatus.OK);
+                User logged_user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+                if(logged_user.getRoles().contains(Role.ROLE_ADMIN)){
+                    if(accountservice.validateIban(IBAN)){
+                        accountservice.updateAccount(IBAN, body);
+                        return new ResponseEntity<AccountDTO>(HttpStatus.OK);
+                    } else {
+                        return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "IBAN is invalid", 400, "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
+                    }
+                } else {
+                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "User role is invalid", 403, "FORBIDDEN"), HttpStatus.FORBIDDEN);
+                }
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Couldn't serialize response for content type application/json", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);

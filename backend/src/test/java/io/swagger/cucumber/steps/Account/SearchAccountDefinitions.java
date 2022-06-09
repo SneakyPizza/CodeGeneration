@@ -10,19 +10,17 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
-public class GetAccountDefinition extends BaseStepDefinitions implements En {
-
-    @Value("${io.swagger.api.token_ADMIN}")
-    private String VALID_TOKEN_ADMIN;
-
+public class SearchAccountDefinitions extends BaseStepDefinitions implements En {
+    
     @Value("${io.swagger.api.token_USER}")
-    private String INVALID_TOKEN;
+    private String VALID_TOKEN_USER;
+    private static final String INVALID_TOKEN_USER = "Search";
 
-    private static final String VALID_HEADER = "Accept";
+    private static final String VALID_HEADER = "Search";
     private static final String INVALID_HEADER = "Invalid";
 
-    private static final String VALID_IBAN = "NL01INHO0000000001";
-    private static final String INVALID_IBAN = "DE01INHO0000000001";
+    private static final String VALID_FULLNAME = "test-test";
+    private static final String INVALID_FULLNAME = "Invalid";
 
     private final HttpHeaders httpHeaders = new HttpHeaders();
     private final TestRestTemplate restTemplate = new TestRestTemplate();
@@ -33,48 +31,46 @@ public class GetAccountDefinition extends BaseStepDefinitions implements En {
 
     private String token;
     private String header;
-    private String iban;
+    private String fullname;
 
-
-    public GetAccountDefinition(){
-
-        Given("^'get-account' I provide valid admin credentials", () -> {
-            token = VALID_TOKEN_ADMIN;
+    public SearchAccountDefinitions(){
+        Given("^'search-account' I provide valid user credentials", () -> {
+            token = VALID_TOKEN_USER;
         });
 
-        And("^'get-account' My iban is valid", () -> {
-            iban = VALID_IBAN;
+        And("^'search-account' My fullname is valid", () -> {
+            fullname = VALID_FULLNAME;
         });
 
-        And("^'get-account' My accept header is valid", () -> {
+        And("^'search-account' My accept header is valid", () -> {
             header = VALID_HEADER;
         });
 
-        When("^'get-account' I perform a get account operation", () -> {
+        When("^'search-account' I perform a search account operation", () -> {
             httpHeaders.clear();
             httpHeaders.add("Authorization", "Bearer " + token);
             httpHeaders.add(header, "application/json");
             request = new HttpEntity<>(null, httpHeaders);
-            response = restTemplate.exchange(getBaseUrl() + "/Accounts/" + iban, HttpMethod.GET, request, String.class);
+            response = restTemplate.exchange(getBaseUrl() + "/Accounts/Search?fullName=" + fullname + "&offset=1&limit=20", HttpMethod.GET, request, String.class);
             status = response.getStatusCode().value();
         });
 
-        Then("^I should see a get account status code of (\\d+)", (Integer statusCode) -> {
+        Then("^I should see a search account status code of (\\d+)", (Integer statusCode) -> {
             Assertions.assertEquals(statusCode, status);
             System.out.println("\u001B[32m" +"Status code: " + response.getStatusCode() + "\u001B[0m");
             System.out.println("\u001B[32m" +"Response: " + response.getBody() + "\u001B[0m");
         });
 
-        And("^'get-account' My accept header is invalid", () -> {
+        Given("^'search-account' I provide invalid user credentials", () -> {
+            token = INVALID_TOKEN_USER;
+        });
+
+        And("^'search-account' My fullname is invalid", () -> {
+            fullname = INVALID_FULLNAME;
+        });
+
+        And("^'search-account' My accept header is invalid", () -> {
             header = INVALID_HEADER;
-        });
-
-        And("^'get-account' My iban is invalid", () -> {
-            iban = INVALID_IBAN;
-        });
-
-        And("^'get-account' I provide invalid admin credentials", () -> {
-            token = INVALID_TOKEN;
         });
     }
 }
