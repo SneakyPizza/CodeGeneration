@@ -38,7 +38,10 @@ import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -69,11 +72,11 @@ public class TransactionsApiController implements TransactionsApi {
         this.request = request;
     }
 
-    public ResponseEntity<? extends Object> getTransactionHistory(@Parameter(in = ParameterIn.PATH, description = "IBAN of a user.", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
+    public ResponseEntity<? extends Object> getTransactionHistory(@Parameter(in = ParameterIn.PATH, description = "IBAN of a user.", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "dateONE", required = false) String dateONE,@Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "dateTWO", required = false) String dateTWO) {
         try {
             //if iban is null
             if (IBAN == null) {
-                return new ResponseEntity<List<GetTransactionDTO>>(HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "A IBAN value is required", 400, "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
             }
             //if iban is not null
             else {
@@ -82,7 +85,7 @@ public class TransactionsApiController implements TransactionsApi {
                 //ceck if user is owner of the account or is admin
                 List<Account> list = user.getAccounts();
 
-                if (list.stream().filter(a -> a.getIBAN().equals(IBAN)).findAny().isPresent() || user.getRoles().contains("ROLE_ADMIN")) {
+                if (list.stream().filter(a -> a.getIBAN().equals(IBAN)).findAny().isPresent() || user.getRoles().contains(Role.ROLE_ADMIN)) {
                     //check if account exists
                     if (accountService.findByIBAN(IBAN) == null) {
                         return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "This account does not exist!", 404, "NOT_FOUND"), HttpStatus.NOT_FOUND);
@@ -94,6 +97,21 @@ public class TransactionsApiController implements TransactionsApi {
                             return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "User does not have any transactions.", 204, "NO_CONTENT"), HttpStatus.NO_CONTENT);
                         }
                         //if user has transactions
+                        else if(dateONE != null && dateTWO != null){
+                            System.out.println("DATE ONE: " + dateONE);
+                            System.out.println("DATE TWO: " + dateTWO);
+                            LocalDateTime date1 = LocalDateTime.of(LocalDate.parse(dateONE), LocalTime.of(0, 0, 0));
+                            LocalDateTime date2 = LocalDateTime.of(LocalDate.parse(dateTWO), LocalTime.of(0, 0, 0));
+                            List<Transaction> transactions = transactionService.findByIBANAndTimestampBetween(IBAN, date1, date2);
+                            if(transactions.isEmpty()){
+                                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "User does not have any transactions between dates:" + dateONE + " " + dateTWO, 204, "NO_CONTENT"), HttpStatus.NO_CONTENT);
+                            }
+                            else{
+                                List<GetTransactionDTO> transactionDTOs = transactions.stream().map(t -> t.toGetTransactionDTO()).collect(java.util.stream.Collectors.toList());
+                                return new ResponseEntity<List<GetTransactionDTO>>(transactionDTOs, HttpStatus.OK);
+                            }
+
+                        }
                         else {
                             List<Transaction> transactions = transactionService.getTransactions(IBAN);
                             List<GetTransactionDTO> transactionDTOs = transactions.stream().map(t -> t.toGetTransactionDTO()).collect(java.util.stream.Collectors.toList());
@@ -106,7 +124,11 @@ public class TransactionsApiController implements TransactionsApi {
                     return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "You do not have acces!", 401, "UNAUTHORIZED"), HttpStatus.UNAUTHORIZED);
                 }
             }
-        } catch (Exception e) {
+        }
+        catch(DateTimeParseException e){
+            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Invalid date format!", 400, "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
+        }
+        catch (Exception e) {
             log.error("Internal server error", e);
             return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "An internal server error had occured!", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -120,7 +142,7 @@ public class TransactionsApiController implements TransactionsApi {
                 //ceck if user is owner of the account or is admin
                 List<Account> list = user.getAccounts();
 
-            if (list.stream().filter(a -> a.getIBAN().equals(body.getFromIBAN())).findAny().isPresent() || user.getRoles().contains("ROLE_ADMIN")) {
+            if (list.stream().filter(a -> a.getIBAN().equals(body.getFromIBAN())).findAny().isPresent() || user.getRoles().contains(Role.ROLE_ADMIN)) {
                 //ceck if fromIBAN and toIBAN exists
                 if (accountService.findByIBAN(body.getFromIBAN()) == null || accountService.findByIBAN(body.getToIBAN()) == null) {
                     return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Account does not exist!", 404, "NOT_FOUND"), HttpStatus.NOT_FOUND);

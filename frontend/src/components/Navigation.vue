@@ -14,13 +14,6 @@
           >UserOverview</router-link
           >
         </li>
-<!--        <li class="nav-item">   -->
-<!--         <li v-if="!this.$store.getters.isAuthenticated" class="nav-item">-->
-<!--          &lt;!&ndash; add a router link to the products page (don't use the a tag!) &ndash;&gt;-->
-<!--          <router-link to="/login" class="nav-link" active-class="active"-->
-<!--            >Login</router-link-->
-<!--          >-->
-<!--        </li>   -->
       <li>
            <router-link to="/AccountSearch" class="Dark_Blue nav-link" active-class="active">Accounts</router-link>
       </li>
@@ -31,9 +24,13 @@
 </template>
 
 <script>
+
 export default {
   name: "Navigation",
-};
+  data() {
+
+  },
+}
 </script>
 
 <style>

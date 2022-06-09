@@ -14,4 +14,7 @@ public interface TransactionRepository extends PagingAndSortingRepository<Transa
     Iterable<Transaction> findByIBAN(String iban);
 
     Iterable<Transaction> findByIBANAndTimestamp(String iban, LocalDateTime now);
+
+    //find all transactions from a IBAN between two dates
+    Iterable<Transaction> findByIBANAndTimestampBetween(String iban, LocalDateTime start, LocalDateTime end);
 }
