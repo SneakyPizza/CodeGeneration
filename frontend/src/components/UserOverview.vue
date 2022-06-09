@@ -71,19 +71,26 @@ import axios from "axios";
 export default {
   name: "Home",
   data() {
+    let headers = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem("token"),
+    };
     return {
       user_id: localStorage.getItem("user"),
       IBAN: [],
       Accounts: [],
       errorMessage: null,
+      header: headers,
     };
   },
   methods: {
     getUser: function () {
       axios
-          .get("/users/" + this.user_id)
+          .get("http://localhost:8080/Users/" + this.user_id, this.headers)
           .then(response => {
+            console.log(response.data);
             this.IBAN = response.data.Accounts;
+            this.getAccounts();
           })
           .catch(error => {
             this.errorMessage = error.response.data.message;
@@ -93,11 +100,12 @@ export default {
     getAccounts: function () {
       // get account for iban in IBAN
       //foreach IBAN
-      IBAN.forEach(function (iban) {
+      this.IBAN.forEach(function (iban) {
         // get account for iban
         axios
-            .get("/accounts/" + iban)
+            .get("http://localhost:8080/accounts/" + iban, )
             .then(response => {
+              console.log(response.data);
               this.Accounts.push(response.data);
             })
             .catch(error => {
@@ -109,7 +117,7 @@ export default {
     },
 
   },
-  Mounted() {
+  mounted () {
     this.getUser();
   },
 };

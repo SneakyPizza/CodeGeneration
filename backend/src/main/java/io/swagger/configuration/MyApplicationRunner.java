@@ -84,7 +84,7 @@ public class MyApplicationRunner implements ApplicationRunner {
         Bank.setZipcode("Bank");
         Bank.setUserstatus(UserStatus.ACTIVE);
         Bank.setDayLimit(new BigDecimal(String.valueOf(BigDecimal.valueOf(900000000000000L))));
-        Bank.setTransactionLimit(new BigDecimal(0));
+        Bank.setTransactionLimit(new BigDecimal(String.valueOf(BigDecimal.valueOf(900000000000000L))));
         Bank.setRoles(new ArrayList<>(List.of(Role.ROLE_ADMIN)));
 
         Account BankAccount = new Account();
@@ -97,7 +97,7 @@ public class MyApplicationRunner implements ApplicationRunner {
 
         Account testAccount = new Account();
         testAccount.setIBAN("NL01INHO0000000002");
-        testAccount.setBalance(new BigDecimal(0));
+        testAccount.setBalance(new BigDecimal(10000));
         testAccount.setUser(testUser);
         testAccount.setAccountType(Account.AccountTypeEnum.CURRENT);
         testAccount.setAbsoluteLimit(new BigDecimal(0));

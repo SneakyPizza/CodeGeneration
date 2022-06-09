@@ -159,7 +159,7 @@ public class User {
 
         List<String> list = getUserDTO.getAccounts();
         for (Account account : this.accounts) {
-            list.add(account.getId().toString());
+            list.add(account.getIBAN());
         }
         getUserDTO.setAccounts(list);
 
