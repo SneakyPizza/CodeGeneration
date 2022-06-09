@@ -43,6 +43,10 @@ public class accountService {
         a.setIBAN(ibanGen.GenerateIban());
         accountRepository.save(a);
     }
+
+    public boolean validateIban(String IBAN){
+        return ibanGen.ValidateIban(IBAN);
+    }
     
 
     //Get all accounts (GET)
@@ -54,6 +58,11 @@ public class accountService {
     //Get a Account with IBAN (GET)
     public Account getAccountWithIBAN (String iban){
         return (Account) accountRepository.findByIBAN(iban);
+    }
+
+    public AccountDTO getAccountDTOWithIBAN(String iban){
+        Account a = getAccountWithIBAN(iban);
+        return a.toAccountDTO();
     }
 
     //Update a existing account with a new account object (PUT)

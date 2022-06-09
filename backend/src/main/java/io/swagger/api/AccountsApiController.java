@@ -10,14 +10,11 @@ import io.swagger.model.entities.Account;
 import io.swagger.model.dto.*;
 import io.swagger.model.dto.*;
 import io.swagger.model.AccountDTO.AccountTypeEnum;
-import io.swagger.model.dto.NameSearchAccountDTO;
-import io.swagger.model.dto.PostAccountDTO;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.entities.*;
 import io.swagger.services.UserService;
 import io.swagger.services.accountService;
-import io.swagger.model.dto.PostTransactionDTO;
 import io.swagger.model.entities.Account;
 import io.swagger.services.accountService;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -47,6 +44,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -161,29 +159,44 @@ public class AccountsApiController implements AccountsApi {
         String accept = request.getHeader("Content-Type");
         if (accept != null && accept.contains("application/json")) {
             try{
-                accountservice.addAccount(body);   
-                return new ResponseEntity<PostAccountDTO>(HttpStatus.OK);
+                User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+                if(user.getRoles().contains(Role.ROLE_ADMIN)){
+                    accountservice.addAccount(body);   
+                    return new ResponseEntity<PostAccountDTO>(HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "User role is invalid", 401, "UNAUTHORIZED"), HttpStatus.UNAUTHORIZED);
+                }
             } catch(Exception e){
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Couldn't serialize response for content type application/json", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-        return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Accept header is invalid", 406, "NOT_ACCEPTABLE"), HttpStatus.NOT_ACCEPTABLE);
+        return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Accept header is invalid", 403, "FORBIDDEN"), HttpStatus.FORBIDDEN);
     }
 
     public ResponseEntity<? extends Object> getAccount(@Parameter(in = ParameterIn.PATH, description = "Gets the account of the IBAN", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                AccountDTO dto = (AccountDTO) accountservice.findByIBAN(IBAN);
-                return new ResponseEntity<AccountDTO>(dto, HttpStatus.OK);
-            } catch (Exception e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Couldn't serialize response for content type application/json", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
+
+        try {
+            if(accountservice.validateIban(IBAN)){
+                User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+                if(user.getRoles().contains(Role.ROLE_ADMIN)){
+                    AccountDTO dto = accountservice.getAccountDTOWithIBAN(IBAN);
+                    if(dto == null){
+                        return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Account is not found", 404, "NOT_FOUND"), HttpStatus.NOT_FOUND);
+                    }
+                    return new ResponseEntity<AccountDTO>(dto, HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "User role is invalid", 403, "FORBIDDEN"), HttpStatus.FORBIDDEN);
+                }
+            } else {
+                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "IBAN is invalid", 400, "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
             }
+        } catch (Exception e) {
+            log.error("Couldn't serialize response for content type application/json", e);
+            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Couldn't serialize response for content type application/json", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Accept header is invalid", 406, "NOT_ACCEPTABLE"), HttpStatus.NOT_ACCEPTABLE);
+        //return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Accept header is invalid", 403, "FORBIDDEN"), HttpStatus.FORBIDDEN);
     }
 
     //@GetMapping
@@ -191,22 +204,29 @@ public class AccountsApiController implements AccountsApi {
 )) @Valid @RequestParam(value = "offset", required = false) Integer offset,@Min(1) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return." ,schema=@Schema(allowableValues={  }, minimum="1", maximum="50"
 , defaultValue="20")) @Valid @RequestParam(value = "limit", required = false, defaultValue="20") Integer limit) {
         String accept = request.getHeader("Accept");
+
+
         if (accept != null && accept.contains("application/json")) {
             
             try {
-                //Convert iterable to list
-                List<Account> accountlist = StreamSupport.stream(accountservice.getAllAccounts()
-                .spliterator(), false)
-                .collect(Collectors.toList());
+                User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+                if(user.getRoles().contains(Role.ROLE_ADMIN)) {
+                    //Convert iterable to list
+                    List<Account> accountlist = StreamSupport.stream(accountservice.getAllAccounts()
+                    .spliterator(), false)
+                    .collect(Collectors.toList());
 
-                //Map account list to accountdto
-                List<AccountDTO> dtos = new ArrayList<AccountDTO>();
-                for (Account account : accountlist) {
-                    AccountDTO a = account.toAccountDTO();
-                    dtos.add(a);
+                    //Map account list to accountdto
+                    List<AccountDTO> dtos = new ArrayList<AccountDTO>();
+                    for (Account account : accountlist) {
+                        AccountDTO a = account.toAccountDTO();
+                        dtos.add(a);
+                    }
+
+                    return new ResponseEntity<List<AccountDTO>>(dtos, HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<List<AccountDTO>>(HttpStatus.FORBIDDEN);
                 }
-
-                return new ResponseEntity<List<AccountDTO>>(dtos, HttpStatus.OK);
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<List<AccountDTO>>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -219,10 +239,14 @@ public class AccountsApiController implements AccountsApi {
 )) @Valid @RequestParam(value = "offset", required = false) Integer offset,@Min(1) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return." ,schema=@Schema(allowableValues={  }, minimum="1", maximum="50"
 , defaultValue="20")) @Valid @RequestParam(value = "limit", required = false, defaultValue="20") Integer limit) {
         String accept = request.getHeader("Search");
+
         if (accept != null && accept.contains("application/json")) {
             try {
-                List<User> users = new ArrayList<User>();
+                User logged_user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+                if(logged_user.getRoles().contains(Role.ROLE_ADMIN) || logged_user.getRoles().contains(Role.ROLE_USER)){
+                    List<User> users = new ArrayList<User>();
                 if(fullName.contains("-")){
+                    //add both parts of the string to array
                     String[] split = fullName.toLowerCase().split("-");
                     for(int i = 0; i < split.length;i++){
                         if(!split[i].isEmpty()){
@@ -230,7 +254,7 @@ public class AccountsApiController implements AccountsApi {
                             List<User> user_fname = userService.findByFirstName(split[i]);
                             //search once on lastname inside user -> return list
                             List<User> user_lname = userService.findByLastName(split[i]);
-                            //voeg de 2 lists samen
+                            //Add everything from both lists to
                             users.addAll(user_fname);
                             users.addAll(user_lname);
                         }
@@ -244,6 +268,8 @@ public class AccountsApiController implements AccountsApi {
                     List<Account> user_accounts = accountservice.findByUserId(user.getId());
                     for (Account account : user_accounts){
                         NameSearchAccountDTO dto = user.toNameSearchAccountDTO(account.getIBAN());
+
+                        //filter duplicates
                         if(!dtos.contains(dto)){
                             System.out.println(dto.toString());
                             dtos.add(dto);
@@ -251,6 +277,9 @@ public class AccountsApiController implements AccountsApi {
                     }
                 }
                 return new ResponseEntity<List<NameSearchAccountDTO>>(dtos ,HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "User role is invalid", 401, "FORBIDDEN"), HttpStatus.FORBIDDEN);
+                }
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Couldn't serialize response for content type application/json", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -264,9 +293,17 @@ public class AccountsApiController implements AccountsApi {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                accountservice.updateAccount(IBAN, body);
-
-                return new ResponseEntity<AccountDTO>(HttpStatus.OK);
+                User logged_user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+                if(logged_user.getRoles().contains(Role.ROLE_ADMIN)){
+                    if(accountservice.validateIban(IBAN)){
+                        accountservice.updateAccount(IBAN, body);
+                        return new ResponseEntity<AccountDTO>(HttpStatus.OK);
+                    } else {
+                        return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "IBAN is invalid", 400, "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
+                    }
+                } else {
+                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "User role is invalid", 403, "FORBIDDEN"), HttpStatus.FORBIDDEN);
+                }
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Couldn't serialize response for content type application/json", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);

@@ -67,7 +67,7 @@ public interface AccountsApi {
     @Operation(summary = "Creates a new bank account.", description = "", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "201", description = "Created") })
+        @ApiResponse(responseCode = "200", description = "OK") })
     @RequestMapping(value = "/Accounts",
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
