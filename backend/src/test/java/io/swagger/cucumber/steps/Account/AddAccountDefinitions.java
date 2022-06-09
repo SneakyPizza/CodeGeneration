@@ -93,7 +93,7 @@ public class AddAccountDefinitions extends BaseStepDefinitions implements En {
         });
 
         And("^'add-account' My token object is invalid", () -> {
-            account = INVALID_TOKEN;
+            token = INVALID_TOKEN;
         });
 
         And("^'add-account' My accept header is invalid", () -> {

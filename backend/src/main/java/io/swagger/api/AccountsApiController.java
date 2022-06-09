@@ -174,9 +174,9 @@ public class AccountsApiController implements AccountsApi {
             if(accountservice.validateIban(IBAN)){
                 User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
                 if(user.getRoles().contains(Role.ROLE_ADMIN)){
-                    AccountDTO dto = (AccountDTO) accountservice.findByIBAN(IBAN);
+                    AccountDTO dto = accountservice.getAccountDTOWithIBAN(IBAN);
                     if(dto == null){
-                        return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "User is not found", 404, "NOT_FOUND"), HttpStatus.NOT_FOUND);
+                        return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Account is not found", 404, "NOT_FOUND"), HttpStatus.NOT_FOUND);
                     }
                     return new ResponseEntity<AccountDTO>(dto, HttpStatus.OK);
                 } else {

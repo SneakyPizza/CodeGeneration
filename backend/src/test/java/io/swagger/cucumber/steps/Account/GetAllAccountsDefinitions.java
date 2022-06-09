@@ -48,11 +48,11 @@ public class GetAllAccountsDefinitions extends BaseStepDefinitions implements En
             httpHeaders.add("Authorization", "Bearer " + token);
             httpHeaders.add(header, "application/json");
             request = new HttpEntity<>(header, httpHeaders);
-            response = restTemplate.exchange(getBaseUrl() + "/Accounts/" + "?offset=1&limit=20", HttpMethod.GET, request, String.class);
+            response = restTemplate.exchange(getBaseUrl() + "/Accounts" + "?offset=1&limit=20", HttpMethod.GET, request, String.class);
             status = response.getStatusCode().value();
         });
 
-        Then("^I should see a get all account status code of (\\d+)", (Integer statusCode) -> {
+        Then("^I should see a get all accounts status code of (\\d+)", (Integer statusCode) -> {
             Assertions.assertEquals(statusCode, status);
             System.out.println("\u001B[32m" +"Status code: " + response.getStatusCode() + "\u001B[0m");
             System.out.println("\u001B[32m" +"Response: " + response.getBody() + "\u001B[0m");

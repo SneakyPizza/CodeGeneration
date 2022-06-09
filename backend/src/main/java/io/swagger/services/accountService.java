@@ -60,6 +60,11 @@ public class accountService {
         return (Account) accountRepository.findByIBAN(iban);
     }
 
+    public AccountDTO getAccountDTOWithIBAN(String iban){
+        Account a = getAccountWithIBAN(iban);
+        return a.toAccountDTO();
+    }
+
     //Update a existing account with a new account object (PUT)
     /*
     public void updateAccount (Account account){

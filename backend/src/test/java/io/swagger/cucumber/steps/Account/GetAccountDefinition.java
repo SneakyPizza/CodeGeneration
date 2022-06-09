@@ -54,7 +54,7 @@ public class GetAccountDefinition extends BaseStepDefinitions implements En {
             header = VALID_HEADER;
         });
 
-        When("^'get-account' I perform a add account operation", () -> {
+        When("^'get-account' I perform a get account operation", () -> {
             httpHeaders.clear();
             httpHeaders.add("Authorization", "Bearer " + token);
             httpHeaders.add(header, "application/json");
