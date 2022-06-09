@@ -6,6 +6,7 @@ import io.swagger.repositories.UserRepository;
 import io.swagger.jwt.JwtTokenProvider;
 
 import java.awt.print.Pageable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,6 +41,12 @@ public class UserService {
 
     public User getUser(UUID id) {
         return userRepository.findById(id).get();
+    }
+
+    public List<User> getUserAsList(UUID id) {
+        List<UUID> userIds = new ArrayList<>(1);
+        userIds.add(id);
+        return (List<User>) userRepository.findAllById(userIds);
     }
 
     public List<User> getAllUsers() {

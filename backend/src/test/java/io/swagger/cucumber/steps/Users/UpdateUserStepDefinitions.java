@@ -32,7 +32,7 @@ public class UpdateUserStepDefinitions extends BaseStepDefinitions implements En
 
     private static final String INVALID_TOKEN = "invalid";
 
-    private static final String INVALID_USER_ID = "kaaskaas-kaas-kaas-kaas-kaaskaaskaas";
+    private static final String INVALID_USER_ID = "3fa85f64-5717-4562-b3fc-2c963f66afa6";
 
     private final HttpHeaders httpHeaders = new HttpHeaders();
     private final TestRestTemplate restTemplate = new TestRestTemplate();
@@ -52,6 +52,7 @@ public class UpdateUserStepDefinitions extends BaseStepDefinitions implements En
     public UpdateUserStepDefinitions() {
         Given("^I give valid user information", () -> {
             userDTO = new UserDTO();
+            userDTO.setUsername("test");
             userDTO.setFirstName("Test");
             userDTO.setLastName("Test");
             userDTO.setEmail("test@test.nl");
@@ -67,27 +68,21 @@ public class UpdateUserStepDefinitions extends BaseStepDefinitions implements En
 
         Given("^I give invalid user information", () -> {
             userDTO = new UserDTO();
-            userDTO.setUserid(UUID.randomUUID());
-            userDTO.setFirstName("");
+            userDTO.setUsername("test");
+            userDTO.setFirstName("Test");
+            userDTO.setLastName(null);
             userDTO.setEmail("test@test.nl");
             userDTO.setPassword("test");
-            userDTO.setStreet("");
+            userDTO.setStreet(null);
+            userDTO.setCity(null);
             userDTO.setZipcode("Test");
             userDTO.setUserstatus(UserDTO.UserstatusEnum.DISABLED);
+            userDTO.setDayLimit(BigDecimal.valueOf(10));
+            userDTO.setTransactionLimit(BigDecimal.valueOf(10));
             userDTO.setRoles(Collections.singletonList(UserDTO.Role.ADMIN));
         });
 
         When("^I call the UpdateUser endpoint", () -> {
-            httpHeaders.clear();
-            httpHeaders.add("Authorization", "Bearer " +  token);
-            request = new HttpEntity<>(null, httpHeaders);
-            getAllResponse = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.GET, request, String.class);
-            status = getAllResponse.getStatusCode().value();
-            userList = objectMapper.readValue(getAllResponse.getBody(), objectMapper.getTypeFactory().constructCollectionType(List.class, GetUserDTO.class));
-
-            id = String.valueOf(userList.get(0).getUserid());
-            userDTO.setUserid(UUID.fromString(id));
-
             httpHeaders.clear();
             // first set userdto to json
             String json = objectMapper.writeValueAsString(userDTO);
@@ -122,6 +117,27 @@ public class UpdateUserStepDefinitions extends BaseStepDefinitions implements En
 
         And("^I have an invalid jwt token$", () -> {
             token = INVALID_TOKEN;
+        });
+
+        And("^The user id is null", () -> {
+            id = null;
+        });
+
+        And("^The user id is not in the database", () -> {
+            id = INVALID_USER_ID;
+            userDTO.setUserid(UUID.fromString(INVALID_USER_ID));
+        });
+
+        And("^I have a valid user id", () -> {
+            httpHeaders.clear();
+            httpHeaders.add("Authorization", "Bearer " +  token);
+            request = new HttpEntity<>(null, httpHeaders);
+            getAllResponse = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.GET, request, String.class);
+            status = getAllResponse.getStatusCode().value();
+            userList = objectMapper.readValue(getAllResponse.getBody(), objectMapper.getTypeFactory().constructCollectionType(List.class, GetUserDTO.class));
+
+            id = String.valueOf(userList.get(0).getUserid());
+            userDTO.setUserid(UUID.fromString(id));
         });
     }
 }
