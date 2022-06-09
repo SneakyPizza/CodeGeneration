@@ -55,7 +55,7 @@ public class MyApplicationRunner implements ApplicationRunner {
         testUser.setUserstatus(UserStatus.ACTIVE);
         testUser.setDayLimit(new BigDecimal(10000));
         testUser.setTransactionLimit(new BigDecimal(500));
-        testUser.setRoles(new ArrayList<>(List.of(Role.ROLE_ADMIN)));
+        testUser.setRoles(new ArrayList<>(List.of(Role.ROLE_USER)));
 
         User testUser2 = new User();
         testUser2.setUsername("test2");
