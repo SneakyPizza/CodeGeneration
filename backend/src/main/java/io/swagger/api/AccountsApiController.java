@@ -63,6 +63,7 @@ public class AccountsApiController implements AccountsApi {
     private final ObjectMapper objectMapper;
 
     private final HttpServletRequest request;
+    //niet nodig
 
     @Autowired
     private io.swagger.services.transactionService transactionService;
@@ -240,7 +241,6 @@ public class AccountsApiController implements AccountsApi {
 , defaultValue="20")) @Valid @RequestParam(value = "limit", required = false, defaultValue="20") Integer limit) {
         String accept = request.getHeader("Search");
 
-        if (accept != null && accept.contains("application/json")) {
             try {
                 User logged_user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
                 if(logged_user.getRoles().contains(Role.ROLE_ADMIN) || logged_user.getRoles().contains(Role.ROLE_USER)){
@@ -284,14 +284,11 @@ public class AccountsApiController implements AccountsApi {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Couldn't serialize response for content type application/json", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        }
 
-        return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Accept header is not valid!", 406, "NOT_ACCEPTABLE"), HttpStatus.NOT_ACCEPTABLE);
     }
 
     public ResponseEntity<? extends Object> updateAccountStatus(@Parameter(in = ParameterIn.PATH, description = "Gets the account of the IBAN", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody AccountDTO body) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
+
             try {
                 User logged_user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
                 if(logged_user.getRoles().contains(Role.ROLE_ADMIN)){
@@ -308,9 +305,6 @@ public class AccountsApiController implements AccountsApi {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Couldn't serialize response for content type application/json", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        }
-
-        return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Accept header is not valid!", 406, "NOT_ACCEPTABLE"), HttpStatus.NOT_ACCEPTABLE);
     }
 
     private ResponseEntity<? extends Object> doTransaction(Transaction transaction){
