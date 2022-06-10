@@ -1,28 +1,38 @@
 package io.swagger.services;
 
+import io.swagger.exeption.custom.InvalidTransactionsException;
+import io.swagger.exeption.custom.TransactionDeniedException;
+import io.swagger.exeption.custom.UnauthorizedException;
+import io.swagger.model.dto.PostTransactionDTO;
 import io.swagger.model.entities.*;
 import io.swagger.repositories.AccountRepository;
 import io.swagger.repositories.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+
 @Service
-public class transactionService {
+public class TransactionService {
 
     @Value("${server.bank.iban}")
-    private String bank_Iban;
+    private String bankIban;
 
     @Autowired
     private AccountRepository accountRepository;
+
+
+    @Autowired
+    UserService userService;
+
+    @Autowired
+    io.swagger.services.accountService accountService;
 
     @Autowired
     private TransactionRepository transactionRepository;
@@ -60,46 +70,44 @@ public class transactionService {
         return (List<Transaction>) transactionRepository.findByIBANAndTimestampBetween(iban, startDate, endDate);
     }
 
-    public void doTransaction(Transaction transaction) {
+    private Transaction executeTransaction(Transaction transaction) {
         transaction.execute();
         transactionRepository.save(transaction);
         //save accounts
         accountRepository.save(transaction.getOrigin());
         accountRepository.save(transaction.getTarget());
+        return transaction;
     }
 
     ////Validation methods////
     //check if a transaction is valid
-    public TransactionValidation isValidTransaction(Transaction transaction){
+    public void isValidTransaction(Transaction transaction){
         if(!validateIsOwner(transaction) &&  transaction.getType() == TransactionType.TRANSFER) {
-            return new TransactionValidation(false, "You do not have access to this account",TransactionValidation.TransactionValidationStatus.UNAUTHORIZED);
+            throw new UnauthorizedException("You do not have access to this account");
         }
-        else if(!validatePINcode(transaction)){
-            return new TransactionValidation(false, "PIN code is incorrect",TransactionValidation.TransactionValidationStatus.INVALID_PIN);
+        else if(!validatePinCode(transaction)){
+            throw new UnauthorizedException("Wrong PIN code");
         }
         else if(!validateIsActive(transaction)){
-            return new TransactionValidation(false, "Both accounts need to be active",TransactionValidation.TransactionValidationStatus.NOT_ACTIVE);
+            throw new InvalidTransactionsException("Account is not active");
         }
         else if(!validateSavingsAccount(transaction)){
-            return new TransactionValidation(false, "Savings account cannot be used for this transaction", TransactionValidation.TransactionValidationStatus.NOT_ALLOWED);
+            throw new InvalidTransactionsException("Savings account cannot be used for this transaction");
         }
         else if(!validateThatOriginIsNotTarget(transaction)){
-            return new TransactionValidation(false, "Cannot transfer money to the same account", TransactionValidation.TransactionValidationStatus.NOT_ALLOWED);
+            throw new InvalidTransactionsException("Cannot transfer money to the same account");
         }
         else if(!validateBalance(transaction)){
-            return new TransactionValidation(false, "Insufficient funds", TransactionValidation.TransactionValidationStatus.INSUFFICIENT_FUNDS);
+            throw new TransactionDeniedException("Insufficient funds for this transaction");
         }
         else if(!validateTransactionLimit(transaction)){
-            return new TransactionValidation(false, "Transaction limit exceeded", TransactionValidation.TransactionValidationStatus.TRANSACTION_LIMIT_EXCEEDED);
+            throw new TransactionDeniedException("Transaction limit exceeded");
         }
         else if(!validateDayLimit(transaction) && transaction.getType() != TransactionType.DEPOSIT){
-            return new TransactionValidation(false, "Day limit exceeded", TransactionValidation.TransactionValidationStatus.DAILY_LIMIT_EXCEEDED);
+            throw new TransactionDeniedException("Daily limit exceeded");
         }
         else if(!validateNotNegative(transaction)){
-            return new TransactionValidation(false, "Amount can not be negative!", TransactionValidation.TransactionValidationStatus.NOT_ALLOWED);
-        }
-        else{
-            return new TransactionValidation(true, "Transaction is valid", TransactionValidation.TransactionValidationStatus.VALID);
+            throw new IllegalArgumentException("Amount can not be negative!");
         }
     }
 
@@ -117,49 +125,36 @@ public class transactionService {
         return transaction.getOrigin().getBalance().subtract(transaction.getAmount()).doubleValue() >= transaction.getOrigin().getAbsoluteLimit().doubleValue();
     }
     //validate pin
-    private boolean validatePINcode(Transaction transaction) {
+    private boolean validatePinCode(Transaction transaction) {
         return transaction.getPerformer().getPincode().equals(transaction.getPincode());
     }
 
     private boolean validateDayLimit(Transaction transaction){
-       //check if performer is admin and if so, return true
-        if(transaction.getPerformer().getRoles().contains("ROLE_ADMIN")){
-           //if performer owns origin
-            if(transaction.getOrigin().getUser().getId().equals(transaction.getPerformer().getId())){
-                //check if origin has exceeded day limit
-                //get all transactions from origin
-                List<Transaction> transactions = getTodaysTransactions(transaction);
-                //get sum of all transactions
-                BigDecimal sum = BigDecimal.ZERO;
-                for(Transaction t : transactions){
-                    sum = sum.add(t.getAmount());
-                }
-                //check if sum is greater than day limit
-                return sum.add(transaction.getAmount()).doubleValue() <= transaction.getPerformer().getDayLimit().doubleValue();
-            }
-            else{
-                return true;
-            }
-        }
-        else if(transaction.getPerformer().getRoles().contains("ROLE_ADMIN") && !transaction.getOrigin().getIBAN().equals(bank_Iban)){
+        if(transaction.getPerformer().getRoles().contains(Role.ROLE_ADMIN) && !transaction.getOrigin().getIBAN().equals(bankIban)) {
             return true;
         }
-        else{
-            //check if origin has exceeded day limit
-            //get all transactions from origin
-            List<Transaction> transactions = getTodaysTransactions(transaction);
-            //get sum of all transactions
-            BigDecimal sum = BigDecimal.ZERO;
-            for(Transaction t : transactions){
-                sum = sum.add(t.getAmount());
-            }
-            //check if sum is greater than day limit
-            return sum.add(transaction.getAmount()).doubleValue() <= transaction.getPerformer().getDayLimit().doubleValue();
+       //check if performer is admin and if so, return true
+        if(transaction.getPerformer().getRoles().contains(Role.ROLE_ADMIN)  && !transaction.getOrigin().getUser().getId().equals(transaction.getPerformer().getId())) {
+            //if performer owns origin
+            return true;
         }
+        //get all transactions from origin
+        List<Transaction> transactions = getTodaysTransactions(transaction);
+        if(transactions.isEmpty()){
+            return true;
+        }
+        //get sum of all transactions
+        BigDecimal sum = BigDecimal.ZERO;
+        for(Transaction t : transactions){
+            sum = sum.add(t.getAmount());
+        }
+        //check if sum is greater than day limit
+        return sum.add(transaction.getAmount()).doubleValue() <= transaction.getPerformer().getDayLimit().doubleValue();
     }
+
     private boolean validateTransactionLimit(Transaction transaction){
         //check if transaction limit is not exceeded
-        if(transaction.getOrigin().getIBAN().equals(bank_Iban) && transaction.getPerformer().getRoles().contains("ROLE_ADMIN") && transaction.getType() != TransactionType.DEPOSIT){
+        if(transaction.getOrigin().getIBAN().equals(bankIban) && transaction.getPerformer().getRoles().contains(Role.ROLE_ADMIN) && transaction.getType() != TransactionType.DEPOSIT){
             return true;
         }
         else if(transaction.getType() == TransactionType.DEPOSIT){
@@ -174,7 +169,7 @@ public class transactionService {
         //only the owner of the savings account can transfer money to it or from it.
         //check if origin is a savings account
         if(transaction.getOrigin().getAccountType() == Account.AccountTypeEnum.SAVINGS || transaction.getTarget().getAccountType() == Account.AccountTypeEnum.SAVINGS){
-            //origin mus have have the same owner as the target
+            //origin mus have the same owner as the target
             return transaction.getOrigin().getUser().getId().equals(transaction.getTarget().getUser().getId());
         }
         else {
@@ -197,4 +192,41 @@ public class transactionService {
             return transaction.getOrigin().getUser().getId().equals(transaction.getPerformer().getId());
         }
     }
+
+    public Transaction doTransaction(PostTransactionDTO transaction, TransactionType type) {
+        //get curent user from security context
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.findByUsername(name);
+        //check if user is owner of the account or is admin
+        List<Account> list = user.getAccounts();
+        if (list.stream().noneMatch(a -> a.getIBAN().equals(transaction.getFromIBAN())) && !user.getRoles().contains(Role.ROLE_ADMIN)) {
+            throw new UnauthorizedException("You are not the owner of this account");
+        }
+        Transaction newTransaction = createTransactionFromPostTransaction(transaction, user, type);
+        //validate transaction
+        isValidTransaction(newTransaction);
+        return executeTransaction(newTransaction);
+    }
+
+    private Transaction createTransactionFromPostTransaction(PostTransactionDTO transaction, User user, TransactionType type) {
+        //create transaction object
+        Transaction t = new Transaction();
+        t.setPerformer(user);
+        t.setIBAN(transaction.getFromIBAN());
+        t.setType(TransactionType.TRANSFER);
+        //set origin and target if they exist, otherwise throw exception
+        if(accountService.findByIBAN(transaction.getFromIBAN()) == null){
+            throw new IllegalArgumentException("Origin account does not exist");
+        }
+        t.setOrigin((Account) accountService.findByIBAN(transaction.getFromIBAN()));
+        if(accountService.findByIBAN(transaction.getToIBAN()) == null){
+            throw new IllegalArgumentException("Target account does not exist");
+        }
+        t.setTarget((Account) accountService.findByIBAN(transaction.getToIBAN()));
+        t.setAmount(transaction.getAmount());
+        t.setPincode(transaction.getPincode());
+        t.setType(type);
+        return t;
+    }
+
 }

@@ -2,20 +2,15 @@ package io.swagger.api;
 
 import io.swagger.annotations.Api;
 import io.swagger.model.AccountDTO;
-import io.swagger.model.AccountDTO.AccountTypeEnum;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.model.entities.Account;
 import io.swagger.model.dto.*;
-import io.swagger.model.dto.*;
-import io.swagger.model.AccountDTO.AccountTypeEnum;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.entities.*;
+import io.swagger.services.TransactionService;
 import io.swagger.services.UserService;
-import io.swagger.services.accountService;
-import io.swagger.model.entities.Account;
 import io.swagger.services.accountService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -30,7 +25,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,13 +33,9 @@ import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 
-import java.io.Console;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -66,7 +56,7 @@ public class AccountsApiController implements AccountsApi {
     //niet nodig
 
     @Autowired
-    private io.swagger.services.transactionService transactionService;
+    private TransactionService transactionService;
 
     @Autowired
     UserService userService;
@@ -118,42 +108,8 @@ public class AccountsApiController implements AccountsApi {
     }
 
     public ResponseEntity<? extends Object> accountWithdraw(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody WithdrawDTO body) {
-
-            try {
-                //get curent user from security context
-                User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-                //ceck if user is owner of the account or is admin
-                List<Account> list = user.getAccounts();
-
-                if (list.stream().filter(a -> a.getIBAN().equals(body.getFromIBAN())).findAny().isPresent() || user.getRoles().contains("ROLE_ADMIN")) {
-                    //ceck if fromIBAN and toIBAN exists
-                    if (accountservice.findByIBAN(body.getFromIBAN()) == null ) {
-                        return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Account does not exist!", 404, "NOT_FOUND"), HttpStatus.NOT_FOUND);
-                    } else {
-                        //creste transaction object
-                        Transaction transaction = new Transaction();
-                        transaction.setPerformer(user);
-                        transaction.setType(TransactionType.WITHDRAWAL);
-                        transaction.setIBAN(body.getFromIBAN());
-                        transaction.setOrigin((Account) accountservice.findByIBAN(body.getFromIBAN()));
-                        transaction.setTarget((Account) accountservice.findByIBAN(bank_Iban));
-                        transaction.setAmount(body.getAmount());
-                        transaction.setPincode(body.getPincode());
-                        return doTransaction(transaction);
-                    }
-                }
-                //if user is not owner of the account or is not admin
-                else {
-                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "You do not have acces!", 401, "UNAUTHORIZED"), HttpStatus.UNAUTHORIZED);
-                }
-            }
-            catch (IllegalArgumentException e){
-                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Ellegal argument in transaction", 400,  "NOT_ALLOWED"), HttpStatus.BAD_REQUEST);
-            }
-            catch (Exception e) {
-                log.error("Internal server error", e);
-                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "An internal server error had occured!", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+        Transaction transaction = transactionService.doTransaction(body.toPostTransactionDTO(bank_Iban), TransactionType.WITHDRAWAL);
+        return new ResponseEntity<GetTransactionDTO>(transaction.toGetTransactionDTO(), HttpStatus.OK);
     }
 
     public ResponseEntity<? extends Object> addAccount(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostAccountDTO body) {
@@ -307,32 +263,5 @@ public class AccountsApiController implements AccountsApi {
             }
     }
 
-    private ResponseEntity<? extends Object> doTransaction(Transaction transaction){
-        //validate transaction
-        TransactionValidation validation = transactionService.isValidTransaction(transaction);
-        if(validation.getStatus() == TransactionValidation.TransactionValidationStatus.VALID){
-            //if transaction is valid
-            transactionService.doTransaction(transaction);
-            //check if transaction is executed
-            if(transactionService.transactionExists(transaction.getId())){
-                return new ResponseEntity<GetTransactionDTO>(transaction.toGetTransactionDTO(), HttpStatus.OK);
-            }
-            else{
-                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Transaction failed!", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-        else if(validation.getStatus() == TransactionValidation.TransactionValidationStatus.UNAUTHORIZED){
-            //return errorDTO
-            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), validation.getMessage(), 401, validation.getStatus().toString()), HttpStatus.UNAUTHORIZED);
-        }
-        else if(validation.getStatus() == TransactionValidation.TransactionValidationStatus.NOT_ALLOWED || validation.getStatus() == TransactionValidation.TransactionValidationStatus.NOT_ACTIVE){
-            //return errorDTO
-            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), validation.getMessage(), 403, validation.getStatus().toString()), HttpStatus.FORBIDDEN);
-        }
-        else{
-            //return errorDTO
-            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), validation.getMessage(), 400, validation.getStatus().toString()), HttpStatus.BAD_REQUEST);
-        }
-    }
 
 }

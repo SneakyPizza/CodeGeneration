@@ -4,7 +4,7 @@ import io.swagger.model.entities.*;
 import io.swagger.repositories.AccountRepository;
 import io.swagger.repositories.UserRepository;
 import io.swagger.services.UserService;
-import io.swagger.services.transactionService;
+import io.swagger.services.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -16,13 +16,12 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Component
 public class MyApplicationRunner implements ApplicationRunner {
 
     @Autowired
-    transactionService transactionService;
+    TransactionService transactionService;
 
     @Autowired
     UserService userService;
