@@ -27,6 +27,7 @@ public class transactionService {
     @Autowired
     private TransactionRepository transactionRepository;
 
+    ////Repository methods////
     //Add a new transaction object to the database
     public void addTransaction(Transaction transaction){
         transactionRepository.save(transaction);
@@ -54,6 +55,20 @@ public class transactionService {
         return (List<Transaction>) transactionRepository.findByIBANAndTimestamp(transaction.getIBAN(), now);
     }
 
+    //findByIBANAndTimestampBetween()
+    public List<Transaction> findByIBANAndTimestampBetween(String iban, LocalDateTime startDate, LocalDateTime endDate){
+        return (List<Transaction>) transactionRepository.findByIBANAndTimestampBetween(iban, startDate, endDate);
+    }
+
+    public void doTransaction(Transaction transaction) {
+        transaction.execute();
+        transactionRepository.save(transaction);
+        //save accounts
+        accountRepository.save(transaction.getOrigin());
+        accountRepository.save(transaction.getTarget());
+    }
+
+    ////Validation methods////
     //check if a transaction is valid
     public TransactionValidation isValidTransaction(Transaction transaction){
         if(!validateIsOwner(transaction) &&  transaction.getType() == TransactionType.TRANSFER) {
@@ -88,7 +103,7 @@ public class transactionService {
         }
     }
 
-    public boolean validateNotNegative(Transaction transaction){
+    private boolean validateNotNegative(Transaction transaction){
         return transaction.getAmount().doubleValue() > 0;
     }
     //validate that origin and target are active accounts
@@ -106,7 +121,7 @@ public class transactionService {
         return transaction.getPerformer().getPincode().equals(transaction.getPincode());
     }
 
-    public boolean validateDayLimit(Transaction transaction){
+    private boolean validateDayLimit(Transaction transaction){
        //check if performer is admin and if so, return true
         if(transaction.getPerformer().getRoles().contains("ROLE_ADMIN")){
            //if performer owns origin
@@ -142,7 +157,7 @@ public class transactionService {
             return sum.add(transaction.getAmount()).doubleValue() <= transaction.getPerformer().getDayLimit().doubleValue();
         }
     }
-    public boolean validateTransactionLimit(Transaction transaction){
+    private boolean validateTransactionLimit(Transaction transaction){
         //check if transaction limit is not exceeded
         if(transaction.getOrigin().getIBAN().equals(bank_Iban) && transaction.getPerformer().getRoles().contains("ROLE_ADMIN") && transaction.getType() != TransactionType.DEPOSIT){
             return true;
@@ -155,7 +170,7 @@ public class transactionService {
 
         }
     }
-    public boolean validateSavingsAccount(Transaction transaction){
+    private boolean validateSavingsAccount(Transaction transaction){
         //only the owner of the savings account can transfer money to it or from it.
         //check if origin is a savings account
         if(transaction.getOrigin().getAccountType() == Account.AccountTypeEnum.SAVINGS || transaction.getTarget().getAccountType() == Account.AccountTypeEnum.SAVINGS){
@@ -167,12 +182,12 @@ public class transactionService {
             return true;
         }
     }
-    public boolean validateThatOriginIsNotTarget(Transaction transaction){
+    private boolean validateThatOriginIsNotTarget(Transaction transaction){
         return !transaction.getOrigin().getId().equals(transaction.getTarget().getId());
     }
 
     //check if performer is the owner of the account
-    public boolean validateIsOwner(Transaction transaction){
+    private boolean validateIsOwner(Transaction transaction){
         //check if performer is an admin
         if(transaction.getPerformer().getRoles().contains(Role.ROLE_ADMIN)){
             return true;
@@ -181,20 +196,5 @@ public class transactionService {
             //check if performer is the owner of the account
             return transaction.getOrigin().getUser().getId().equals(transaction.getPerformer().getId());
         }
-    }
-
-    //findByIBANAndTimestampBetween()
-    public List<Transaction> findByIBANAndTimestampBetween(String iban, LocalDateTime startDate, LocalDateTime endDate){
-        return (List<Transaction>) transactionRepository.findByIBANAndTimestampBetween(iban, startDate, endDate);
-    }
-
-
-
-    public void doTransaction(Transaction transaction) {
-        transaction.execute();
-        transactionRepository.save(transaction);
-        //save accounts
-        accountRepository.save(transaction.getOrigin());
-        accountRepository.save(transaction.getTarget());
     }
 }

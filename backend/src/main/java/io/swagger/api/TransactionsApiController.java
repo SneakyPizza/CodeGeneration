@@ -135,67 +135,68 @@ public class TransactionsApiController implements TransactionsApi {
     }
 
     public ResponseEntity<? extends Object> transaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostTransactionDTO body) {
-        try {
-            //get curent user from security context
-                String name = SecurityContextHolder.getContext().getAuthentication().getName();
-            User user = userService.findByUsername(name);
-                //ceck if user is owner of the account or is admin
-                List<Account> list = user.getAccounts();
-
-            if (list.stream().filter(a -> a.getIBAN().equals(body.getFromIBAN())).findAny().isPresent() || user.getRoles().contains(Role.ROLE_ADMIN)) {
-                //ceck if fromIBAN and toIBAN exists
-                if (accountService.findByIBAN(body.getFromIBAN()) == null || accountService.findByIBAN(body.getToIBAN()) == null) {
-                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Account does not exist!", 404, "NOT_FOUND"), HttpStatus.NOT_FOUND);
-                }
-                else {
-                    //creste transaction object
-                    Transaction transaction = new Transaction();
-                    transaction.setPerformer(user);
-                    transaction.setIBAN(body.getFromIBAN());
-                    transaction.setType(TransactionType.TRANSFER);
-                    transaction.setOrigin((Account) accountService.findByIBAN(body.getFromIBAN()));
-                    transaction.setTarget((Account) accountService.findByIBAN(body.getToIBAN()));
-                    transaction.setAmount(body.getAmount());
-                    transaction.setPincode(body.getPincode());
-                    //validate transaction
-                    TransactionValidation validation = transactionService.isValidTransaction(transaction);
-                    if(validation.getStatus() == TransactionValidation.TransactionValidationStatus.VALID){
-                        //if transaction is valid
-                        transactionService.doTransaction(transaction);
-                        //check if transaction is executed
-                        if(transactionService.transactionExists(transaction.getId())){
-                            return new ResponseEntity<GetTransactionDTO>(transaction.toGetTransactionDTO(), HttpStatus.OK);
-                        }
-                        else{
-                            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Transaction failed!", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
-                        }
-                    }
-                    else if(validation.getStatus() == TransactionValidation.TransactionValidationStatus.UNAUTHORIZED){
-                        //return errorDTO
-                        return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), validation.getMessage(), 401, validation.getStatus().toString()), HttpStatus.UNAUTHORIZED);
-                    }
-                    else if(validation.getStatus() == TransactionValidation.TransactionValidationStatus.NOT_ALLOWED || validation.getStatus() == TransactionValidation.TransactionValidationStatus.NOT_ACTIVE){
-                        //return errorDTO
-                        return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), validation.getMessage(), 403, validation.getStatus().toString()), HttpStatus.FORBIDDEN);
-                    }
-                    else{
-                        //return errorDTO
-                        return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), validation.getMessage(), 400, validation.getStatus().toString()), HttpStatus.BAD_REQUEST);
-                    }
-                }
-            }
-            //if user is not owner of the account or is not admin
-            else {
-                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "You do not have acces!", 401, "UNAUTHORIZED"), HttpStatus.UNAUTHORIZED);
-            }
-        }
-        catch (IllegalArgumentException e){
-            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Ellegal argument in transaction", 400,  "NOT_ALLOWED"), HttpStatus.BAD_REQUEST);
-
-        }
-        catch (Exception e) {
-            log.error("Internal server error", e);
-            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "An internal server error had occured!", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        throw new IllegalArgumentException("Invalid request!!!!");
+//        try {
+//            //get curent user from security context
+//                String name = SecurityContextHolder.getContext().getAuthentication().getName();
+//            User user = userService.findByUsername(name);
+//                //ceck if user is owner of the account or is admin
+//                List<Account> list = user.getAccounts();
+//
+//            if (list.stream().filter(a -> a.getIBAN().equals(body.getFromIBAN())).findAny().isPresent() || user.getRoles().contains(Role.ROLE_ADMIN)) {
+//                //ceck if fromIBAN and toIBAN exists
+//                if (accountService.findByIBAN(body.getFromIBAN()) == null || accountService.findByIBAN(body.getToIBAN()) == null) {
+//                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Account does not exist!", 404, "NOT_FOUND"), HttpStatus.NOT_FOUND);
+//                }
+//                else {
+//                    //creste transaction object
+//                    Transaction transaction = new Transaction();
+//                    transaction.setPerformer(user);
+//                    transaction.setIBAN(body.getFromIBAN());
+//                    transaction.setType(TransactionType.TRANSFER);
+//                    transaction.setOrigin((Account) accountService.findByIBAN(body.getFromIBAN()));
+//                    transaction.setTarget((Account) accountService.findByIBAN(body.getToIBAN()));
+//                    transaction.setAmount(body.getAmount());
+//                    transaction.setPincode(body.getPincode());
+//                    //validate transaction
+//                    TransactionValidation validation = transactionService.isValidTransaction(transaction);
+//                    if(validation.getStatus() == TransactionValidation.TransactionValidationStatus.VALID){
+//                        //if transaction is valid
+//                        transactionService.doTransaction(transaction);
+//                        //check if transaction is executed
+//                        if(transactionService.transactionExists(transaction.getId())){
+//                            return new ResponseEntity<GetTransactionDTO>(transaction.toGetTransactionDTO(), HttpStatus.OK);
+//                        }
+//                        else{
+//                            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Transaction failed!", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
+//                        }
+//                    }
+//                    else if(validation.getStatus() == TransactionValidation.TransactionValidationStatus.UNAUTHORIZED){
+//                        //return errorDTO
+//                        return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), validation.getMessage(), 401, validation.getStatus().toString()), HttpStatus.UNAUTHORIZED);
+//                    }
+//                    else if(validation.getStatus() == TransactionValidation.TransactionValidationStatus.NOT_ALLOWED || validation.getStatus() == TransactionValidation.TransactionValidationStatus.NOT_ACTIVE){
+//                        //return errorDTO
+//                        return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), validation.getMessage(), 403, validation.getStatus().toString()), HttpStatus.FORBIDDEN);
+//                    }
+//                    else{
+//                        //return errorDTO
+//                        return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), validation.getMessage(), 400, validation.getStatus().toString()), HttpStatus.BAD_REQUEST);
+//                    }
+//                }
+//            }
+//            //if user is not owner of the account or is not admin
+//            else {
+//                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "You do not have acces!", 401, "UNAUTHORIZED"), HttpStatus.UNAUTHORIZED);
+//            }
+//        }
+//        catch (IllegalArgumentException e){
+//            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Ellegal argument in transaction", 400,  "NOT_ALLOWED"), HttpStatus.BAD_REQUEST);
+//
+//        }
+//        catch (Exception e) {
+//            log.error("Internal server error", e);
+//            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "An internal server error had occured!", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
     }
 }

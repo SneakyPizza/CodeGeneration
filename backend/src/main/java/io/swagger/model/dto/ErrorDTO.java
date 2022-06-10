@@ -17,17 +17,17 @@ import javax.validation.constraints.*;
 
 
 public class ErrorDTO   {
-  @JsonProperty("timestamp")
-  private String timestamp = null;
-
-  @JsonProperty("message")
-  private String message = null;
-
   @JsonProperty("status")
   private Integer status = null;
 
   @JsonProperty("error")
   private String error = null;
+
+  @JsonProperty("message")
+  private String message = null;
+
+  @JsonProperty("timestamp")
+  private String timestamp = null;
 
 //full constructor
     public ErrorDTO(String timestamp, String message, Integer status, String error) {
