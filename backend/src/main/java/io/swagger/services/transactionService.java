@@ -9,7 +9,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -180,6 +182,13 @@ public class transactionService {
             return transaction.getOrigin().getUser().getId().equals(transaction.getPerformer().getId());
         }
     }
+
+    //findByIBANAndTimestampBetween()
+    public List<Transaction> findByIBANAndTimestampBetween(String iban, LocalDateTime startDate, LocalDateTime endDate){
+        return (List<Transaction>) transactionRepository.findByIBANAndTimestampBetween(iban, startDate, endDate);
+    }
+
+
 
     public void doTransaction(Transaction transaction) {
         transaction.execute();

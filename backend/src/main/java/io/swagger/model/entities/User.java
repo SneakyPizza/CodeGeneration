@@ -5,6 +5,7 @@ import javax.xml.bind.DatatypeConverter;
 
 import io.swagger.model.GetUserDTO;
 import io.swagger.model.UserDTO;
+import io.swagger.model.dto.NameSearchAccountDTO;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -13,6 +14,7 @@ import org.hibernate.annotations.Type;
 import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -43,6 +45,8 @@ public class User {
     @NonNull
     private String zipcode;
     @NonNull
+    private UserStatus userstatus;
+    @NonNull
     private BigDecimal dayLimit;
     @NonNull
     private BigDecimal transactionLimit;
@@ -57,7 +61,7 @@ public class User {
     private List<Role> roles;
 
     // all args constructor
-    public User(String username, String password, String email, String firstName, String lastName, String street, String city, String zipcode, BigDecimal dayLimit, BigDecimal transactionLimit, String pincode, List<Account> accounts, List<Role> roles) {
+    public User(String username, String password, String email, String firstName, String lastName, String street, String city, String zipcode, UserStatus userstatus, BigDecimal dayLimit, BigDecimal transactionLimit, String pincode, List<Account> accounts, List<Role> roles) {
         this.username = username;
         this.password = password;
         this.email = email;
@@ -66,6 +70,7 @@ public class User {
         this.street = street;
         this.city = city;
         this.zipcode = zipcode;
+        this.userstatus = userstatus;
         this.dayLimit = dayLimit;
         this.transactionLimit = transactionLimit;
         this.pincode = pincode;
@@ -93,6 +98,23 @@ public class User {
         }
     }
 
+    public UserDTO toUserDTO(){
+        UserDTO dto = new UserDTO();
+        //missing username
+        dto.setEmail(email);
+        dto.setPassword(password);
+        dto.setFirstName(firstName);
+        dto.setLastName(lastName);
+        dto.setStreet(street);
+        dto.setCity(city);
+        dto.setZipcode(zipcode);
+        dto.setDayLimit(dayLimit);
+        dto.setTransactionLimit(transactionLimit);
+        return dto;
+    }
+
+
+    
     public UserDTO getUserDTO() {
     	UserDTO userDTO = new UserDTO();
     	userDTO.setUserid(this.id);
@@ -104,6 +126,12 @@ public class User {
     	userDTO.setStreet(this.street);
     	userDTO.setCity(this.city);
     	userDTO.setZipcode(this.zipcode);
+        if (this.userstatus == UserStatus.ACTIVE) {
+            userDTO.setUserstatus(UserDTO.UserstatusEnum.ACTIVE);
+        }
+        else if (this.userstatus == UserStatus.DISABLED) {
+            userDTO.setUserstatus(UserDTO.UserstatusEnum.DISABLED);
+        }
     	userDTO.setDayLimit(this.dayLimit);
     	userDTO.setTransactionLimit(this.transactionLimit);
         if (this.roles.contains(Role.ROLE_ADMIN) && this.roles.contains(Role.ROLE_USER)) {
@@ -129,6 +157,19 @@ public class User {
         getUserDTO.setStreet(this.street);
         getUserDTO.setCity(this.city);
         getUserDTO.setZipcode(this.zipcode);
+
+        List<String> list = new ArrayList<String>();
+        for (Account account : this.accounts) {
+            list.add(account.getIBAN());
+        }
+        getUserDTO.setAccounts(list);
+
+        if (this.userstatus == UserStatus.ACTIVE) {
+            getUserDTO.setUserstatus(GetUserDTO.UserstatusEnum.ACTIVE);
+        }
+        else if (this.userstatus == UserStatus.DISABLED) {
+            getUserDTO.setUserstatus(GetUserDTO.UserstatusEnum.DISABLED);
+        }
         getUserDTO.setDayLimit(this.dayLimit);
         getUserDTO.setTransactionLimit(this.transactionLimit);
         if (this.roles.contains(Role.ROLE_ADMIN) && this.roles.contains(Role.ROLE_USER)) {
@@ -154,6 +195,12 @@ public class User {
         user.setStreet(userDTO.getStreet());
         user.setCity(userDTO.getCity());
         user.setZipcode(userDTO.getZipcode());
+        if (userDTO.getUserstatus() == UserDTO.UserstatusEnum.ACTIVE) {
+            user.setUserstatus(UserStatus.ACTIVE);
+        }
+        else if (userDTO.getUserstatus() == UserDTO.UserstatusEnum.DISABLED) {
+            user.setUserstatus(UserStatus.DISABLED);
+        }
         user.setDayLimit(userDTO.getDayLimit());
         user.setTransactionLimit(userDTO.getTransactionLimit());
         if (userDTO.getRoles().contains(GetUserDTO.Role.ADMIN) && userDTO.getRoles().contains(GetUserDTO.Role.USER)) {
@@ -167,4 +214,12 @@ public class User {
         }
         return user;
     }
+
+    public NameSearchAccountDTO toNameSearchAccountDTO(String iban){
+        NameSearchAccountDTO dto = new NameSearchAccountDTO();
+        dto.setFirstName(this.getFirstName());
+        dto.setLastName(this.getLastName());
+        dto.setIBAN(iban);
+        return dto;
+      }
 }

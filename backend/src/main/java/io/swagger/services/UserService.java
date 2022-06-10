@@ -6,7 +6,9 @@ import io.swagger.repositories.UserRepository;
 import io.swagger.jwt.JwtTokenProvider;
 
 import java.awt.print.Pageable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import io.swagger.utils.PincodeGenerator;
@@ -53,6 +55,14 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public boolean checkIfUserExists(UUID id) {
+        return userRepository.existsById(id);
+    }
+
+    public boolean checkIfUserExistsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
     public User updateUser(User user) {
         return userRepository.save(user);
     }
@@ -62,11 +72,18 @@ public class UserService {
         return userRepository.findByUsername(userName);
     }
 
+    public List<User> findByFirstName(String firstname){
+        return userRepository.findByFirstName(firstname);
+    }
+
+    public List<User> findByLastName(String lastname){
+        return userRepository.findByLastName(lastname);
+    }
     public JWT_DTO login(String username, String password) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         JWT_DTO jwt_dto = new JWT_DTO();
         User user = userRepository.findByUsername(username);
         jwt_dto.setJwTtoken(tokenProvider.createToken(username, user.getRoles()));
+        jwt_dto.setId(user.getId().toString());
         return jwt_dto;
     }
 }

@@ -26,7 +26,7 @@ public class HistoryStepDefinitions  extends BaseStepDefinitions implements En {
     @Value("${io.swagger.api.token_ADMIN}")
     private String VALID_TOKEN_ADMIN;
     private static final String INVALID_TOKEN = "invalid";
-    private static final String USER_IBAN = "NL01INHO0000000002";
+    private static final String USER_IBAN = "NL01INHO0000000003";
     private static final String ADMIN_IBAN = "NL01INHO0000000001";
     private static final String IBAN_INVALID = "invalid";
 

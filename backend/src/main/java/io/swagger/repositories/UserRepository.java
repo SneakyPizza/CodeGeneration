@@ -1,6 +1,5 @@
 package io.swagger.repositories;
 
-import io.swagger.model.entities.Account;
 import io.swagger.model.entities.User;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -16,4 +15,9 @@ public interface UserRepository extends PagingAndSortingRepository<User, UUID> {
 
     User findByUsername(String username);
     List<User> findAll();
+    boolean existsByUsername(String username);
+
+    List<User> findByFirstName(String firstname);
+
+    List<User> findByLastName(String lastname);
 }

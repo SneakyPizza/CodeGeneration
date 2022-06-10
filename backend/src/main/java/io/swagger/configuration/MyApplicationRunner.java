@@ -1,9 +1,6 @@
 package io.swagger.configuration;
 
-import io.swagger.model.entities.Account;
-import io.swagger.model.entities.Role;
-import io.swagger.model.entities.Transaction;
-import io.swagger.model.entities.User;
+import io.swagger.model.entities.*;
 import io.swagger.repositories.AccountRepository;
 import io.swagger.repositories.UserRepository;
 import io.swagger.services.UserService;
@@ -55,9 +52,25 @@ public class MyApplicationRunner implements ApplicationRunner {
         testUser.setStreet("test");
         testUser.setCity("test");
         testUser.setZipcode("test");
+        testUser.setUserstatus(UserStatus.ACTIVE);
         testUser.setDayLimit(new BigDecimal(10000));
         testUser.setTransactionLimit(new BigDecimal(500));
-        testUser.setRoles(new ArrayList<>(List.of(Role.ROLE_ADMIN)));
+        testUser.setRoles(new ArrayList<>(List.of(Role.ROLE_USER)));
+
+        User testUser2 = new User();
+        testUser2.setUsername("test2");
+        testUser2.setPincode("1234");
+        testUser2.setPassword(passwordEncoder.encode("test2"));
+        testUser2.setEmail("test2@test2.nl");
+        testUser2.setFirstName("test2");
+        testUser2.setLastName("test2");
+        testUser2.setStreet("test2");
+        testUser2.setCity("test2");
+        testUser2.setZipcode("test2");
+        testUser2.setUserstatus(UserStatus.DISABLED);
+        testUser2.setDayLimit(new BigDecimal(10000));
+        testUser2.setTransactionLimit(new BigDecimal(500));
+        testUser2.setRoles(new ArrayList<>(List.of(Role.ROLE_USER)));
 
         User Bank = new User();
         Bank.setUsername("Bank");
@@ -69,8 +82,9 @@ public class MyApplicationRunner implements ApplicationRunner {
         Bank.setStreet("Bank");
         Bank.setCity("Bank");
         Bank.setZipcode("Bank");
+        Bank.setUserstatus(UserStatus.ACTIVE);
         Bank.setDayLimit(new BigDecimal(String.valueOf(BigDecimal.valueOf(900000000000000L))));
-        Bank.setTransactionLimit(new BigDecimal(0));
+        Bank.setTransactionLimit(new BigDecimal(String.valueOf(BigDecimal.valueOf(900000000000000L))));
         Bank.setRoles(new ArrayList<>(List.of(Role.ROLE_ADMIN)));
 
         Account BankAccount = new Account();
@@ -83,18 +97,29 @@ public class MyApplicationRunner implements ApplicationRunner {
 
         Account testAccount = new Account();
         testAccount.setIBAN("NL01INHO0000000002");
-        testAccount.setBalance(new BigDecimal(0));
+        testAccount.setBalance(new BigDecimal(10000));
         testAccount.setUser(testUser);
         testAccount.setAccountType(Account.AccountTypeEnum.CURRENT);
         testAccount.setAbsoluteLimit(new BigDecimal(0));
         testAccount.setActive(Account.ActiveEnum.ACTIVE);
 
+        Account testAccount2 = new Account();
+        testAccount2.setIBAN("NL01INHO0000000003");
+        testAccount2.setBalance(new BigDecimal(0));
+        testAccount2.setUser(testUser2);
+        testAccount2.setAccountType(Account.AccountTypeEnum.CURRENT);
+        testAccount2.setAbsoluteLimit(new BigDecimal(0));
+        testAccount2.setActive(Account.ActiveEnum.ACTIVE);
+
         testUser.setAccounts(new ArrayList<>(List.of(testAccount)));
+        testUser2.setAccounts(new ArrayList<>(List.of(testAccount2)));
         Bank.setAccounts(new ArrayList<>(List.of(BankAccount)));
         userRepository.save(testUser);
+        userRepository.save(testUser2);
         userRepository.save(Bank);
         accountRepo.save(BankAccount);
         accountRepo.save(testAccount);
+        accountRepo.save(testAccount2);
 
         //test transaction
         Transaction transaction = new Transaction();
@@ -109,9 +134,10 @@ public class MyApplicationRunner implements ApplicationRunner {
         System.out.println(transaction.getOrigin().getBalance());
         System.out.println(transaction.getTarget().getBalance());
         transactionService.addTransaction(transaction);
+        /*
         if(transactionService.transactionExists(transaction.getId())){
             accountRepo.save(transaction.getOrigin());
             accountRepo.save(transaction.getTarget());
-        }
+        }*/
     }
 }
