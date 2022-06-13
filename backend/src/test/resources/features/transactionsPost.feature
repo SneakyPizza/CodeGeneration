@@ -16,7 +16,7 @@ Feature: Everything transaction related
        Given I provide valid admin credentials
        And My Pin is incorrect
        When I perform a transaction
-       Then I should see a transaction status code of 401
+       Then I should see a transaction status code of 400
 
        Scenario: Preformatted transaction as admin
        Given I provide valid admin credentials

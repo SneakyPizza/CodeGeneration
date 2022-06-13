@@ -55,7 +55,7 @@ public class MyApplicationRunner implements ApplicationRunner {
         testUser.setUserstatus(UserStatus.ACTIVE);
         testUser.setDayLimit(new BigDecimal(10000));
         testUser.setTransactionLimit(new BigDecimal(500));
-        testUser.setRoles(new ArrayList<>(List.of(Role.ROLE_ADMIN)));
+        testUser.setRoles(new ArrayList<>(List.of(Role.ROLE_USER)));
 
         User testUser2 = new User();
         testUser2.setUsername("test2");
@@ -84,7 +84,7 @@ public class MyApplicationRunner implements ApplicationRunner {
         Bank.setZipcode("Bank");
         Bank.setUserstatus(UserStatus.ACTIVE);
         Bank.setDayLimit(new BigDecimal(String.valueOf(BigDecimal.valueOf(900000000000000L))));
-        Bank.setTransactionLimit(new BigDecimal(0));
+        Bank.setTransactionLimit(new BigDecimal(String.valueOf(BigDecimal.valueOf(900000000000000L))));
         Bank.setRoles(new ArrayList<>(List.of(Role.ROLE_ADMIN)));
 
         Account BankAccount = new Account();
@@ -97,18 +97,29 @@ public class MyApplicationRunner implements ApplicationRunner {
 
         Account testAccount = new Account();
         testAccount.setIBAN("NL01INHO0000000002");
-        testAccount.setBalance(new BigDecimal(0));
+        testAccount.setBalance(new BigDecimal(10000));
         testAccount.setUser(testUser);
         testAccount.setAccountType(Account.AccountTypeEnum.CURRENT);
         testAccount.setAbsoluteLimit(new BigDecimal(0));
         testAccount.setActive(Account.ActiveEnum.ACTIVE);
 
+        Account testAccount2 = new Account();
+        testAccount2.setIBAN("NL01INHO0000000003");
+        testAccount2.setBalance(new BigDecimal(0));
+        testAccount2.setUser(testUser2);
+        testAccount2.setAccountType(Account.AccountTypeEnum.CURRENT);
+        testAccount2.setAbsoluteLimit(new BigDecimal(0));
+        testAccount2.setActive(Account.ActiveEnum.ACTIVE);
+
         testUser.setAccounts(new ArrayList<>(List.of(testAccount)));
+        testUser2.setAccounts(new ArrayList<>(List.of(testAccount2)));
         Bank.setAccounts(new ArrayList<>(List.of(BankAccount)));
         userRepository.save(testUser);
+        userRepository.save(testUser2);
         userRepository.save(Bank);
         accountRepo.save(BankAccount);
         accountRepo.save(testAccount);
+        accountRepo.save(testAccount2);
 
         //test transaction
         Transaction transaction = new Transaction();
