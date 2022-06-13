@@ -177,4 +177,15 @@ public class DepositDTO   {
     }
     return o.toString().replace("\n", "\n    ");
   }
+
+  public PostTransactionDTO toPostTransactionDTO(String iban) {
+    PostTransactionDTO postTransactionDTO = new PostTransactionDTO();
+    postTransactionDTO.setAmount(this.amount);
+    postTransactionDTO.setFromIBAN(iban);
+    postTransactionDTO.setToIBAN(this.toIBAN);
+    postTransactionDTO.setTimestamp(this.timestamp);
+    postTransactionDTO.setPincode(this.pincode);
+    postTransactionDTO.setFromUserId(this.fromUserId);
+    return postTransactionDTO;
+  }
 }

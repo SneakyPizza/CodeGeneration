@@ -46,7 +46,7 @@ import java.util.stream.StreamSupport;
 public class AccountsApiController implements AccountsApi {
 
     @Value("${server.bank.iban}")
-    private String bank_Iban;
+    private String bankIban;
 
     private static final Logger log = LoggerFactory.getLogger(AccountsApiController.class);
 
@@ -70,45 +70,12 @@ public class AccountsApiController implements AccountsApi {
         this.request = request;
     }
     public ResponseEntity<? extends Object> accountDeposit(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody DepositDTO body) {
-            try {
-                //get curent user from security context
-                User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-                //ceck if user is owner of the account or is admin
-                List<Account> list = user.getAccounts();
-
-                if (list.stream().filter(a -> a.getIBAN().equals(body.getToIBAN())).findAny().isPresent() || user.getRoles().contains("ROLE_ADMIN")) {
-                    //ceck if fromIBAN and toIBAN exists
-                    if (accountservice.findByIBAN(body.getToIBAN()) == null) {
-                        return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Account does not exist!", 404, "NOT_FOUND"), HttpStatus.NOT_FOUND);
-                    } else {
-                        //creste transaction object
-                        Transaction transaction = new Transaction();
-                        transaction.setPerformer(user);
-                        transaction.setType(TransactionType.DEPOSIT);
-                        transaction.setOrigin((Account) accountservice.findByIBAN(bank_Iban));
-                        transaction.setTarget((Account) accountservice.findByIBAN(body.getToIBAN()));
-                        transaction.setIBAN(bank_Iban);
-                        transaction.setAmount(body.getAmount());
-                        transaction.setPincode(body.getPincode());
-                        return doTransaction(transaction);
-                    }
-                }
-                //if user is not owner of the account or is not admin
-                else {
-                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "You do not have acces!", 401, "UNAUTHORIZED"), HttpStatus.UNAUTHORIZED);
-                }
-            }
-            catch (IllegalArgumentException e){
-                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Ellegal argument in transaction", 400,  "NOT_ALLOWED"), HttpStatus.BAD_REQUEST);
-            }
-            catch (Exception e) {
-                log.error("Internal server error", e);
-                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "An internal server error had occured!", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+        Transaction transaction = transactionService.doTransaction(body.toPostTransactionDTO(bankIban), TransactionType.DEPOSIT);
+        return new ResponseEntity<>(transaction.toGetTransactionDTO(), HttpStatus.OK);
     }
 
     public ResponseEntity<? extends Object> accountWithdraw(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody WithdrawDTO body) {
-        Transaction transaction = transactionService.doTransaction(body.toPostTransactionDTO(bank_Iban), TransactionType.WITHDRAWAL);
+        Transaction transaction = transactionService.doTransaction(body.toPostTransactionDTO(bankIban), TransactionType.WITHDRAWAL);
         return new ResponseEntity<GetTransactionDTO>(transaction.toGetTransactionDTO(), HttpStatus.OK);
     }
 
@@ -262,6 +229,13 @@ public class AccountsApiController implements AccountsApi {
                 return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Couldn't serialize response for content type application/json", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
             }
     }
+
+    private void checkBody(Object body){
+        if (body == null) {
+        throw new NullPointerException("A application/json value is required");
+        }
+    }
+
 
 
 }

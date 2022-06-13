@@ -1,6 +1,7 @@
 package io.swagger.services;
 
 import io.swagger.exeption.custom.InvalidTransactionsException;
+import io.swagger.exeption.custom.NotFoundException;
 import io.swagger.exeption.custom.TransactionDeniedException;
 import io.swagger.exeption.custom.UnauthorizedException;
 import io.swagger.model.dto.PostTransactionDTO;
@@ -49,7 +50,9 @@ public class TransactionService {
     }
 
     //Get a transaction by id
-    public Transaction getTransactionById(UUID id){ return transactionRepository.findById(id).get(); }
+    public Transaction getTransactionById(UUID id){
+        return transactionRepository.findById(id).orElseThrow(() -> new NotFoundException("Transaction not found"));
+    }
 
     //Get all transactions from a specific user
     public List<Transaction> getTransactions(String iban) {return (List<Transaction>) transactionRepository.findByIBAN(iban);}
@@ -166,7 +169,6 @@ public class TransactionService {
         }
     }
     private boolean validateSavingsAccount(Transaction transaction){
-        //only the owner of the savings account can transfer money to it or from it.
         //check if origin is a savings account
         if(transaction.getOrigin().getAccountType() == Account.AccountTypeEnum.SAVINGS || transaction.getTarget().getAccountType() == Account.AccountTypeEnum.SAVINGS){
             //origin mus have the same owner as the target
@@ -198,8 +200,8 @@ public class TransactionService {
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.findByUsername(name);
         //check if user is owner of the account or is admin
-        List<Account> list = user.getAccounts();
-        if (list.stream().noneMatch(a -> a.getIBAN().equals(transaction.getFromIBAN())) && !user.getRoles().contains(Role.ROLE_ADMIN)) {
+        List<Account> userList = user.getAccounts();
+        if (userList.stream().noneMatch(a -> a.getIBAN().equals(transaction.getFromIBAN())) && !user.getRoles().contains(Role.ROLE_ADMIN)) {
             throw new UnauthorizedException("You are not the owner of this account");
         }
         Transaction newTransaction = createTransactionFromPostTransaction(transaction, user, type);
@@ -213,7 +215,7 @@ public class TransactionService {
         Transaction t = new Transaction();
         t.setPerformer(user);
         t.setIBAN(transaction.getFromIBAN());
-        t.setType(TransactionType.TRANSFER);
+        t.setType(type);
         //set origin and target if they exist, otherwise throw exception
         if(accountService.findByIBAN(transaction.getFromIBAN()) == null){
             throw new IllegalArgumentException("Origin account does not exist");
@@ -228,5 +230,4 @@ public class TransactionService {
         t.setType(type);
         return t;
     }
-
 }
