@@ -177,4 +177,16 @@ public class WithdrawDTO   {
     }
     return o.toString().replace("\n", "\n    ");
   }
+
+  public PostTransactionDTO toPostTransactionDTO(String iban) {
+    PostTransactionDTO postTransactionDTO = new PostTransactionDTO();
+    postTransactionDTO.setAmount(this.amount);
+    postTransactionDTO.setFromIBAN(this.fromIBAN);
+    postTransactionDTO.setToIBAN(iban);
+    postTransactionDTO.setTimestamp(this.timestamp);
+    postTransactionDTO.setPincode(this.pincode);
+    postTransactionDTO.setFromUserId(this.fromUserId);
+    return postTransactionDTO;
+  }
+
 }

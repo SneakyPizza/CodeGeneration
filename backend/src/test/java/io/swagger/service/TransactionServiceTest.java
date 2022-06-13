@@ -5,24 +5,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.entities.*;
 import io.swagger.repositories.AccountRepository;
 import io.swagger.repositories.UserRepository;
-import io.swagger.services.transactionService;
+import io.swagger.services.TransactionService;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.annotation.Order;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -32,7 +28,7 @@ import java.util.List;
 public class TransactionServiceTest {
 
     @Autowired
-    private transactionService transactionService;
+    private TransactionService transactionService;
 
     @Autowired
     private AccountRepository accountRepository;
