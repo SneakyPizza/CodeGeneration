@@ -22,8 +22,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 
-
-
 @SpringBootTest
 public class TransactionServiceTest {
 
@@ -113,62 +111,55 @@ public class TransactionServiceTest {
         Assertions.assertEquals(BankAccount.getIBAN(), t.get(0).getOrigin().getIBAN());
     }
 
-    @Test
-    @Order(5)
-    //validate a transaction
-    void E_validateTransaction() {
-        TransactionValidation v = transactionService.isValidTransaction(transaction);
-        Assertions.assertEquals(v.getStatus(), TransactionValidation.TransactionValidationStatus.VALID);
-    }
 
-    @Test
-    @Order(6)
-    //transaction with invalid pin
-    void F_invalidIBAN() {
-        Transaction t = new Transaction();
-        t.setAmount(new BigDecimal(99));
-        t.setTimestamp(LocalDateTime.now());
-        t.setTarget(testAccount);
-        t.setOrigin(BankAccount);
-        t.setPincode("1232");
-        t.setPerformer(Bank);
-        t.setIBAN("NL01INHO0000000001");
-        t.execute();
-        TransactionValidation v = transactionService.isValidTransaction(t);
-        Assertions.assertEquals(v.getStatus(), TransactionValidation.TransactionValidationStatus.INVALID_PIN);
-    }
-
-    @Test
-    @Order(7)
-    //transaction with invalid origin is same as target
-    void G_invalidOrigin() {
-        Transaction t = new Transaction();
-        t.setAmount(new BigDecimal(99));
-        t.setTimestamp(LocalDateTime.now());
-        t.setTarget(testAccount);
-        t.setOrigin(testAccount);
-        t.setPincode("1234");
-        t.setPerformer(Bank);
-        t.setIBAN(testAccount.getIBAN());
-        t.execute();
-        TransactionValidation v = transactionService.isValidTransaction(t);
-        Assertions.assertEquals(v.getStatus(), TransactionValidation.TransactionValidationStatus.NOT_ALLOWED);
-    }
-
-    @Test
-    @Order(8)
-    //transaction with transaction with invalid amount
-    void H_invalidAmount() {
-        Transaction t = new Transaction();
-        t.setAmount(new BigDecimal(1000));
-        t.setTimestamp(LocalDateTime.now());
-        t.setTarget(BankAccount);
-        t.setOrigin(testAccount);
-        t.setPincode("1234");
-        t.setPerformer(testUser);
-        t.setIBAN(testAccount.getIBAN());
-        t.execute();
-        TransactionValidation v = transactionService.isValidTransaction(t);
-        Assertions.assertEquals(v.getStatus(), TransactionValidation.TransactionValidationStatus.TRANSACTION_LIMIT_EXCEEDED);
-    }
+//    @Test
+//    @Order(6)
+//    //transaction with invalid pin
+//    void F_invalidIBAN() {
+//        Transaction t = new Transaction();
+//        t.setAmount(new BigDecimal(99));
+//        t.setTimestamp(LocalDateTime.now());
+//        t.setTarget(testAccount);
+//        t.setOrigin(BankAccount);
+//        t.setPincode("1232");
+//        t.setPerformer(Bank);
+//        t.setIBAN("NL01INHO0000000001");
+//        t.execute();
+//        TransactionValidation v = transactionService.isValidTransaction(t);
+//        Assertions.assertEquals(v.getStatus(), TransactionValidation.TransactionValidationStatus.INVALID_PIN);
+//    }
+//
+//    @Test
+//    @Order(7)
+//    //transaction with invalid origin is same as target
+//    void G_invalidOrigin() {
+//        Transaction t = new Transaction();
+//        t.setAmount(new BigDecimal(99));
+//        t.setTimestamp(LocalDateTime.now());
+//        t.setTarget(testAccount);
+//        t.setOrigin(testAccount);
+//        t.setPincode("1234");
+//        t.setPerformer(Bank);
+//        t.setIBAN(testAccount.getIBAN());
+//        t.execute();
+//        TransactionValidation v = transactionService.isValidTransaction(t);
+//        Assertions.assertEquals(v.getStatus(), TransactionValidation.TransactionValidationStatus.NOT_ALLOWED);
+//    }
+//
+//    @Test
+//    @Order(8)
+//    //transaction with transaction with invalid amount
+//    void H_invalidAmount() {
+//        Transaction t = new Transaction();
+//        t.setAmount(new BigDecimal(1000));
+//        t.setTimestamp(LocalDateTime.now());
+//        t.setTarget(BankAccount);
+//        t.setOrigin(testAccount);
+//        t.setPincode("1234");
+//        t.setPerformer(testUser);
+//        t.setIBAN(testAccount.getIBAN());
+//        t.execute();
+//        TransactionValidation v = transactionService.isValidTransaction(t);
+//        Assertions.assertEquals(v.getStatus(), TransactionValidation.TransactionValidationStatus.TRANSACTION_LIMIT_EXCEEDED);
+//    }
 }

@@ -1,6 +1,7 @@
 package io.swagger.exeption;
 
 import io.swagger.exeption.custom.InvalidTransactionsException;
+import io.swagger.exeption.custom.NotFoundException;
 import io.swagger.exeption.custom.TransactionDeniedException;
 import io.swagger.exeption.custom.UnauthorizedException;
 import io.swagger.model.dto.ErrorDTO;
@@ -30,6 +31,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorDTO> handleInvalidTransactionsException(InvalidTransactionsException e) {
         ErrorDTO errorDTO = new ErrorDTO(LocalDateTime.now().toString(), e.getMessage(), HttpStatus.BAD_REQUEST.value(), "Invalid Transactions");
         return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<ErrorDTO> handleNullPointerException(NullPointerException e) {
+        ErrorDTO errorDTO = new ErrorDTO(LocalDateTime.now().toString(), e.getMessage(), HttpStatus.BAD_REQUEST.value(), "Null Pointer");
+        return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorDTO> handleNotFoundException(NotFoundException e) {
+        ErrorDTO errorDTO = new ErrorDTO(LocalDateTime.now().toString(), e.getMessage(), HttpStatus.NOT_FOUND.value(), "Not Found");
+        return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(TransactionDeniedException.class)
