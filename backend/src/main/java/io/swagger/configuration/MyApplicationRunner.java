@@ -104,7 +104,7 @@ public class MyApplicationRunner implements ApplicationRunner {
 
         Account testAccount2 = new Account();
         testAccount2.setIBAN("NL01INHO0000000003");
-        testAccount2.setBalance(new BigDecimal(0));
+        testAccount2.setBalance(new BigDecimal(10000));
         testAccount2.setUser(testUser2);
         testAccount2.setAccountType(Account.AccountTypeEnum.CURRENT);
         testAccount2.setAbsoluteLimit(new BigDecimal(0));
@@ -126,6 +126,7 @@ public class MyApplicationRunner implements ApplicationRunner {
         transaction.setTimestamp(LocalDateTime.now());
         transaction.setTarget(testAccount);
         transaction.setOrigin(BankAccount);
+        transaction.setType(TransactionType.TRANSFER);
         transaction.setPincode("1234");
         transaction.setPerformer(Bank);
         transaction.setIBAN(BankAccount.getIBAN());
@@ -133,10 +134,10 @@ public class MyApplicationRunner implements ApplicationRunner {
         System.out.println(transaction.getOrigin().getBalance());
         System.out.println(transaction.getTarget().getBalance());
         transactionService.addTransaction(transaction);
-        /*
+
         if(transactionService.transactionExists(transaction.getId())){
             accountRepo.save(transaction.getOrigin());
             accountRepo.save(transaction.getTarget());
-        }*/
+        }
     }
 }

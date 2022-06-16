@@ -117,6 +117,24 @@ public class TransactionStepDefinitions extends BaseStepDefinitions implements E
         And("^I filled in a negative amount", () -> {
             transaction = NEGATIVE_TRANSACTION_USER;
         });
+        And("^I have a error object with message \"([^\"]*)\"$", (String arg0) -> {
+            errorDTO = mapper.readValue(response.getBody(), ErrorDTO.class);
+            Assertions.assertEquals(arg0, errorDTO.getMessage());
+            Assertions.assertNotNull(errorDTO.getTimestamp());
+            Assertions.assertNotNull(errorDTO.getStatus());
+            Assertions.assertNotNull(errorDTO.getError());
+        });
+        And("^body is empty$", () -> {
+            Assertions.assertNull(response.getBody());
+        });
+        And("^I should have a transaction object with type \"([^\"]*)\"$", (String arg0) -> {
+            resultTransaction = mapper.readValue(response.getBody(), GetTransactionDTO.class);
+            Assertions.assertEquals(arg0, resultTransaction.getType());
+            Assertions.assertNotNull(resultTransaction.getFromUserId());
+            Assertions.assertEquals(dto.getFromIBAN(), resultTransaction.getFromIBAN());
+            Assertions.assertEquals(dto.getAmount(), resultTransaction.getAmount());
+            Assertions.assertNotNull(resultTransaction.getToIBAN());
+        });
 
     }
 }
