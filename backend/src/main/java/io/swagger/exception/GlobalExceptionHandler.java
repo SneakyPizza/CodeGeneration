@@ -1,9 +1,6 @@
-package io.swagger.exeption;
+package io.swagger.exception;
 
-import io.swagger.exeption.custom.InvalidTransactionsException;
-import io.swagger.exeption.custom.NotFoundException;
-import io.swagger.exeption.custom.TransactionDeniedException;
-import io.swagger.exeption.custom.UnauthorizedException;
+import io.swagger.exception.custom.*;
 import io.swagger.model.dto.ErrorDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,9 +1,9 @@
 package io.swagger.services;
 
-import io.swagger.exeption.custom.InvalidTransactionsException;
-import io.swagger.exeption.custom.NotFoundException;
-import io.swagger.exeption.custom.TransactionDeniedException;
-import io.swagger.exeption.custom.UnauthorizedException;
+import io.swagger.exception.custom.InvalidTransactionsException;
+import io.swagger.exception.custom.NotFoundException;
+import io.swagger.exception.custom.TransactionDeniedException;
+import io.swagger.exception.custom.UnauthorizedException;
 import io.swagger.model.dto.PostTransactionDTO;
 import io.swagger.model.entities.*;
 import io.swagger.repositories.AccountRepository;
@@ -33,7 +33,7 @@ public class TransactionService {
     UserService userService;
 
     @Autowired
-    io.swagger.services.accountService accountService;
+    AccountService accountService;
 
     @Autowired
     private TransactionRepository transactionRepository;

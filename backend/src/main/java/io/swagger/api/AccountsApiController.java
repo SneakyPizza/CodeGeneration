@@ -11,7 +11,7 @@ import io.swagger.model.dto.*;
 import io.swagger.model.entities.*;
 import io.swagger.services.TransactionService;
 import io.swagger.services.UserService;
-import io.swagger.services.accountService;
+import io.swagger.services.AccountService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -62,7 +62,7 @@ public class AccountsApiController implements AccountsApi {
     UserService userService;
 
     @Autowired
-    private accountService accountservice;
+    private AccountService accountservice;
 
     @org.springframework.beans.factory.annotation.Autowired
     public AccountsApiController(ObjectMapper objectMapper, HttpServletRequest request) {

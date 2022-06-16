@@ -2,6 +2,7 @@ package io.swagger.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.swagger.exception.custom.NotFoundException;
 import io.swagger.model.entities.*;
 import io.swagger.repositories.AccountRepository;
 import io.swagger.repositories.UserRepository;
@@ -48,12 +49,14 @@ public class TransactionServiceTest {
 
     public Account BankAccount;
 
+    private static final String userNotFound = "User not found";
+
 
     @BeforeEach
     void setup(){
        //get the user from the database
-        testUser = userRepository.findByUsername("test");
-        Bank = userRepository.findByUsername("Bank");
+        testUser = userRepository.findByUsername("test").orElseThrow(() -> new NotFoundException(userNotFound));
+        Bank = userRepository.findByUsername("Bank").orElseThrow(() -> new NotFoundException(userNotFound));
 
         //get the account from the database
         testAccount = (Account) accountRepository.findByIBAN("NL01INHO0000000002");

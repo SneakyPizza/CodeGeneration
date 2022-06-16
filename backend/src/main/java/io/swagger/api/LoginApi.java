@@ -6,7 +6,7 @@
 package io.swagger.api;
 
 import io.swagger.model.dto.LoginDTO;
-import io.swagger.model.dto.JWT_DTO;
+import io.swagger.model.dto.JwtDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -30,7 +30,7 @@ public interface LoginApi {
     @Operation(summary = "Post the login data to the api", description = "", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Login" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "application/json", schema = @Schema(implementation = JWT_DTO.class))) })
+        @ApiResponse(responseCode = "200", description = "OK", content = @Content(mediaType = "application/json", schema = @Schema(implementation = JwtDTO.class))) })
     @RequestMapping(value = "/login",
         produces = { "application/json" }, 
         consumes = { "application/json" }, 
