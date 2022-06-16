@@ -1,17 +1,19 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from './components/Home.vue';
-import AccountSearch from './components/AccountSearch.vue';
-import UserOverview from './components/UserOverview.vue';
-import Login from "@/components/Login";
 
+import UserOverview from './components/UserOverview.vue';
+import Login from "./components/Login";
+import axios from "axios";
+import store from "./store";
+
+axios.defaults.baseURL = 'http://localhost:8080'
+
+axios.defaults.headers.common['Authorization'] = `Bearer ${store.state.token}`;
 
 const routes = [
-    { path: '/', component: Home },
-    { path: '/AccountSearch', component: AccountSearch },
-    { path: '/UserOverview', component: UserOverview },
-    { path: '/login', component: Login },
+    { path: '/UserOverview', component: UserOverview, meta: {reqToken: true, adminOnly: false, }},
+    { path: '/login', component: Login, meta: {reqToken: false, adminOnly: false, }},
 ];
 
 
@@ -19,29 +21,35 @@ const router = createRouter({
     "history": createWebHistory(),
     routes
 })
-//router.push('/login'); if not authenticated
 router.beforeEach((to, from, next) => {
-    //if jwt token is not present, redirect to login page
-    if (localStorage.getItem('token') == null && localStorage.getItem('user') == null && to.path !== '/login') {
-        next("/login");
-    }
-    else{
-        //if token is expired, redirect to login page
-        if(new Date(localStorage.getItem("expires")) < new Date() && to.path !== '/login') {
-            //delete token and user and expires from local storage
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            localStorage.removeItem('expires');
-            //redirect to login page
-            next("/login");
-        }
-        else{
+    if (to.matched.some(record => record.meta.reqToken)) {
+        if (!store.state.token) {
+            next('/login');
+        } else {
             next();
         }
+    } else if (to.matched.some(record => record.meta.adminOnly)) {
+        if (store.state.user.admin) {
+            next();
+        } else {
+            next('/UserOverview');
+        }
     }
-})
+    else if (!to.matched.some(record => record)){
+        if (!store.state.token) {
+            next('/login');
+        } else {
+            next('/UserOverview');
+        }
+    }
+    else{
+        next();
+    }
+
+});
 
 
 const app = createApp(App);
 app.use(router);
+app.use(store)
 app.mount('#app');
