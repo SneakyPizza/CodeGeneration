@@ -59,14 +59,14 @@ public class UsersApiController implements UsersApi {
 
     public ResponseEntity<? extends Object> addUser(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostAsUserDTO postAsUserDTO) {
         User user = userService.createUser(postAsUserDTO);
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
+        return new ResponseEntity<>(user.getPostAsUserDTO(), HttpStatus.CREATED);
     }
 
     // checks if endpoint is called by an admin
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<? extends Object> addUserAdmin(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostUserDTO postUserDTO) {
         User user = userService.createUserAdmin(postUserDTO);
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
+        return new ResponseEntity<>(user.getPostUserDTO(), HttpStatus.CREATED);
     }
 
     // checks if endpoint is called by an admin
@@ -75,16 +75,16 @@ public class UsersApiController implements UsersApi {
 )) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Min(1) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return." ,schema=@Schema(allowableValues={  }, minimum="1", maximum="50"
 , defaultValue="20")) @Valid @RequestParam(value = "limit", required = false, defaultValue="20") Integer limit) {
         List<User> users = userService.getAllUsers(offset, limit);
-        return new ResponseEntity<>(users, HttpStatus.OK);
+        return new ResponseEntity<>(users, HttpStatus.OK); // needs to be DTO
     }
 
     public ResponseEntity<? extends Object> getUser(/*@DecimalMin("1")*/@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") UUID id) {
         User user = userService.getUser(id);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>(user, HttpStatus.OK); // needs to be DTO
     }
 
     public ResponseEntity<? extends Object> updateUser(/*@DecimalMin("1")*/@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") UUID id, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostUserDTO postUserDTO) {
         User user = userService.updateUser(postUserDTO);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>(user, HttpStatus.OK); // needs to be DTO
     }
 }
