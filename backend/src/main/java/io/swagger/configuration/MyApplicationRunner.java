@@ -4,7 +4,7 @@ import io.swagger.model.entities.*;
 import io.swagger.repositories.AccountRepository;
 import io.swagger.repositories.UserRepository;
 import io.swagger.services.UserService;
-import io.swagger.services.transactionService;
+import io.swagger.services.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -16,13 +16,12 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Component
 public class MyApplicationRunner implements ApplicationRunner {
 
     @Autowired
-    transactionService transactionService;
+    TransactionService transactionService;
 
     @Autowired
     UserService userService;
@@ -105,7 +104,7 @@ public class MyApplicationRunner implements ApplicationRunner {
 
         Account testAccount2 = new Account();
         testAccount2.setIBAN("NL01INHO0000000003");
-        testAccount2.setBalance(new BigDecimal(0));
+        testAccount2.setBalance(new BigDecimal(10000));
         testAccount2.setUser(testUser2);
         testAccount2.setAccountType(Account.AccountTypeEnum.CURRENT);
         testAccount2.setAbsoluteLimit(new BigDecimal(0));
@@ -127,6 +126,7 @@ public class MyApplicationRunner implements ApplicationRunner {
         transaction.setTimestamp(LocalDateTime.now());
         transaction.setTarget(testAccount);
         transaction.setOrigin(BankAccount);
+        transaction.setType(TransactionType.TRANSFER);
         transaction.setPincode("1234");
         transaction.setPerformer(Bank);
         transaction.setIBAN(BankAccount.getIBAN());
@@ -134,10 +134,10 @@ public class MyApplicationRunner implements ApplicationRunner {
         System.out.println(transaction.getOrigin().getBalance());
         System.out.println(transaction.getTarget().getBalance());
         transactionService.addTransaction(transaction);
-        /*
+
         if(transactionService.transactionExists(transaction.getId())){
             accountRepo.save(transaction.getOrigin());
             accountRepo.save(transaction.getTarget());
-        }*/
+        }
     }
 }

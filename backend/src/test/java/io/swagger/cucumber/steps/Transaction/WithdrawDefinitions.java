@@ -11,6 +11,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 
+import java.util.UUID;
+
 public class WithdrawDefinitions extends BaseStepDefinitions implements En {
 
     // Token is valid for one a rly short time apparentlyprivate static final String VALID_TOKEN_USER = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiYXV0aCI6W3siYXV0aG9yaXR5IjoiUk9MRV9BRE1JTiJ9XSwiaWF0IjoxNjU0NTIzMDUwLCJleHAiOjE2NTQ1MjY2NTB9.N0-U8GlkNxeHG8pR9IiqJVbVopgAMEvKBRbMwmzGCQk";private static final String VALID_TOKEN_ADMIN = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCYW5rIiwiYXV0aCI6W3siYXV0aG9yaXR5IjoiUk9MRV9BRE1JTiJ9XSwiaWF0IjoxNjU0NTIzMTAzLCJleHAiOjE2NTQ1MjY3MDN9.H3t7QDx2s-L_bOSSojujupT-i8stdq0cZcjBxcOI0vY";
@@ -81,6 +83,23 @@ public class WithdrawDefinitions extends BaseStepDefinitions implements En {
 
         And("^'withdraw' I have exceeded the withdraw limit", () -> {
             transaction = LIMIT_EXCEEDED_TRANSACTION_USER;
+        });
+
+        And("^I should have a withdraw object with type \"([^\"]*)\"$", (String arg0) -> {
+            resultTransaction = mapper.readValue(response.getBody(), GetTransactionDTO.class);
+            Assertions.assertEquals(arg0, resultTransaction.getType());
+            Assertions.assertNotNull(resultTransaction.getFromUserId());
+            Assertions.assertEquals(dto.getFromIBAN(), resultTransaction.getFromIBAN());
+            Assertions.assertEquals(dto.getAmount(), resultTransaction.getAmount());
+            Assertions.assertNotNull(resultTransaction.getToIBAN());
+        });
+
+        And("^I should have a error object with message \"([^\"]*)\"$", (String arg0) -> {
+            errorDTO = mapper.readValue(response.getBody(), ErrorDTO.class);
+            Assertions.assertEquals(arg0, errorDTO.getMessage());
+            Assertions.assertNotNull(errorDTO.getTimestamp());
+            Assertions.assertNotNull(errorDTO.getStatus());
+            Assertions.assertNotNull(errorDTO.getError());
         });
 
     }

@@ -32,7 +32,7 @@ public class accountService {
     private UserService userService;
 
     private ibanGenerator ibanGen = new ibanGenerator();
-    
+
     //Add a new account object to the database (POST)
     public void addAccount(PostAccountDTO account) {
         Account a = new Account<User>();
