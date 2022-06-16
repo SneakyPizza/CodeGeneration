@@ -20,4 +20,6 @@ public interface UserRepository extends PagingAndSortingRepository<User, UUID> {
     List<User> findByFirstName(String firstname);
 
     List<User> findByLastName(String lastname);
+
+    //
 }
