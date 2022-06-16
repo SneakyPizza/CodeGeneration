@@ -14,8 +14,10 @@ import java.util.UUID;
 public interface UserRepository extends PagingAndSortingRepository<User, UUID> {
 
     User findByUsername(String username);
+    List<User> findAll();
+    boolean existsByUsername(String username);
+
     List<User> findByFirstName(String firstname);
-    List<User> findByLastName(String lastName);
-    //User findById(UUID id);
-    List<User> findAll(/*limit, offset*/);
+
+    List<User> findByLastName(String lastname);
 }

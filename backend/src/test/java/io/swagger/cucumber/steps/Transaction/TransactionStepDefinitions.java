@@ -26,14 +26,14 @@ public class TransactionStepDefinitions extends BaseStepDefinitions implements E
     @Value("${io.swagger.api.token_ADMIN}")
     private String VALID_TOKEN_ADMIN;
    private static final String INVALID_TOKEN = "invalid";
-    private static final String VALID_TRANSACTION_USER = "{\n  \"amount\": 500,\n  \"fromIBAN\": \"NL01INHO0000000002\",\n  \"fromUserId\": \"d36dc67d-ed99-404f-9f0b-f66497e67983\",\n  \"pincode\": \"1234\",\n  \"toIBAN\": \"NL01INHO0000000001\"\n}";
+    private static final String VALID_TRANSACTION_USER = "{\n  \"amount\": 500,\n  \"fromIBAN\": \"NL01INHO0000000003\",\n  \"fromUserId\": \"d36dc67d-ed99-404f-9f0b-f66497e67983\",\n  \"pincode\": \"1234\",\n  \"toIBAN\": \"NL01INHO0000000001\"\n}";
     private static final String VALID_TRANSACTION_ADMIN = "{\n  \"amount\": 500,\n  \"fromIBAN\": \"NL01INHO0000000001\",\n  \"fromUserId\": \"d36dc67d-ed99-404f-9f0b-f66497e67983\",\n  \"pincode\": \"1234\",\n  \"toIBAN\": \"NL01INHO0000000002\"\n}";
     private static final String INVALID_PIN_TRANSACTION_ADMIN = "{\n  \"amount\": 500,\n  \"fromIBAN\": \"NL01INHO0000000002\",\n  \"fromUserId\": \"d36dc67d-ed99-404f-9f0b-f66497e67983\",\n  \"pincode\": \"1534\",\n  \"toIBAN\": \"NL01INHO0000000001\"\n}";
-    private static final String INVALID_IBAN_TRANSACTION_ADMIN = "{\n  \"amount\": 500,\n  \"fromIBAN\": \"NL01INHO0000000003\",\n  \"fromUserId\": \"d36dc67d-ed99-404f-9f0b-f66497e67983\",\n  \"pincode\": \"1234\",\n  \"toIBAN\": \"NL01INHO0000000002\"\n}";
+    private static final String INVALID_IBAN_TRANSACTION_ADMIN = "{\n  \"amount\": 500,\n  \"fromIBAN\": \"NL01INHO0000000004\",\n  \"fromUserId\": \"d36dc67d-ed99-404f-9f0b-f66497e67983\",\n  \"pincode\": \"1234\",\n  \"toIBAN\": \"NL01INHO0000000002\"\n}";
     private static final String INVALID_TARGET_TRANSACTION_ADMIN = "{\n  \"amount\": 500,\n  \"fromIBAN\": \"NL01INHO0000000001\",\n  \"fromUserId\": \"d36dc67d-ed99-404f-9f0b-f66497e67983\",\n  \"pincode\": \"1234\",\n  \"toIBAN\": \"NL01INHO0000000001\"\n}";
-    private static final String INVALID_AMOUNT_TRANSACTION_USER = "{\n  \"amount\": 5000,\n  \"fromIBAN\": \"NL01INHO0000000002\",\n  \"fromUserId\": \"d36dc67d-ed99-404f-9f0b-f66497e67983\",\n  \"pincode\": \"1234\",\n  \"toIBAN\": \"NL01INHO0000000001\"\n}";
+    private static final String INVALID_AMOUNT_TRANSACTION_USER = "{\n  \"amount\": 5000,\n  \"fromIBAN\": \"NL01INHO0000000003\",\n  \"fromUserId\": \"d36dc67d-ed99-404f-9f0b-f66497e67983\",\n  \"pincode\": \"1234\",\n  \"toIBAN\": \"NL01INHO0000000001\"\n}";
     private static final String NO_ACCESS_TRANSACTION_USER = "{\n  \"amount\": 500,\n  \"fromIBAN\": \"NL01INHO0000000001\",\n  \"fromUserId\": \"d36dc67d-ed99-404f-9f0b-f66497e67983\",\n  \"pincode\": \"1234\",\n  \"toIBAN\": \"NL01INHO0000000002\"\n}";
-    private static final String NEGATIVE_TRANSACTION_USER = "{\n  \"amount\": -500,\n  \"fromIBAN\": \"NL01INHO0000000002\",\n  \"fromUserId\": \"d36dc67d-ed99-404f-9f0b-f66497e67983\",\n  \"pincode\": \"1234\",\n  \"toIBAN\": \"NL01INHO0000000001\"\n}";
+    private static final String NEGATIVE_TRANSACTION_USER = "{\n  \"amount\": -500,\n  \"fromIBAN\": \"NL01INHO0000000003\",\n  \"fromUserId\": \"d36dc67d-ed99-404f-9f0b-f66497e67983\",\n  \"pincode\": \"1234\",\n  \"toIBAN\": \"NL01INHO0000000001\"\n}";
 
 
 
@@ -116,6 +116,24 @@ public class TransactionStepDefinitions extends BaseStepDefinitions implements E
 
         And("^I filled in a negative amount", () -> {
             transaction = NEGATIVE_TRANSACTION_USER;
+        });
+        And("^I have a error object with message \"([^\"]*)\"$", (String arg0) -> {
+            errorDTO = mapper.readValue(response.getBody(), ErrorDTO.class);
+            Assertions.assertEquals(arg0, errorDTO.getMessage());
+            Assertions.assertNotNull(errorDTO.getTimestamp());
+            Assertions.assertNotNull(errorDTO.getStatus());
+            Assertions.assertNotNull(errorDTO.getError());
+        });
+        And("^body is empty$", () -> {
+            Assertions.assertNull(response.getBody());
+        });
+        And("^I should have a transaction object with type \"([^\"]*)\"$", (String arg0) -> {
+            resultTransaction = mapper.readValue(response.getBody(), GetTransactionDTO.class);
+            Assertions.assertEquals(arg0, resultTransaction.getType());
+            Assertions.assertNotNull(resultTransaction.getFromUserId());
+            Assertions.assertEquals(dto.getFromIBAN(), resultTransaction.getFromIBAN());
+            Assertions.assertEquals(dto.getAmount(), resultTransaction.getAmount());
+            Assertions.assertNotNull(resultTransaction.getToIBAN());
         });
 
     }

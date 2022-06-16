@@ -20,6 +20,7 @@ import java.util.UUID;
 
 import static org.h2.value.DataType.readValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class AddUserStepDefinitions extends BaseStepDefinitions implements En {
 
@@ -47,10 +48,10 @@ public class AddUserStepDefinitions extends BaseStepDefinitions implements En {
     private String id;
 
     public AddUserStepDefinitions() {
-
-        /*Given("^I provide all the user details", () -> {
+        Given("^I provide valid user details", () -> {
             userDTO = new UserDTO();
             userDTO.setUserid(UUID.randomUUID());
+            userDTO.setUsername("Test");
             userDTO.setFirstName("Test");
             userDTO.setLastName("Test");
             userDTO.setEmail("test@test.nl");
@@ -64,24 +65,63 @@ public class AddUserStepDefinitions extends BaseStepDefinitions implements En {
             userDTO.setRoles(Collections.singletonList(UserDTO.Role.ADMIN));
         });
 
+        Given("^I provide wrong user details with null values", () -> {
+            userDTO = new UserDTO();
+            userDTO.setUserid(UUID.randomUUID());
+            userDTO.setUsername(null);
+            userDTO.setFirstName("Test");
+            userDTO.setLastName("Test");
+            userDTO.setEmail(null);
+            userDTO.setPassword("test");
+            userDTO.setStreet("Test");
+            userDTO.setCity("Test");
+            userDTO.setZipcode("Test");
+            userDTO.setUserstatus(null);
+            userDTO.setDayLimit(BigDecimal.valueOf(10));
+            userDTO.setTransactionLimit(null);
+            userDTO.setRoles(Collections.singletonList(UserDTO.Role.ADMIN));
+        });
+
         When("I call the AddUser endpoint", () -> {
             httpHeaders.clear();
             httpHeaders.set("Authorization", "Bearer " + token);
+            httpHeaders.add("Content-Type", "application/json");
             request = new HttpEntity<>(objectMapper.writeValueAsString(userDTO), httpHeaders);
-            response = restTemplate.exchange("/Users", HttpMethod.POST, request, UserDTO.class);
+            response = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.POST, request, UserDTO.class);
             status = response.getStatusCode().value();
-            userDTO = response.getBody();
         });
 
-        Then("The user is added to the database and i get status code (\\d+)", (Integer statusCode) -> {
-            // get the user from the database with id from the response
-            id = userDTO.getUserid().toString();
-            request = new HttpEntity<>(httpHeaders);
-            // get user with id from /users/{id}
-            response = restTemplate.exchange("/Users/" + id, HttpMethod.GET, request, UserDTO.class);
+        When("I call the AddUser endpoint twice", () -> {
+            httpHeaders.clear();
+            httpHeaders.set("Authorization", "Bearer " + token);
+            httpHeaders.add("Content-Type", "application/json");
+            request = new HttpEntity<>(objectMapper.writeValueAsString(userDTO), httpHeaders);
+            response = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.POST, request, UserDTO.class);
+            status = response.getStatusCode().value();
 
-            Assertions.assertNotNull(response.getBody());
+            httpHeaders.clear();
+            httpHeaders.set("Authorization", "Bearer " + token);
+            httpHeaders.add("Content-Type", "application/json");
+            request = new HttpEntity<>(objectMapper.writeValueAsString(userDTO), httpHeaders);
+            response = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.POST, request, UserDTO.class);
+            status = response.getStatusCode().value();
+        });
+
+        Then("^The user is added to the database and i get status code (\\d+)", (Integer statusCode) -> {
+            assertNotNull(response);
             assertEquals(statusCode, status);
-        });*/
+        });
+
+        Then("^The user is not added to the database and i get status code (\\d+)", (Integer statusCode) -> {
+            assertEquals(statusCode, status);
+        });
+
+        And("^I have a valid token jwt", () -> {
+            token = VALID_TOKEN_USER;
+        });
+
+        And("^I have an invalid token jwt", () -> {
+            token = INVALID_TOKEN;
+        });
     }
 }

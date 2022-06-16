@@ -32,6 +32,9 @@ public class GetTransactionDTO   {
   @JsonProperty("fromUserId")
   private UUID fromUserId = null;
 
+  @JsonProperty("type")
+  private String type = null;
+
   public GetTransactionDTO fromIBAN(String fromIBAN) {
     this.fromIBAN = fromIBAN;
     return this;
@@ -128,6 +131,25 @@ public class GetTransactionDTO   {
     this.fromUserId = fromUserId;
   }
 
+  public GetTransactionDTO type(String type) {
+    this.type = type;
+    return this;
+  }
+
+  /**
+   * Get type
+   * @return type
+   **/
+  @Schema(description = "")
+
+  @Valid
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
 
   @Override
   public boolean equals(Object o) {
@@ -142,12 +164,13 @@ public class GetTransactionDTO   {
         Objects.equals(this.toIBAN, getTransactionDTO.toIBAN) &&
         Objects.equals(this.amount, getTransactionDTO.amount) &&
         Objects.equals(this.timestamp, getTransactionDTO.timestamp) &&
-        Objects.equals(this.fromUserId, getTransactionDTO.fromUserId);
+        Objects.equals(this.fromUserId, getTransactionDTO.fromUserId) &&
+            Objects.equals(this.type, getTransactionDTO.type);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(fromIBAN, toIBAN, amount, timestamp, fromUserId);
+    return Objects.hash(fromIBAN, toIBAN, amount, timestamp, fromUserId, type);
   }
 
   @Override
@@ -160,6 +183,7 @@ public class GetTransactionDTO   {
     sb.append("    amount: ").append(toIndentedString(amount)).append("\n");
     sb.append("    timestamp: ").append(toIndentedString(timestamp)).append("\n");
     sb.append("    fromUserId: ").append(toIndentedString(fromUserId)).append("\n");
+    sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -112,7 +112,7 @@ public class UpdateUserStepDefinitions extends BaseStepDefinitions implements En
         });
 
         And("^I have a valid jwt token", () -> {
-            token = VALID_TOKEN_USER;
+            token = VALID_TOKEN_ADMIN;
         });
 
         And("^I have an invalid jwt token$", () -> {
@@ -130,7 +130,7 @@ public class UpdateUserStepDefinitions extends BaseStepDefinitions implements En
 
         And("^I have a valid user id", () -> {
             httpHeaders.clear();
-            httpHeaders.add("Authorization", "Bearer " +  token);
+            httpHeaders.add("Authorization", "Bearer " +  VALID_TOKEN_ADMIN);
             request = new HttpEntity<>(null, httpHeaders);
             getAllResponse = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.GET, request, String.class);
             status = getAllResponse.getStatusCode().value();

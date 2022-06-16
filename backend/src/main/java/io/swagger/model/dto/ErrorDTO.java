@@ -15,19 +15,22 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-31T13:09:56.197Z[GMT]")
 
-
 public class ErrorDTO   {
-  @JsonProperty("timestamp")
-  private String timestamp = null;
-
-  @JsonProperty("message")
-  private String message = null;
-
   @JsonProperty("status")
   private Integer status = null;
 
   @JsonProperty("error")
   private String error = null;
+
+  @JsonProperty("message")
+  private String message = null;
+
+  @JsonProperty("timestamp")
+  private String timestamp = null;
+
+  //empty constructor
+    public ErrorDTO() {
+    }
 
 //full constructor
     public ErrorDTO(String timestamp, String message, Integer status, String error) {
@@ -157,4 +160,5 @@ public class ErrorDTO   {
     }
     return o.toString().replace("\n", "\n    ");
   }
+
 }

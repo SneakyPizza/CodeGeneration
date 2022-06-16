@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.server.ResponseStatusException;
@@ -43,6 +44,10 @@ public class accountService {
         a.setIBAN(ibanGen.GenerateIban());
         accountRepository.save(a);
     }
+
+    public boolean validateIban(String IBAN){
+        return ibanGen.ValidateIban(IBAN);
+    }
     
 
     //Get all accounts (GET)
@@ -54,6 +59,11 @@ public class accountService {
     //Get a Account with IBAN (GET)
     public Account getAccountWithIBAN (String iban){
         return (Account) accountRepository.findByIBAN(iban);
+    }
+
+    public AccountDTO getAccountDTOWithIBAN(String iban){
+        Account a = getAccountWithIBAN(iban);
+        return a.toAccountDTO();
     }
 
     //Update a existing account with a new account object (PUT)

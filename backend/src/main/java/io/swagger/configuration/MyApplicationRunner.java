@@ -4,7 +4,7 @@ import io.swagger.model.entities.*;
 import io.swagger.repositories.AccountRepository;
 import io.swagger.repositories.UserRepository;
 import io.swagger.services.UserService;
-import io.swagger.services.transactionService;
+import io.swagger.services.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -16,13 +16,12 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Component
 public class MyApplicationRunner implements ApplicationRunner {
 
     @Autowired
-    transactionService transactionService;
+    TransactionService transactionService;
 
     @Autowired
     UserService userService;
@@ -55,7 +54,7 @@ public class MyApplicationRunner implements ApplicationRunner {
         testUser.setUserstatus(UserStatus.ACTIVE);
         testUser.setDayLimit(new BigDecimal(10000));
         testUser.setTransactionLimit(new BigDecimal(500));
-        testUser.setRoles(new ArrayList<>(List.of(Role.ROLE_ADMIN)));
+        testUser.setRoles(new ArrayList<>(List.of(Role.ROLE_USER)));
 
         User testUser2 = new User();
         testUser2.setUsername("test2");
@@ -103,12 +102,23 @@ public class MyApplicationRunner implements ApplicationRunner {
         testAccount.setAbsoluteLimit(new BigDecimal(0));
         testAccount.setActive(Account.ActiveEnum.ACTIVE);
 
+        Account testAccount2 = new Account();
+        testAccount2.setIBAN("NL01INHO0000000003");
+        testAccount2.setBalance(new BigDecimal(10000));
+        testAccount2.setUser(testUser2);
+        testAccount2.setAccountType(Account.AccountTypeEnum.CURRENT);
+        testAccount2.setAbsoluteLimit(new BigDecimal(0));
+        testAccount2.setActive(Account.ActiveEnum.ACTIVE);
+
         testUser.setAccounts(new ArrayList<>(List.of(testAccount)));
+        testUser2.setAccounts(new ArrayList<>(List.of(testAccount2)));
         Bank.setAccounts(new ArrayList<>(List.of(BankAccount)));
         userRepository.save(testUser);
+        userRepository.save(testUser2);
         userRepository.save(Bank);
         accountRepo.save(BankAccount);
         accountRepo.save(testAccount);
+        accountRepo.save(testAccount2);
 
         //test transaction
         Transaction transaction = new Transaction();
@@ -116,6 +126,7 @@ public class MyApplicationRunner implements ApplicationRunner {
         transaction.setTimestamp(LocalDateTime.now());
         transaction.setTarget(testAccount);
         transaction.setOrigin(BankAccount);
+        transaction.setType(TransactionType.TRANSFER);
         transaction.setPincode("1234");
         transaction.setPerformer(Bank);
         transaction.setIBAN(BankAccount.getIBAN());
@@ -123,10 +134,10 @@ public class MyApplicationRunner implements ApplicationRunner {
         System.out.println(transaction.getOrigin().getBalance());
         System.out.println(transaction.getTarget().getBalance());
         transactionService.addTransaction(transaction);
-        /*
+
         if(transactionService.transactionExists(transaction.getId())){
             accountRepo.save(transaction.getOrigin());
             accountRepo.save(transaction.getTarget());
-        }*/
+        }
     }
 }
