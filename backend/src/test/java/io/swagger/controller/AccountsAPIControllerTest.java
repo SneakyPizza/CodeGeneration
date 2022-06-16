@@ -6,14 +6,11 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import io.swagger.api.AccountsApiController;
@@ -22,17 +19,15 @@ import io.swagger.model.entities.Role;
 import io.swagger.model.entities.User;
 import io.swagger.repositories.AccountRepository;
 import io.swagger.repositories.UserRepository;
-import io.swagger.services.accountService;
+import io.swagger.services.AccountService;
 
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AccountsApiController.class)
 public class AccountsAPIControllerTest {
@@ -44,7 +39,7 @@ public class AccountsAPIControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private accountService accountService;
+    private AccountService accountService;
 
     @MockBean
     private AccountRepository accountRepository;

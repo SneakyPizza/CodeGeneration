@@ -1,18 +1,17 @@
-package io.swagger.model;
+package io.swagger.model.dto;
 
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
-import org.springframework.validation.annotation.Validated;
-
-import javax.persistence.Id;
-import javax.validation.Valid;
 
 /**
  * UserDTO
@@ -21,10 +20,7 @@ import javax.validation.Valid;
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-31T10:41:25.283Z[GMT]")
 
 
-public class UserDTO   {
-  @JsonProperty("userid")
-  private UUID userid = null;
-
+public class PostAsUserDTO {
   @JsonProperty("username")
   private String username = null;
 
@@ -49,100 +45,13 @@ public class UserDTO   {
   @JsonProperty("zipcode")
   private String zipcode = null;
 
-  /**
-   * Gets or Sets userstatus
-   */
-  public enum UserstatusEnum {
-    ACTIVE("active"),
-
-    DISABLED("disabled");
-
-    private String value;
-
-    UserstatusEnum(String value) {
-      this.value = value;
-    }
-
-    @Override
-    @JsonValue
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    @JsonCreator
-    public static UserstatusEnum fromValue(String text) {
-      for (UserstatusEnum b : UserstatusEnum.values()) {
-        if (String.valueOf(b.value).equals(text)) {
-          return b;
-        }
-      }
-      return null;
-    }
-  }
-  @JsonProperty("userstatus")
-  private UserstatusEnum userstatus = null;
-
   @JsonProperty("dayLimit")
   private BigDecimal dayLimit = null;
 
   @JsonProperty("transactionLimit")
   private BigDecimal transactionLimit = null;
 
-  /**
-   * Gets or Sets roles
-   */
-  public enum Role {
-    ADMIN("admin"),
-
-    USER("user");
-
-    private String value;
-
-    Role(String value) {
-      this.value = value;
-    }
-
-    @Override
-    @JsonValue
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    @JsonCreator
-    public static Role fromValue(String text) {
-      for (Role b : Role.values()) {
-        if (String.valueOf(b.value).equals(text)) {
-          return b;
-        }
-      }
-      return null;
-    }
-  }
-  @JsonProperty("roles")
-  @Valid
-  private List<Role> roles = null;
-
-  public UserDTO userid(UUID userid) {
-    this.userid = userid;
-    return this;
-  }
-
-  /**
-   * Get userid
-   * @return userid
-   **/
-  @Schema(description = "")
-
-  @Valid
-  public UUID getUserid() {
-    return userid;
-  }
-
-  public void setUserid(UUID userid) {
-    this.userid = userid;
-  }
-
-  public UserDTO username(String username) {
+  public PostAsUserDTO username(String username) {
     this.username = username;
     return this;
   }
@@ -161,7 +70,7 @@ public class UserDTO   {
     this.username = username;
   }
 
-  public UserDTO password(String password) {
+  public PostAsUserDTO password(String password) {
     this.password = password;
     return this;
   }
@@ -180,7 +89,7 @@ public class UserDTO   {
     this.password = password;
   }
 
-  public UserDTO email(String email) {
+  public PostAsUserDTO email(String email) {
     this.email = email;
     return this;
   }
@@ -199,7 +108,7 @@ public class UserDTO   {
     this.email = email;
   }
 
-  public UserDTO firstName(String firstName) {
+  public PostAsUserDTO firstName(String firstName) {
     this.firstName = firstName;
     return this;
   }
@@ -218,7 +127,7 @@ public class UserDTO   {
     this.firstName = firstName;
   }
 
-  public UserDTO lastName(String lastName) {
+  public PostAsUserDTO lastName(String lastName) {
     this.lastName = lastName;
     return this;
   }
@@ -237,7 +146,7 @@ public class UserDTO   {
     this.lastName = lastName;
   }
 
-  public UserDTO street(String street) {
+  public PostAsUserDTO street(String street) {
     this.street = street;
     return this;
   }
@@ -256,7 +165,7 @@ public class UserDTO   {
     this.street = street;
   }
 
-  public UserDTO city(String city) {
+  public PostAsUserDTO city(String city) {
     this.city = city;
     return this;
   }
@@ -275,7 +184,7 @@ public class UserDTO   {
     this.city = city;
   }
 
-  public UserDTO zipcode(String zipcode) {
+  public PostAsUserDTO zipcode(String zipcode) {
     this.zipcode = zipcode;
     return this;
   }
@@ -294,26 +203,7 @@ public class UserDTO   {
     this.zipcode = zipcode;
   }
 
-  public UserDTO userstatus(UserstatusEnum userstatus) {
-    this.userstatus = userstatus;
-    return this;
-  }
-
-  /**
-   * Get userstatus
-   * @return userstatus
-   **/
-  @Schema(description = "")
-
-  public UserstatusEnum getUserstatus() {
-    return userstatus;
-  }
-
-  public void setUserstatus(UserstatusEnum userstatus) {
-    this.userstatus = userstatus;
-  }
-
-  public UserDTO dayLimit(BigDecimal dayLimit) {
+  public PostAsUserDTO dayLimit(BigDecimal dayLimit) {
     this.dayLimit = dayLimit;
     return this;
   }
@@ -333,7 +223,7 @@ public class UserDTO   {
     this.dayLimit = dayLimit;
   }
 
-  public UserDTO transactionLimit(BigDecimal transactionLimit) {
+  public PostAsUserDTO transactionLimit(BigDecimal transactionLimit) {
     this.transactionLimit = transactionLimit;
     return this;
   }
@@ -353,61 +243,30 @@ public class UserDTO   {
     this.transactionLimit = transactionLimit;
   }
 
-  public UserDTO roles(List<Role> roles) {
-    this.roles = roles;
-    return this;
-  }
-
-  public UserDTO addRolesItem(Role rolesItem) {
-    if (this.roles == null) {
-      this.roles = new ArrayList<Role>();
-    }
-    this.roles.add(rolesItem);
-    return this;
-  }
-
-  /**
-   * Get roles
-   * @return roles
-   **/
-  @Schema(description = "")
-
-  public List<Role> getRoles() {
-    return roles;
-  }
-
-  public void setRoles(List<Role> roles) {
-    this.roles = roles;
-  }
-
-
   @Override
-  public boolean equals(java.lang.Object o) {
+  public boolean equals(Object o) {
     if (this == o) {
       return true;
     }
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    UserDTO userDTO = (UserDTO) o;
-    return Objects.equals(this.userid, userDTO.userid) &&
-            Objects.equals(this.username, userDTO.username) &&
-            Objects.equals(this.password, userDTO.password) &&
-            Objects.equals(this.email, userDTO.email) &&
-            Objects.equals(this.firstName, userDTO.firstName) &&
-            Objects.equals(this.lastName, userDTO.lastName) &&
-            Objects.equals(this.street, userDTO.street) &&
-            Objects.equals(this.city, userDTO.city) &&
-            Objects.equals(this.zipcode, userDTO.zipcode) &&
-            Objects.equals(this.userstatus, userDTO.userstatus) &&
-            Objects.equals(this.dayLimit, userDTO.dayLimit) &&
-            Objects.equals(this.transactionLimit, userDTO.transactionLimit) &&
-            Objects.equals(this.roles, userDTO.roles);
+    PostAsUserDTO postUserDTO = (PostAsUserDTO) o;
+    return Objects.equals(this.username, postUserDTO.username) &&
+            Objects.equals(this.password, postUserDTO.password) &&
+            Objects.equals(this.email, postUserDTO.email) &&
+            Objects.equals(this.firstName, postUserDTO.firstName) &&
+            Objects.equals(this.lastName, postUserDTO.lastName) &&
+            Objects.equals(this.street, postUserDTO.street) &&
+            Objects.equals(this.city, postUserDTO.city) &&
+            Objects.equals(this.zipcode, postUserDTO.zipcode) &&
+            Objects.equals(this.dayLimit, postUserDTO.dayLimit) &&
+            Objects.equals(this.transactionLimit, postUserDTO.transactionLimit);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(userid, username, password, email, firstName, lastName, street, city, zipcode, userstatus, dayLimit, transactionLimit, roles);
+    return Objects.hash(username, password, email, firstName, lastName, street, city, zipcode, dayLimit, transactionLimit);
   }
 
   @Override
@@ -415,7 +274,6 @@ public class UserDTO   {
     StringBuilder sb = new StringBuilder();
     sb.append("class UserDTO {\n");
 
-    sb.append("    userid: ").append(toIndentedString(userid)).append("\n");
     sb.append("    username: ").append(toIndentedString(username)).append("\n");
     sb.append("    password: ").append(toIndentedString(password)).append("\n");
     sb.append("    email: ").append(toIndentedString(email)).append("\n");
@@ -424,10 +282,8 @@ public class UserDTO   {
     sb.append("    street: ").append(toIndentedString(street)).append("\n");
     sb.append("    city: ").append(toIndentedString(city)).append("\n");
     sb.append("    zipcode: ").append(toIndentedString(zipcode)).append("\n");
-    sb.append("    userstatus: ").append(toIndentedString(userstatus)).append("\n");
     sb.append("    dayLimit: ").append(toIndentedString(dayLimit)).append("\n");
     sb.append("    transactionLimit: ").append(toIndentedString(transactionLimit)).append("\n");
-    sb.append("    roles: ").append(toIndentedString(roles)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -436,7 +292,7 @@ public class UserDTO   {
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private String toIndentedString(java.lang.Object o) {
+  private String toIndentedString(Object o) {
     if (o == null) {
       return "null";
     }

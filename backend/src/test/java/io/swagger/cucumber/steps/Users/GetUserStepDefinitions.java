@@ -3,8 +3,7 @@ package io.swagger.cucumber.steps.Users;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java8.En;
 import io.swagger.cucumber.steps.BaseStepDefinitions;
-import io.swagger.model.GetUserDTO;
-import io.swagger.model.UserDTO;
+import io.swagger.model.dto.GetUserDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -14,9 +13,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
-import java.util.UUID;
 
-import static org.h2.value.DataType.readValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class GetUserStepDefinitions extends BaseStepDefinitions implements En {

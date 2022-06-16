@@ -34,7 +34,7 @@ public class TransactionService {
     UserRepository userRepository;
 
     @Autowired
-    io.swagger.services.accountService accountService;
+    AccountService accountService;
 
     @Autowired
     private TransactionRepository transactionRepository;

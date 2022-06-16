@@ -1,4 +1,4 @@
-package io.swagger.exeption.custom;
+package io.swagger.exception.custom;
 
 public class UnauthorizedException extends RuntimeException {
     public UnauthorizedException(String message) {
