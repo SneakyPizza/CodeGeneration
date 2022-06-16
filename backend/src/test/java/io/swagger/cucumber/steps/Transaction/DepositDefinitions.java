@@ -90,6 +90,21 @@ public class DepositDefinitions extends BaseStepDefinitions implements En {
         And("^'deposit' IBAN does not exist!", () -> {
             transaction = INVALID_IBAN_TRANSACTION_ADMIN;
         });
+        And("^'Deposit' I have a error object with message \"([^\"]*)\"$", (String arg0) -> {
+            errorDTO = mapper.readValue(response.getBody(), ErrorDTO.class);
+            Assertions.assertEquals(arg0, errorDTO.getMessage());
+            Assertions.assertNotNull(errorDTO.getTimestamp());
+            Assertions.assertNotNull(errorDTO.getStatus());
+            Assertions.assertNotNull(errorDTO.getError());
+        });
+        And("^'Deposit' I should have a transaction object with type \"([^\"]*)\"$", (String arg0) -> {
+            resultTransaction = mapper.readValue(response.getBody(), GetTransactionDTO.class);
+            Assertions.assertEquals(arg0, resultTransaction.getType());
+            Assertions.assertNotNull(resultTransaction.getFromUserId());
+            Assertions.assertEquals(dto.getToIBAN(), resultTransaction.getToIBAN());
+            Assertions.assertEquals(dto.getAmount(), resultTransaction.getAmount());
+            Assertions.assertNotNull(resultTransaction.getFromIBAN());
+        });
 
     }
 }

@@ -89,7 +89,7 @@ public class TransactionService {
             throw new UnauthorizedException("You do not have access to this account");
         }
         else if(!validatePinCode(transaction)){
-            throw new UnauthorizedException("Wrong PIN code");
+            throw new UnauthorizedException("Invalid Pin code");
         }
         else if(!validateIsActive(transaction)){
             throw new InvalidTransactionsException("Account is not active");
@@ -220,7 +220,13 @@ public class TransactionService {
         //get curent user from security context
         User user = getUserFromSecurityContext();
         //check if user is owner of the account or is admin
-        validateAccessToAccount(transaction.getFromIBAN(), user);
+        if(type != TransactionType.DEPOSIT){
+            validateAccessToAccount(transaction.getFromIBAN(), user);
+        }
+        else{
+            validateAccessToAccount(transaction.getToIBAN(), user);
+        }
+
         Transaction newTransaction = createTransactionFromPostTransaction(transaction, user, type);
         //validate transaction
         isValidTransaction(newTransaction);
@@ -231,15 +237,20 @@ public class TransactionService {
         //create transaction object
         Transaction t = new Transaction();
         t.setPerformer(user);
-        t.setIBAN(transaction.getFromIBAN());
+        if(type == TransactionType.DEPOSIT){
+            t.setIBAN(transaction.getToIBAN());
+        }
+        else{
+            t.setIBAN(transaction.getFromIBAN());
+        }
         t.setType(type);
         //set origin and target if they exist, otherwise throw exception
         if(accountService.findByIBAN(transaction.getFromIBAN()) == null){
-            throw new IllegalArgumentException("Origin account does not exist");
+            throw new IllegalArgumentException("Given iban for origin account does not exist");
         }
         t.setOrigin((Account) accountService.findByIBAN(transaction.getFromIBAN()));
         if(accountService.findByIBAN(transaction.getToIBAN()) == null){
-            throw new IllegalArgumentException("Target account does not exist");
+            throw new IllegalArgumentException("Given iban for target account does not exist");
         }
         t.setTarget((Account) accountService.findByIBAN(transaction.getToIBAN()));
         t.setAmount(transaction.getAmount());
