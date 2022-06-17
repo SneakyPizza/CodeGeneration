@@ -1,20 +1,21 @@
 package io.swagger.services;
 
-import io.swagger.exeption.custom.InvalidTransactionsException;
-import io.swagger.exeption.custom.NotFoundException;
-import io.swagger.exeption.custom.TransactionDeniedException;
-import io.swagger.exeption.custom.UnauthorizedException;
+import io.swagger.exeption.custom.*;
+import io.swagger.model.dto.GetTransactionDTO;
 import io.swagger.model.dto.PostTransactionDTO;
 import io.swagger.model.entities.*;
 import io.swagger.repositories.AccountRepository;
 import io.swagger.repositories.TransactionRepository;
+import io.swagger.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,7 +31,7 @@ public class TransactionService {
 
 
     @Autowired
-    UserService userService;
+    UserRepository userRepository;
 
     @Autowired
     io.swagger.services.accountService accountService;
@@ -83,13 +84,12 @@ public class TransactionService {
     }
 
     ////Validation methods////
-    //check if a transaction is valid
     public void isValidTransaction(Transaction transaction){
         if(!validateIsOwner(transaction) &&  transaction.getType() == TransactionType.TRANSFER) {
             throw new UnauthorizedException("You do not have access to this account");
         }
         else if(!validatePinCode(transaction)){
-            throw new UnauthorizedException("Wrong PIN code");
+            throw new UnauthorizedException("Invalid Pin code");
         }
         else if(!validateIsActive(transaction)){
             throw new InvalidTransactionsException("Account is not active");
@@ -195,15 +195,38 @@ public class TransactionService {
         }
     }
 
-    public Transaction doTransaction(PostTransactionDTO transaction, TransactionType type) {
-        //get curent user from security context
+    private User getUserFromSecurityContext(){
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userService.findByUsername(name);
-        //check if user is owner of the account or is admin
-        List<Account> userList = user.getAccounts();
-        if (userList.stream().noneMatch(a -> a.getIBAN().equals(transaction.getFromIBAN())) && !user.getRoles().contains(Role.ROLE_ADMIN)) {
+        //get user if not null
+        User user = userRepository.findByUsername(name);
+        if(user == null){
+            throw new UnauthorizedException("Could not find user from provided token");
+        }
+        return user;
+    }
+
+    private void validateAccessToAccount (String iban, User user){
+        List<Account> accountList = user.getAccounts();
+        if(accountList.isEmpty()){
+            throw new InvalidTransactionsException("User has no accounts");
+        }
+        if (accountList.stream().noneMatch(a -> a.getIBAN().equals(iban)) && !user.getRoles().contains(Role.ROLE_ADMIN)) {
             throw new UnauthorizedException("You are not the owner of this account");
         }
+    }
+
+    //////Do Transaction//////
+    public Transaction doTransaction(PostTransactionDTO transaction, TransactionType type) {
+        //get curent user from security context
+        User user = getUserFromSecurityContext();
+        //check if user is owner of the account or is admin
+        if(type != TransactionType.DEPOSIT){
+            validateAccessToAccount(transaction.getFromIBAN(), user);
+        }
+        else{
+            validateAccessToAccount(transaction.getToIBAN(), user);
+        }
+
         Transaction newTransaction = createTransactionFromPostTransaction(transaction, user, type);
         //validate transaction
         isValidTransaction(newTransaction);
@@ -214,15 +237,20 @@ public class TransactionService {
         //create transaction object
         Transaction t = new Transaction();
         t.setPerformer(user);
-        t.setIBAN(transaction.getFromIBAN());
+        if(type == TransactionType.DEPOSIT){
+            t.setIBAN(transaction.getToIBAN());
+        }
+        else{
+            t.setIBAN(transaction.getFromIBAN());
+        }
         t.setType(type);
         //set origin and target if they exist, otherwise throw exception
         if(accountService.findByIBAN(transaction.getFromIBAN()) == null){
-            throw new IllegalArgumentException("Origin account does not exist");
+            throw new IllegalArgumentException("Given iban for origin account does not exist");
         }
         t.setOrigin((Account) accountService.findByIBAN(transaction.getFromIBAN()));
         if(accountService.findByIBAN(transaction.getToIBAN()) == null){
-            throw new IllegalArgumentException("Target account does not exist");
+            throw new IllegalArgumentException("Given iban for target account does not exist");
         }
         t.setTarget((Account) accountService.findByIBAN(transaction.getToIBAN()));
         t.setAmount(transaction.getAmount());
@@ -230,4 +258,36 @@ public class TransactionService {
         t.setType(type);
         return t;
     }
+
+    /////Get History/////
+    public List<GetTransactionDTO> getHistory(String iban) {
+        validationForGetHistory(iban);
+        List<Transaction> transactions = getTransactions(iban);
+        return transactions.stream().map(Transaction::toGetTransactionDTO).collect(java.util.stream.Collectors.toList());
+    }
+
+    public List<GetTransactionDTO> getHistory(String iban, String date1, String date2) {
+        validationForGetHistory(iban);
+        LocalDateTime dateOne = LocalDateTime.of(LocalDate.parse(date1), LocalTime.of(0, 0, 0));
+        LocalDateTime dateTwo = LocalDateTime.of(LocalDate.parse(date2), LocalTime.of(0, 0, 0));
+        List<Transaction> transactions = findByIBANAndTimestampBetween(iban, dateOne, dateTwo);
+        if(transactions.isEmpty()){
+            throw new IllegalArgumentException("No transactions found for given period: " + date1 + " - " + date2);
+        }
+        return transactions.stream().map(Transaction::toGetTransactionDTO).collect(java.util.stream.Collectors.toList());
+    }
+
+    private void validationForGetHistory(String iban){
+        if (accountService.findByIBAN(iban) == null) {
+            throw new IllegalArgumentException("Account does not exist");
+        }
+        //get current user from security context
+        User user = getUserFromSecurityContext();
+        //check if user is owner of the account or is admin
+        validateAccessToAccount(iban, user);
+        if (getTransactions(iban).isEmpty()) {
+            throw new NoContentException("Account has no transactions");
+        }
+    }
+
 }

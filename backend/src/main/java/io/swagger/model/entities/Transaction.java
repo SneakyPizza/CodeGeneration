@@ -69,13 +69,14 @@ public class Transaction   {
 
   public GetTransactionDTO toGetTransactionDTO() {
     GetTransactionDTO transactionDTO = new GetTransactionDTO();
-    transactionDTO.setFromIBAN(IBAN);
+    transactionDTO.setFromIBAN(Origin.getIBAN());
     transactionDTO.setToIBAN(Target.getIBAN());
     transactionDTO.setAmount(amount);
     //set timestamp is current datetime
     transactionDTO.setTimestamp(LocalDateTime.now().toString());
 
     transactionDTO.setFromUserId(Origin.getUser().getId());
+    transactionDTO.setType(type.toString());
     return transactionDTO;
   }
   //setter for amount
