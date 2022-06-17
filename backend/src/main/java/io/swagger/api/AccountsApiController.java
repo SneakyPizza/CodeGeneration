@@ -173,7 +173,8 @@ public class AccountsApiController implements AccountsApi {
     public ResponseEntity<? extends Object> searchAccount(@NotNull @Parameter(in = ParameterIn.QUERY, description = "" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "fullName", required = true) String fullName,@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the result set." ,schema=@Schema(allowableValues={  }
 )) @Valid @RequestParam(value = "offset", required = false) Integer offset,@Min(1) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return." ,schema=@Schema(allowableValues={  }, minimum="1", maximum="50"
 , defaultValue="20")) @Valid @RequestParam(value = "limit", required = false, defaultValue="20") Integer limit) {       
-            try {
+    /*        
+    try {
                 User logged_user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
                 if(logged_user.getRoles().contains(Role.ROLE_ADMIN) || logged_user.getRoles().contains(Role.ROLE_USER)){
                     List<User> users = new ArrayList<User>();
@@ -216,7 +217,10 @@ public class AccountsApiController implements AccountsApi {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Couldn't serialize response for content type application/json", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
             }
-
+        */
+        User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        List<NameSearchAccountDTO> dtos = accountservice.searchAccountDTOs(fullName, limit, offset, user);
+        return new ResponseEntity<List<NameSearchAccountDTO>>(dtos, HttpStatus.OK);
     }
 
     public ResponseEntity<? extends Object> updateAccountStatus(@Parameter(in = ParameterIn.PATH, description = "Gets the account of the IBAN", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody AccountDTO body) {

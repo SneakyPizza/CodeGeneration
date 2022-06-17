@@ -1,9 +1,11 @@
 package io.swagger.services;
 
 import io.swagger.exeption.custom.InvalidIbanException;
+import io.swagger.exeption.custom.NotFoundException;
 import io.swagger.exeption.custom.UnauthorizedException;
 import io.swagger.model.AccountDTO;
 import io.swagger.model.GetUserDTO.Role;
+import io.swagger.model.dto.NameSearchAccountDTO;
 import io.swagger.model.dto.PostAccountDTO;
 import io.swagger.model.entities.Account;
 import io.swagger.model.entities.User;
@@ -44,8 +46,6 @@ public class accountService {
         accountRepository.save(a);
         return account;
     }
-
-
     
     //Get all accounts (GET)
     public List<AccountDTO> getAllAccounts(User user){
@@ -70,12 +70,28 @@ public class accountService {
         return account.toAccountDTO();
     }
 
+    public List<NameSearchAccountDTO> searchAccountDTOs(String fullname, int limit, int offset, User user){
+    validateUserRoleUser(user);
+    validateNameSearchRequest(fullname, limit, offset);
+
+    return findAccountUsers(splitFullNameToUsers(fullname));
+    }
+
+    public void validateNameSearchRequest(String fullname, int limit, int offset){
+        if(!checkSearchAccountFullname(fullname)){
+            throw new IllegalArgumentException("Invalid fullname, please use '-' between the first and last name once.");
+        } else if(checkLimit(limit)){
+            throw new IllegalArgumentException("Invalid limit, limit needs to be between 1 and 20");
+        } else if(checkOffset(offset)){
+            throw new IllegalArgumentException("Invalid offset value, needs to be between 1 and 50");
+        }
+    }
+
     //update an account object to the database
     public AccountDTO updateAccount(String iban, AccountDTO account, User user) {
         validateIban(iban);
         validateUserRoleAdmin(user);
         validateAccountDTO(account);
-        //validate accountdto
         Account<User> a = getAccountWithIBAN(iban);
         a.setAccountType(Account.AccountTypeEnum.fromValue(account.getAccountType().toString()));
         a.setActive(Account.ActiveEnum.fromValue(account.getActive().toString()));
@@ -104,6 +120,14 @@ public class accountService {
         return ibanGen.ValidateIban(iban);
     }
 
+    private boolean checkOffset(int offset){
+        return (offset > 0 || offset < 51);
+    }
+
+    private boolean checkLimit(int limit){
+        return (limit > 0 || limit < 21);
+    }
+
     private boolean getAccountdtoNullCheck(AccountDTO accountdto){
         if(accountdto == null) throw new NullPointerException("accountdto is null");
         return accountdto != null;
@@ -112,6 +136,11 @@ public class accountService {
     private boolean getAccountNullCheck(Account account){
         if(account == null) throw new NullPointerException("account is null");
         return account != null;
+    }
+
+    private boolean checkSearchAccountFullname(String fullname){
+        long count = fullname.chars().filter(ch -> ch == '-').count();
+        return count == 1;
     }
 
     private boolean checkPostAccountType(PostAccountDTO postaccountdto){
@@ -180,11 +209,11 @@ public class accountService {
         if(postaccountdto.getAbsoluteLimit().compareTo(BigDecimal.ZERO) < 0){
             throw new IllegalArgumentException("Unable to set limit below ZERO");
         } else if(!userService.checkIfUserExists(postaccountdto.getUserid())){
-            //User not found exception
+            throw new NotFoundException("User was not found");
         } else if(!checkPostAccountType(postaccountdto)){
-            //invalid accounttype
+            throw new IllegalArgumentException("Invalid account type");
         } else if(!checkPostAccountActive(postaccountdto)){
-            // invalid active status
+            throw new IllegalArgumentException("Invalid active type");
         }
     }
 
@@ -192,12 +221,43 @@ public class accountService {
         if(accountdto.getAbsoluteLimit().compareTo(BigDecimal.ZERO) < 0){
             throw new IllegalArgumentException("Unable to set limit below ZERO");
         } else if(!userService.checkIfUserExists(accountdto.getUserid())){
-            //user not found exception
+            throw new NotFoundException("User was not found");
         } else if(!checkAccountType(accountdto)){
-            //Invalid accounttype
+            throw new IllegalArgumentException("Invalid account type");
         } else if(!checkAccountActive(accountdto)){
-            //invalid active status
+            throw new IllegalArgumentException("Invalid active type");
+        } else if(getAccountdtoNullCheck(accountdto)){
+            throw new IllegalArgumentException("The accountdto is null");
         }
+    }
+
+    private List<User> splitFullNameToUsers(String fullname){
+        List<User> users = new ArrayList<User>();
+        String[] split = fullname.toLowerCase().split("-");
+        for(int i = 0; i < split.length;i++){
+            if(!split[i].isEmpty()){
+                List<User> user_fname = userService.findByFirstName(split[i]);
+                List<User> user_lname = userService.findByLastName(split[i]);
+                users.addAll(user_fname);
+                users.addAll(user_lname);
+            }
+        }
+        return users;
+    }
+    
+    private List<NameSearchAccountDTO> findAccountUsers(List<User> users){
+        List<NameSearchAccountDTO> dtos = new ArrayList<NameSearchAccountDTO>();
+        for (User user : users) {
+            List<Account> user_accounts = findByUserId(user.getId());
+            for (Account account : user_accounts){
+                NameSearchAccountDTO dto = user.toNameSearchAccountDTO(account.getIBAN());
+                if(!dtos.contains(dto)){
+                    //System.out.println(dto.toString());
+                    dtos.add(dto);
+                }
+            }
+        }
+        return dtos;
     }
 
 
