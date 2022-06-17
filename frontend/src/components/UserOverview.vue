@@ -82,14 +82,19 @@ export default {
     };
   },
   async created() {
+    console.log("Home created");
     try {
       //get token from store
       const token = this.$store.state.token;
       //for account in this.user.accounts
-      for (let account of this.user.Accounts) {
-        const resp = await AccountService.getAccount(account, token);
+      console.log("going in loop" + this.user.accounts);
+      for (let account in this.user.Accounts) {
+        console.log('getting account')
+        const resp = await AccountService.getAccount(this.user.Accounts[account], token);
         this.accounts.push(resp.data);
       }
+      console.log("accounts: " + this.accounts);
+      console.log("done");
 
     }
     catch (error) {

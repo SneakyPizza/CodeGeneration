@@ -1,6 +1,9 @@
 package io.swagger.services;
 
-import io.swagger.exeption.custom.*;
+import io.swagger.exception.custom.InvalidTransactionsException;
+import io.swagger.exception.custom.NotFoundException;
+import io.swagger.exception.custom.TransactionDeniedException;
+import io.swagger.exception.custom.UnauthorizedException;
 import io.swagger.model.dto.GetTransactionDTO;
 import io.swagger.model.dto.PostTransactionDTO;
 import io.swagger.model.entities.*;
@@ -195,10 +198,10 @@ public class TransactionService {
         }
     }
 
-    private User getUserFromSecurityContext(){
+    public User getUserFromSecurityContext(){
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
         //get user if not null
-        User user = userRepository.findByUsername(name);
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new NotFoundException("User not found"));
         if(user == null){
             throw new UnauthorizedException("Could not find user from provided token");
         }
@@ -286,7 +289,7 @@ public class TransactionService {
         //check if user is owner of the account or is admin
         validateAccessToAccount(iban, user);
         if (getTransactions(iban).isEmpty()) {
-            throw new NoContentException("Account has no transactions");
+            throw new NotFoundException("Account has no transactions");
         }
     }
 
