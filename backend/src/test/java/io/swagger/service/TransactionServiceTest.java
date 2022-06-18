@@ -74,7 +74,7 @@ class TransactionServiceTest {
 
     public Account BankAccount;
 
-    private static final String userNotFound = "User not found";
+    private static final String USER_NOT_FOUND = "User not found";
     private SecurityContext securityContext;
 
 
@@ -86,8 +86,8 @@ class TransactionServiceTest {
         SecurityContextHolder.setContext(securityContext);
 
        //get the user from the database
-        testUser = userRepository.findByUsername("test").orElseThrow(() -> new NotFoundException(userNotFound));
-        Bank = userRepository.findByUsername("Bank").orElseThrow(() -> new NotFoundException(userNotFound));
+        testUser = userRepository.findByUsername("test").orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+        Bank = userRepository.findByUsername("Bank").orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
 
         //get the account from the database
         testAccount = (Account) accountRepository.findByIBAN("NL01INHO0000000002");
