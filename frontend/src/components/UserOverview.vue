@@ -1,11 +1,9 @@
 <template>
+  <navigation />
   <section>
     <div class="container-lg">
       <h1 class="blue mt-3 mt-lg-3">Overview</h1>
       <div class="row mt-4">
-        <div v-if="errorMessage" class="alert alert-danger" role="alert">
-          {{ errorMessage }}
-        </div>
         <div class="card">
           <div class="card-body">
             <div class="">
@@ -17,110 +15,93 @@
           </div>
         </div>
       </div>
-      /* v-for account in accounts */
-      <div v-for="account in accounts" :key='account._id'>
-              <div class="row mt-4">
-                <div class="card shadow ">
-                  <div class="card-body">
-                    <h6 class="card-title">{{account.type}}</h6>
-                    <h2><img class="small_img margin-right" src="../assets/icons/dollar.png" alt="">Payments </h2><p class=" price">&euro;
-                    {{account.balance}}</p>
-                    <p class="left50px">{{account.IBAN}} <br>
-                      {{ account.daylimit }} &euro; moneys</p>
-                  </div>
-                  <div class="card-footer">
-                    <h4 class="p-2 blue">Show more <img class="Small_pointer" src="../assets/icons/caret-right.svg" alt=""></h4>
-                  </div>
+<!--      v for account in account-->
+      <div v-for="account in accounts" v-bind:key="account">
+            <div class="row mt-4">
+              <div class="card shadow mt-3">
+                <div class="card-body">
+                  <h6 class="card-title">Current</h6>
+                  <h2><img class="small_img margin-right" src="../assets/icons/dollar.png" alt="">Payments</h2>
+                  <p class="left50px">{{account.IBAN}}<br>
+                    Limit &euro; account.balance</p>
+                </div>
+                <div class="card-footer">
+                  <h4 class="p-2 blue">Show more <img class="Small_pointer" src="../assets/icons/caret-right.svg" alt=""></h4>
                 </div>
               </div>
+            </div>
       </div>
-
-<!--      <div class="row mt-4">-->
-<!--        <div class="card shadow ">-->
-<!--          <div class="card-body">-->
-<!--            <h6 class="card-title">Current</h6>-->
-<!--            <h2><img class="small_img margin-right" src="../assets/icons/dollar.png" alt="">Payments </h2><p class=" price">&euro; 1000,01</p>-->
-<!--            <p class="left50px">User info plus IBAN <br>-->
+<!--    <div class="row mt-4">-->
+<!--      <div class="card shadow mt-3">-->
+<!--        <div class="card-body">-->
+<!--          <h6 class="card-title">Current</h6>-->
+<!--          <h2><img class="small_img margin-right" src="../assets/icons/dollar.png" alt="">Payments</h2>-->
+<!--          <p class="left50px">User info plus IBAN <br>-->
 <!--            Limit &euro; moneys</p>-->
-<!--          </div>-->
-<!--          <div class="card-footer">-->
-<!--            <h4 class="p-2 blue">Show more <img class="Small_pointer" src="../assets/icons/caret-right.svg" alt=""></h4>-->
-<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="card-footer">-->
+<!--          <h4 class="p-2 blue">Show more <img class="Small_pointer" src="../assets/icons/caret-right.svg" alt=""></h4>-->
 <!--        </div>-->
 <!--      </div>-->
-<!--      <div class="row mt-4">-->
-<!--        <div class="card shadow ">-->
-<!--          <div class="card-body">-->
-<!--            <h6 class="card-title">Savings</h6>-->
-<!--            <h2><img class="small_img margin-right" src="../assets/icons/saving-money.svg" alt="">Savings account</h2><p class=" price">&euro; 1000,01</p>-->
-<!--            <p class="left50px">User info plus IBAN <br>-->
-<!--              Limit &euro; moneys</p>-->
-<!--          </div>-->
-<!--          <div class="card-footer">-->
-<!--            <h4 class="p-2 blue">Show more <img class="Small_pointer" src="../assets/icons/caret-right.svg" alt=""></h4>-->
-<!--          </div>-->
+<!--    </div>-->
+<!--    <div class="row mt-4">-->
+<!--      <div class="card shadow ">-->
+<!--        <div class="card-body">-->
+<!--          <h6 class="card-title">Savings</h6>-->
+<!--          <h2><img class="small_img margin-right" src="../assets/icons/saving-money.svg" alt="">Savings account</h2>-->
+<!--          <p class="left50px">User info plus IBAN <br>-->
+<!--            Limit &euro; moneys</p>-->
+<!--        </div>-->
+<!--        <div class="card-footer">-->
+<!--          <h4 class="p-2 blue">Show more <img class="Small_pointer" src="../assets/icons/caret-right.svg" alt=""></h4>-->
 <!--        </div>-->
 <!--      </div>-->
+<!--    </div>-->
     </div>
   </section>
 </template>
 
 <script>
-import axios from "axios";
+import Navigation from './Navigation.vue';
+import AccountService from "@/Services/AccountService";
 
 export default {
   name: "Home",
+  components: {
+    Navigation,
+  },
+  computed:{
+    user(){
+      return this.$store.state.user;
+    },
+  },
   data() {
-    let headers = {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem("token"),
-    };
     return {
-      user_id: localStorage.getItem("user"),
-      IBAN: [],
-      Accounts: [],
-      errorMessage: null,
-      header: headers,
+      total: 0,
+      accounts: [],
     };
   },
-  methods: {
-    getUser: function () {
-      axios
-          .get("http://localhost:8080/Users/" + this.user_id, this.headers)
-          .then(response => {
-            console.log(response.data);
-            this.IBAN = response.data.Accounts;
-            this.getAccounts();
-          })
-          .catch(error => {
-            this.errorMessage = error.response.data.message;
-          });
-    },
-    //get accounts
-    getAccounts: function () {
-      // get account for iban in IBAN
-      //foreach IBAN
-      this.IBAN.forEach(function (iban) {
-        // get account for iban
-        axios
-            .get("http://localhost:8080/accounts/" + iban, )
-            .then(response => {
-              console.log(response.data);
-              this.Accounts.push(response.data);
-            })
-            .catch(error => {
-              this.errorMessage = error.response.data.message;
-            });
-      });
+  async created() {
+    console.log("Home created");
+    try {
+      //get token from store
+      const token = this.$store.state.token;
+      //for account in this.user.accounts
+      console.log("going in loop" + this.user.accounts);
+      for (let account in this.user.Accounts) {
+        console.log('getting account')
+        const resp = await AccountService.getAccount(this.user.Accounts[account], token);
+        this.accounts.push(resp.data);
+      }
+      console.log("accounts: " + this.accounts);
+      console.log("done");
 
-
-    },
-
-  },
-  mounted () {
-    this.getUser();
-  },
-};
+    }
+    catch (error) {
+      console.log(error + " in Home created");
+    }
+  }
+}
 </script>
 
 <style>

@@ -195,7 +195,7 @@ public class TransactionService {
         }
     }
 
-    private User getUserFromSecurityContext(){
+    public User getUserFromSecurityContext(){
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
         //get user if not null
         User user = userRepository.findByUsername(name).orElseThrow();
@@ -286,7 +286,7 @@ public class TransactionService {
         //check if user is owner of the account or is admin
         validateAccessToAccount(iban, user);
         if (getTransactions(iban).isEmpty()) {
-            throw new NoContentException("Account has no transactions");
+            throw new NotFoundException("Account has no transactions");
         }
     }
 
