@@ -51,7 +51,11 @@ public class UserService {
     }
 
     public User getUser(UUID id) {
-        return userRepository.findById(id).orElseThrow(() -> new NotFoundException(userNotFound));
+        if (validateUUID(id)) {
+            return userRepository.findById(id).orElseThrow(() -> new NotFoundException(userNotFound));
+        } else {
+            throw new IllegalArgumentException("Invalid UUID");
+        }
     }
 
     public List<GetUserDTO> getAllUsers(Integer offset, Integer limit) {
@@ -114,6 +118,11 @@ public class UserService {
             return false;
         }
         return passwordEncoder.matches(password, user.getPassword());
+    }
+
+    private boolean validateUUID(UUID id) {
+        // check if id is correct format
+        return id.toString().matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
     }
 
     private boolean validateLimit(Integer limit) {

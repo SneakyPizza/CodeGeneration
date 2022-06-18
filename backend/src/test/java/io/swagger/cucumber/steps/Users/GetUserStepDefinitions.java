@@ -3,6 +3,7 @@ package io.swagger.cucumber.steps.Users;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java8.En;
 import io.swagger.cucumber.steps.BaseStepDefinitions;
+import io.swagger.model.dto.ErrorDTO;
 import io.swagger.model.dto.GetUserDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.junit.jupiter.api.Assertions;
@@ -13,8 +14,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
 
@@ -33,7 +35,7 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private String token;
-    private ResponseEntity<GetUserDTO> response;
+    private ResponseEntity<String> response;
     private ResponseEntity<String> getAllResponse;
 
     private List<GetUserDTO> userList;
@@ -41,12 +43,14 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
     private int offset = 0;
     private HttpEntity<String> request;
     private Integer status;
-
     private GetUserDTO getUserDTO;
+    private ErrorDTO errorDTO;
     private String id;
 
     public GetUserStepDefinitions() {
-
+        //
+        // GetAllUsers
+        //
         Given("^I have a valid token for an admin", () -> {
             token = VALID_TOKEN_ADMIN;
         });
@@ -59,9 +63,17 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
             limit = 51;
         });
 
-        /*Given("^The limit is lower than 1", () -> {
+        Given("^The limit is lower than 1", () -> {
             limit = -10;
-        });*/
+        });
+
+        Given("^The offset is lower than 0", () -> {
+            offset = -10;
+        });
+
+        Given("^The offset is higher than the total number of users", () -> {
+            offset = 1000000000;
+        });
 
         When("^I call the GetAllUsers endpoint", () -> {
             httpHeaders.clear();
@@ -70,43 +82,39 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
             getAllResponse = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.GET, request, String.class);
             status = getAllResponse.getStatusCode().value();
 
-            if (token == VALID_TOKEN_ADMIN) {
+            if (Objects.equals(token, VALID_TOKEN_ADMIN)) {
                 userList = objectMapper.readValue(getAllResponse.getBody(), objectMapper.getTypeFactory().constructCollectionType(List.class, GetUserDTO.class));
             }
         });
 
-
-        /*Then("^I should get a status code of (\\d+)", (Integer statusCode) -> {
-            assertEquals(statusCode, status);
-        });*/
-
-        Then("^I should see all the users in a list and return a (\\d+) status code", (Integer statusCode) -> {
-            assertEquals(statusCode, status);
+        And("^I should see a list of users", () -> {
             userList.forEach(user -> {
-                assertEquals(true, user.getUserid() != null);
-                assertEquals(true, user.getUsername() != null);
-                assertEquals(true, user.getEmail() != null);
-                assertEquals(true, user.getFirstName() != null);
-                assertEquals(true, user.getLastName() != null);
-                assertEquals(true, user.getStreet() != null);
-                assertEquals(true, user.getCity() != null);
-                assertEquals(true, user.getZipcode() != null);
-                assertEquals(true, user.getUserstatus() != null);
-                assertEquals(true, user.getDayLimit() != null);
-                assertEquals(true, user.getTransactionLimit() != null);
-                assertEquals(true, user.getRoles() != null);
+                assertNotNull(user.getUserid());
+                assertNotNull(user.getUsername());
+                assertNotNull(user.getEmail());
+                assertNotNull(user.getFirstName());
+                assertNotNull(user.getLastName());
+                assertNotNull(user.getStreet());
+                assertNotNull(user.getCity());
+                assertNotNull(user.getZipcode());
+                assertNotNull(user.getUserstatus());
+                assertNotNull(user.getDayLimit());
+                assertNotNull(user.getTransactionLimit());
+                assertNotNull(user.getRoles());
             });
         });
 
-        /*Then ("^I should get the first 20 users and return a (\\d+) status code", (Integer statusCode) -> {
-            assertEquals(statusCode, status);
-            assertEquals(2, userList.size());
+        And("^I get an error object with message \"([^\"]*)\"$", (String arg0) -> {
+            errorDTO =  objectMapper.readValue(response.getBody(), ErrorDTO.class);
+            Assertions.assertEquals(arg0, errorDTO.getMessage());
+            Assertions.assertNotNull(errorDTO.getTimestamp());
+            Assertions.assertNotNull(errorDTO.getStatus());
+            Assertions.assertNotNull(errorDTO.getError());
         });
 
-        And("^I have a valid admin token", () -> {
-            token = VALID_TOKEN_ADMIN;
-        });*/
-
+        //
+        // GetUser
+        //
         Given("^I provide a correct user id", () -> {
         });
 
@@ -132,7 +140,7 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
             // get id from /Users/{id}
             httpHeaders.add("Authorization", "Bearer " +  token);
             request = new HttpEntity<>(id, httpHeaders);
-            response = restTemplate.exchange(getBaseUrl() + "/Users/" + id, HttpMethod.GET, request, GetUserDTO.class);
+            response = restTemplate.exchange(getBaseUrl() + "/Users/" + id, HttpMethod.GET, request, String.class);
             status = response.getStatusCode().value();
         });
 
@@ -141,7 +149,7 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
             // get id from /Users/{id}
             httpHeaders.add("Authorization", "Bearer " +  token);
             request = new HttpEntity<>(id, httpHeaders);
-            response = restTemplate.exchange(getBaseUrl() + "/Users/" + id, HttpMethod.GET, request, GetUserDTO.class);
+            response = restTemplate.exchange(getBaseUrl() + "/Users/" + id, HttpMethod.GET, request, String.class);
             status = response.getStatusCode().value();
         });
 
