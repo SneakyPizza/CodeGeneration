@@ -30,6 +30,8 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
 
     private static final String INVALID_USER_ID = "3fa85f64-5717-4562-b3fc-2c963f66afa6";
 
+    private static final String WRONG_FORMAT_USER_ID = "3fa85f64-5717-4562-b3fc";
+
     private final HttpHeaders httpHeaders = new HttpHeaders();
     private final TestRestTemplate restTemplate = new TestRestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -55,36 +57,46 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
             token = VALID_TOKEN_ADMIN;
         });
 
-        Given("^I have a valid token for a user", () -> {
+        Given("^I have a valid token for an user", () -> {
             token = VALID_TOKEN_USER;
         });
 
         Given("^The limit is higher than 50", () -> {
             limit = 51;
+            offset = 0;
         });
 
         Given("^The limit is lower than 1", () -> {
             limit = -10;
+            offset = 0;
         });
 
         Given("^The offset is lower than 0", () -> {
+            limit = 10;
             offset = -10;
         });
 
         Given("^The offset is higher than the total number of users", () -> {
+            limit = 10;
             offset = 1000000000;
         });
 
         When("^I call the GetAllUsers endpoint", () -> {
             httpHeaders.clear();
             httpHeaders.add("Authorization", "Bearer " +  token);
-            request = new HttpEntity<>(null, httpHeaders);
-            getAllResponse = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.GET, request, String.class);
+            request = new HttpEntity<>(httpHeaders);
+            // query with limit and offset
+            getAllResponse = restTemplate.exchange( getBaseUrl() + "/Users?limit=" + limit + "&offset=" + offset, HttpMethod.GET, request, String.class);
             status = getAllResponse.getStatusCode().value();
 
             if (Objects.equals(token, VALID_TOKEN_ADMIN)) {
-                userList = objectMapper.readValue(getAllResponse.getBody(), objectMapper.getTypeFactory().constructCollectionType(List.class, GetUserDTO.class));
+                userList = objectMapper.readValue(getAllResponse.getBody(), objectMapper.getTypeFactory().constructCollectionType(List.class, String.class));
             }
+        });
+
+        And("^I have a valid limit and offset", () -> {
+            limit = 10;
+            offset = 0;
         });
 
         And("^I should see a list of users", () -> {
@@ -119,12 +131,12 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
         Given("^I provide a correct user id", () -> {
         });
 
-        Given("^I have an invalid user id", () -> {
-            id = INVALID_USER_ID;
+        Given("^I have a user id that is in wrong format", () -> {
+            id = WRONG_FORMAT_USER_ID;
         });
 
-        Given("I have a user id that is null", () -> {
-            id = null;
+        Given("^I have a user id that is not in the database", () -> {
+            id = INVALID_USER_ID;
         });
 
         When("^I call the GetAllUser endpoint i get all users and use the id of the first user to get a user from GetUser", () -> {
@@ -156,6 +168,23 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
 
         Then("^I should see a (\\d+) status code", (Integer statusCode) -> {
             Assertions.assertEquals(statusCode, status);
+        });
+
+        And("^I should see a user object" , () -> {
+            getUserDTO = objectMapper.readValue(response.getBody(), GetUserDTO.class);
+            assertNotNull(getUserDTO.getUserid());
+            assertNotNull(getUserDTO.getUsername());
+            assertNotNull(getUserDTO.getEmail());
+            assertNotNull(getUserDTO.getFirstName());
+            assertNotNull(getUserDTO.getLastName());
+            assertNotNull(getUserDTO.getStreet());
+            assertNotNull(getUserDTO.getCity());
+            assertNotNull(getUserDTO.getZipcode());
+            assertNotNull(getUserDTO.getUserstatus());
+            assertNotNull(getUserDTO.getDayLimit());
+            assertNotNull(getUserDTO.getTransactionLimit());
+            assertNotNull(getUserDTO.getRoles());
+            assertNotNull(getUserDTO.getAccounts());
         });
 
         And("^I have a valid user token", () -> {

@@ -52,16 +52,16 @@ public class AddUserStepDefinitions extends BaseStepDefinitions implements En {
     public AddUserStepDefinitions() {
         Given("^I provide valid user details", () -> {
             postAsUserDTO = new PostAsUserDTO();
-            postAsUserDTO.setUsername("Test");
-            postAsUserDTO.setFirstName("Test");
+            postAsUserDTO.setUsername("Klaas");
+            postAsUserDTO.setFirstName("Jansen");
             postAsUserDTO.setLastName("Test");
-            postAsUserDTO.setEmail("test@test.nl");
+            postAsUserDTO.setEmail("klaasjansen@test.nl");
             postAsUserDTO.setPassword("test");
             postAsUserDTO.setStreet("Test");
             postAsUserDTO.setCity("Test");
             postAsUserDTO.setZipcode("Test");
-            postAsUserDTO.setDayLimit(BigDecimal.valueOf(10));
-            postAsUserDTO.setTransactionLimit(BigDecimal.valueOf(10));
+            postAsUserDTO.setDayLimit(BigDecimal.valueOf(1000));
+            postAsUserDTO.setTransactionLimit(BigDecimal.valueOf(100));
         });
 
         Given("^I provide wrong user details with null values", () -> {
@@ -73,7 +73,7 @@ public class AddUserStepDefinitions extends BaseStepDefinitions implements En {
             httpHeaders.clear();
             httpHeaders.add("Content-Type", "application/json");
             request = new HttpEntity<>(objectMapper.writeValueAsString(postUserDTO), httpHeaders);
-            response = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.POST, request, String.class);
+            response = restTemplate.exchange(getBaseUrl() + "/signup", HttpMethod.POST, request, String.class);
             status = response.getStatusCode().value();
         });
 
@@ -81,13 +81,13 @@ public class AddUserStepDefinitions extends BaseStepDefinitions implements En {
             httpHeaders.clear();
             httpHeaders.add("Content-Type", "application/json");
             request = new HttpEntity<>(objectMapper.writeValueAsString(postUserDTO), httpHeaders);
-            response = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.POST, request, String.class);
+            response = restTemplate.exchange(getBaseUrl() + "/signup", HttpMethod.POST, request, String.class);
             status = response.getStatusCode().value();
 
             httpHeaders.clear();
             httpHeaders.add("Content-Type", "application/json");
             request = new HttpEntity<>(objectMapper.writeValueAsString(postUserDTO), httpHeaders);
-            response = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.POST, request, String.class);
+            response = restTemplate.exchange(getBaseUrl() + "/signup", HttpMethod.POST, request, String.class);
             status = response.getStatusCode().value();
         });
 

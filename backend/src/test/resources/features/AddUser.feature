@@ -3,7 +3,7 @@ Feature: Everything AddUser related
     Scenario: Adding a user with no account
         Given I provide valid user details
         When I call the AddUser endpoint
-        Then I should see a user status code of 200
+        Then I should see a user status code of 201
         And I should receive the user added to the database
 
     Scenario: Adding a user with no account with fields that are null
