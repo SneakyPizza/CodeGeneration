@@ -74,17 +74,16 @@ public class UsersApiController implements UsersApi {
     public ResponseEntity<? extends Object> getAllUsers(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the result set." ,schema=@Schema(allowableValues={  }
 )) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Min(1) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return." ,schema=@Schema(allowableValues={  }, minimum="1", maximum="50"
 , defaultValue="20")) @Valid @RequestParam(value = "limit", required = false, defaultValue="20") Integer limit) {
-        List<User> users = userService.getAllUsers(offset, limit);
-        return new ResponseEntity<>(users, HttpStatus.OK); // needs to be DTO
+        return new ResponseEntity<>(userService.getAllUsers(offset, limit), HttpStatus.OK);
     }
 
     public ResponseEntity<? extends Object> getUser(/*@DecimalMin("1")*/@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") UUID id) {
         User user = userService.getUser(id);
-        return new ResponseEntity<>(user, HttpStatus.OK); // needs to be DTO
+        return new ResponseEntity<>(user.getGetUserDTO(), HttpStatus.OK);
     }
 
     public ResponseEntity<? extends Object> updateUser(/*@DecimalMin("1")*/@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") UUID id, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostUserDTO postUserDTO) {
         User user = userService.updateUser(postUserDTO);
-        return new ResponseEntity<>(user, HttpStatus.OK); // needs to be DTO
+        return new ResponseEntity<>(user.getPostUserDTO(), HttpStatus.OK);
     }
 }

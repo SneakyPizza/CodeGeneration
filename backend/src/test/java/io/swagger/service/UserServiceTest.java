@@ -122,6 +122,6 @@ class UserServiceTest {
         Assertions.assertEquals(new BigDecimal(500), createdUser.getTransactionLimit());
         Assertions.assertEquals(1, createdUser.getRoles().size());
         Assertions.assertEquals(Role.ROLE_USER, createdUser.getRoles().get(0));
-
+        return true; // not good
     }
 }

@@ -2,6 +2,7 @@ package io.swagger.services;
 
 import io.swagger.exception.custom.NotFoundException;
 import io.swagger.exception.custom.UnauthorizedException;
+import io.swagger.model.dto.GetUserDTO;
 import io.swagger.model.dto.JwtDTO;
 import io.swagger.model.dto.PostAsUserDTO;
 import io.swagger.model.entities.Role;
@@ -53,15 +54,14 @@ public class UserService {
         return userRepository.findById(id).orElseThrow(() -> new NotFoundException(userNotFound));
     }
 
-    public List<User> getAllUsers(Integer offset, Integer limit) {
+    public List<GetUserDTO> getAllUsers(Integer offset, Integer limit) {
         if (!validateLimit(limit)) {
             throw new IllegalArgumentException("Limit must be between 1 and 50");
         }
         if (!validateOffset(offset)) {
             throw new IllegalArgumentException("Offset should be between 0 and the total number of users");
         }
-        Pageable pageable = PageRequest.of(offset, limit);
-        return userRepository.findAll(pageable).getContent();
+        return getUserDTOs(userRepository.findAll(PageRequest.of(offset, limit)).getContent());
     }
 
     public User createUser(PostAsUserDTO postAsUserDTO) {
@@ -131,6 +131,14 @@ public class UserService {
         jwtDTO.setJwtToken(tokenProvider.createToken(user.getUsername(), user.getRoles()));
         jwtDTO.setId(user.getId().toString());
         return jwtDTO;
+    }
+
+    private List<GetUserDTO> getUserDTOs(List<User> users) {
+        List<GetUserDTO> getUserDTOs = new java.util.ArrayList<>();
+        for (User user : users) {
+            getUserDTOs.add(user.getGetUserDTO());
+        }
+        return getUserDTOs;
     }
 }
 
