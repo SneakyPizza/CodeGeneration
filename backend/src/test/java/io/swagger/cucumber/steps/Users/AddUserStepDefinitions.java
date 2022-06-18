@@ -3,6 +3,7 @@ package io.swagger.cucumber.steps.Users;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java8.En;
 import io.swagger.cucumber.steps.BaseStepDefinitions;
+import io.swagger.model.dto.PostAsUserDTO;
 import io.swagger.model.dto.PostUserDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -41,42 +42,32 @@ public class AddUserStepDefinitions extends BaseStepDefinitions implements En {
     private Integer status;
 
     private PostUserDTO postUserDTO;
+    private PostAsUserDTO postAsUserDTO;
+
     private String id;
 
     public AddUserStepDefinitions() {
         Given("^I provide valid user details", () -> {
-            postUserDTO = new PostUserDTO();
-            postUserDTO.setUsername("Test");
-            postUserDTO.setFirstName("Test");
-            postUserDTO.setLastName("Test");
-            postUserDTO.setEmail("test@test.nl");
-            postUserDTO.setPassword("test");
-            postUserDTO.setStreet("Test");
-            postUserDTO.setCity("Test");
-            postUserDTO.setZipcode("Test");
-            postUserDTO.setDayLimit(BigDecimal.valueOf(10));
-            postUserDTO.setTransactionLimit(BigDecimal.valueOf(10));
-            postUserDTO.setRoles(Collections.singletonList(PostUserDTO.Role.ADMIN));
+            postAsUserDTO = new PostAsUserDTO();
+            postAsUserDTO.setUsername("Test");
+            postAsUserDTO.setFirstName("Test");
+            postAsUserDTO.setLastName("Test");
+            postAsUserDTO.setEmail("test@test.nl");
+            postAsUserDTO.setPassword("test");
+            postAsUserDTO.setStreet("Test");
+            postAsUserDTO.setCity("Test");
+            postAsUserDTO.setZipcode("Test");
+            postAsUserDTO.setDayLimit(BigDecimal.valueOf(10));
+            postAsUserDTO.setTransactionLimit(BigDecimal.valueOf(10));
         });
 
         Given("^I provide wrong user details with null values", () -> {
             postUserDTO = new PostUserDTO();
             postUserDTO.setUsername(null);
-            postUserDTO.setFirstName("Test");
-            postUserDTO.setLastName("Test");
-            postUserDTO.setEmail(null);
-            postUserDTO.setPassword("test");
-            postUserDTO.setStreet("Test");
-            postUserDTO.setCity("Test");
-            postUserDTO.setZipcode("Test");
-            postUserDTO.setDayLimit(BigDecimal.valueOf(10));
-            postUserDTO.setTransactionLimit(null);
-            postUserDTO.setRoles(Collections.singletonList(PostUserDTO.Role.ADMIN));
         });
 
         When("I call the AddUser endpoint", () -> {
             httpHeaders.clear();
-            httpHeaders.set("Authorization", "Bearer " + token);
             httpHeaders.add("Content-Type", "application/json");
             request = new HttpEntity<>(objectMapper.writeValueAsString(postUserDTO), httpHeaders);
             response = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.POST, request, PostUserDTO.class);
@@ -85,35 +76,28 @@ public class AddUserStepDefinitions extends BaseStepDefinitions implements En {
 
         When("I call the AddUser endpoint twice", () -> {
             httpHeaders.clear();
-            httpHeaders.set("Authorization", "Bearer " + token);
             httpHeaders.add("Content-Type", "application/json");
             request = new HttpEntity<>(objectMapper.writeValueAsString(postUserDTO), httpHeaders);
             response = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.POST, request, PostUserDTO.class);
             status = response.getStatusCode().value();
 
             httpHeaders.clear();
-            httpHeaders.set("Authorization", "Bearer " + token);
             httpHeaders.add("Content-Type", "application/json");
             request = new HttpEntity<>(objectMapper.writeValueAsString(postUserDTO), httpHeaders);
             response = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.POST, request, PostUserDTO.class);
             status = response.getStatusCode().value();
         });
 
-        Then("^The user is added to the database and i get status code (\\d+)", (Integer statusCode) -> {
-            assertNotNull(response);
+        Then("^I should see a user status code of (\\d+)", (Integer statusCode) -> {
             assertEquals(statusCode, status);
         });
 
-        Then("^The user is not added to the database and i get status code (\\d+)", (Integer statusCode) -> {
-            assertEquals(statusCode, status);
+        And("^I should receive an error message with \"([^\"]*)\"$", (String errorMessage) -> {
+            assertEquals(errorMessage, response.getBody());
         });
 
-        And("^I have a valid token jwt", () -> {
-            token = VALID_TOKEN_USER;
-        });
-
-        And("^I have an invalid token jwt", () -> {
-            token = INVALID_TOKEN;
+        And("^I should receive the user added to the database", () -> {
+            assertNotNull(response.getBody());
         });
     }
 }
