@@ -1,9 +1,6 @@
 package io.swagger.services;
 
-import io.swagger.exception.custom.InvalidTransactionsException;
-import io.swagger.exception.custom.NotFoundException;
-import io.swagger.exception.custom.TransactionDeniedException;
-import io.swagger.exception.custom.UnauthorizedException;
+import io.swagger.exception.custom.*;
 import io.swagger.model.dto.GetTransactionDTO;
 import io.swagger.model.dto.PostTransactionDTO;
 import io.swagger.model.entities.*;
@@ -201,7 +198,7 @@ public class TransactionService {
     public User getUserFromSecurityContext(){
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
         //get user if not null
-        User user = userRepository.findByUsername(name).orElseThrow(() -> new NotFoundException("User not found"));
+        User user = userRepository.findByUsername(name).orElseThrow();
         if(user == null){
             throw new UnauthorizedException("Could not find user from provided token");
         }

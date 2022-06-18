@@ -125,6 +125,13 @@ public class User {
     	postUserDTO.setZipcode(this.zipcode);
     	postUserDTO.setDayLimit(this.dayLimit);
     	postUserDTO.setTransactionLimit(this.transactionLimit);
+        //userstatus
+        if (this.userstatus == UserStatus.ACTIVE) {
+            postUserDTO.setUserstatus(PostUserDTO.UserstatusEnum.ACTIVE);
+        }
+        else if (this.userstatus == UserStatus.DISABLED) {
+            postUserDTO.setUserstatus(PostUserDTO.UserstatusEnum.DISABLED);
+        }
         if (this.roles.contains(Role.ROLE_ADMIN) && this.roles.contains(Role.ROLE_USER)) {
             postUserDTO.setRoles(List.of(PostUserDTO.Role.ADMIN, PostUserDTO.Role.USER));
         } else if(this.roles.contains(Role.ROLE_ADMIN)) {
@@ -135,6 +142,21 @@ public class User {
             postUserDTO.setRoles(Collections.emptyList());
         }
     	return postUserDTO;
+    }
+
+    public PostAsUserDTO getPostAsUserDTO() {
+        PostAsUserDTO postAsUserDTO = new PostAsUserDTO();
+        postAsUserDTO.setUsername(this.username);
+        postAsUserDTO.setPassword(this.password);
+        postAsUserDTO.setEmail(this.email);
+        postAsUserDTO.setFirstName(this.firstName);
+        postAsUserDTO.setLastName(this.lastName);
+        postAsUserDTO.setStreet(this.street);
+        postAsUserDTO.setCity(this.city);
+        postAsUserDTO.setZipcode(this.zipcode);
+        postAsUserDTO.setDayLimit(this.dayLimit);
+        postAsUserDTO.setTransactionLimit(this.transactionLimit);
+        return postAsUserDTO;
     }
 
     public GetUserDTO getGetUserDTO() {
