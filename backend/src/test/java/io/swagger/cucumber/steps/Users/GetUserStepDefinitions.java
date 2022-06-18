@@ -101,6 +101,7 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
                 assertNotNull(user.getDayLimit());
                 assertNotNull(user.getTransactionLimit());
                 assertNotNull(user.getRoles());
+                assertNotNull(user.getAccounts());
             });
         });
 
@@ -153,7 +154,7 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
             status = response.getStatusCode().value();
         });
 
-        Then("^I should see a status code of (\\d+)", (Integer statusCode) -> {
+        Then("^I should see a (\\d+) status code", (Integer statusCode) -> {
             Assertions.assertEquals(statusCode, status);
         });
 

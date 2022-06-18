@@ -62,15 +62,11 @@ public class UsersApiController implements UsersApi {
         return new ResponseEntity<>(user.getPostAsUserDTO(), HttpStatus.CREATED);
     }
 
-    // checks if endpoint is called by an admin
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<? extends Object> addUserAdmin(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostUserDTO postUserDTO) {
         User user = userService.createUserAdmin(postUserDTO);
         return new ResponseEntity<>(user.getPostUserDTO(), HttpStatus.CREATED);
     }
 
-    // checks if endpoint is called by an admin
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<? extends Object> getAllUsers(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the result set." ,schema=@Schema(allowableValues={  }
 )) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Min(1) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return." ,schema=@Schema(allowableValues={  }, minimum="1", maximum="50"
 , defaultValue="20")) @Valid @RequestParam(value = "limit", required = false, defaultValue="20") Integer limit) {

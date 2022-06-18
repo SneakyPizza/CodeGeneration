@@ -3,8 +3,10 @@ package io.swagger.cucumber.steps.Users;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java8.En;
 import io.swagger.cucumber.steps.BaseStepDefinitions;
+import io.swagger.model.dto.ErrorDTO;
 import io.swagger.model.dto.PostAsUserDTO;
 import io.swagger.model.dto.PostUserDTO;
+import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
@@ -36,13 +38,14 @@ public class AddUserStepDefinitions extends BaseStepDefinitions implements En {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private String token;
-    private ResponseEntity<PostUserDTO> response;
+    private ResponseEntity<String> response;
 
     private HttpEntity<String> request;
     private Integer status;
 
     private PostUserDTO postUserDTO;
     private PostAsUserDTO postAsUserDTO;
+    private ErrorDTO errorDTO;
 
     private String id;
 
@@ -70,7 +73,7 @@ public class AddUserStepDefinitions extends BaseStepDefinitions implements En {
             httpHeaders.clear();
             httpHeaders.add("Content-Type", "application/json");
             request = new HttpEntity<>(objectMapper.writeValueAsString(postUserDTO), httpHeaders);
-            response = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.POST, request, PostUserDTO.class);
+            response = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.POST, request, String.class);
             status = response.getStatusCode().value();
         });
 
@@ -78,13 +81,13 @@ public class AddUserStepDefinitions extends BaseStepDefinitions implements En {
             httpHeaders.clear();
             httpHeaders.add("Content-Type", "application/json");
             request = new HttpEntity<>(objectMapper.writeValueAsString(postUserDTO), httpHeaders);
-            response = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.POST, request, PostUserDTO.class);
+            response = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.POST, request, String.class);
             status = response.getStatusCode().value();
 
             httpHeaders.clear();
             httpHeaders.add("Content-Type", "application/json");
             request = new HttpEntity<>(objectMapper.writeValueAsString(postUserDTO), httpHeaders);
-            response = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.POST, request, PostUserDTO.class);
+            response = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.POST, request, String.class);
             status = response.getStatusCode().value();
         });
 
@@ -92,8 +95,12 @@ public class AddUserStepDefinitions extends BaseStepDefinitions implements En {
             assertEquals(statusCode, status);
         });
 
-        And("^I should receive an error message with \"([^\"]*)\"$", (String errorMessage) -> {
-            assertEquals(errorMessage, response.getBody());
+        And("^I should receive an error message with \"([^\"]*)\"$", (String arg0) -> {
+            errorDTO =  objectMapper.readValue(response.getBody(), ErrorDTO.class);
+            Assertions.assertEquals(arg0, errorDTO.getMessage());
+            Assertions.assertNotNull(errorDTO.getTimestamp());
+            Assertions.assertNotNull(errorDTO.getStatus());
+            Assertions.assertNotNull(errorDTO.getError());
         });
 
         And("^I should receive the user added to the database", () -> {
