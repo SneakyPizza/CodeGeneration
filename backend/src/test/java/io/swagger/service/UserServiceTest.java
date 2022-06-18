@@ -74,14 +74,14 @@ class UserServiceTest {
 
     @Test
     void getUser() {
-        userList = userService.getAllUsers(0, 1);
+//        userList = userService.getAllUsers(0, 1);
         testUser = userService.getUser(UUID.fromString(String.valueOf(userList.get(0).getId())));
         assertUser(testUser);
     }
 
     @Test
     void getAllUsers() {
-        userList = userService.getAllUsers(0, 1);
+//        userList = userService.getAllUsers(0, 1);
         Assertions.assertEquals(1, userList.size());
         Assertions.assertEquals("test", userList.get(0).getUsername());
         Assertions.assertTrue(passwordEncoder.matches("test", userList.get(0).getPassword()));

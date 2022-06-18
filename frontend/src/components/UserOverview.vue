@@ -20,10 +20,17 @@
             <div class="row mt-4">
               <div class="card shadow mt-3">
                 <div class="card-body">
-                  <h6 class="card-title">Current</h6>
-                  <h2><img class="small_img margin-right" src="../assets/icons/dollar.png" alt="">Payments</h2>
+                  <h6 class="card-title">{{account.accountType}}</h6>
+                  <div v-if="account.accountType === 'savings'">
+                    <h2><img class="small_img margin-right" src="../assets/icons/piggy-bank-fill.svg" alt="">Savings account</h2>
+                  </div>
+                  <div v-if="account.accountType === 'current'">
+                    <h2><img class="small_img margin-right" src="../assets/icons/dollar.png" alt="">Payments account</h2>
+                  </div>
+
                   <p class="left50px">{{account.IBAN}}<br>
-                    Limit &euro; account.balance</p>
+                    Balance &euro; {{account.balance}}<br>
+                    Limit &euro; {{user.transactionLimit}}</p>
                 </div>
                 <div class="card-footer">
                   <h4 class="p-2 blue">Show more <img class="Small_pointer" src="../assets/icons/caret-right.svg" alt=""></h4>
@@ -31,32 +38,6 @@
               </div>
             </div>
       </div>
-<!--    <div class="row mt-4">-->
-<!--      <div class="card shadow mt-3">-->
-<!--        <div class="card-body">-->
-<!--          <h6 class="card-title">Current</h6>-->
-<!--          <h2><img class="small_img margin-right" src="../assets/icons/dollar.png" alt="">Payments</h2>-->
-<!--          <p class="left50px">User info plus IBAN <br>-->
-<!--            Limit &euro; moneys</p>-->
-<!--        </div>-->
-<!--        <div class="card-footer">-->
-<!--          <h4 class="p-2 blue">Show more <img class="Small_pointer" src="../assets/icons/caret-right.svg" alt=""></h4>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--    <div class="row mt-4">-->
-<!--      <div class="card shadow ">-->
-<!--        <div class="card-body">-->
-<!--          <h6 class="card-title">Savings</h6>-->
-<!--          <h2><img class="small_img margin-right" src="../assets/icons/saving-money.svg" alt="">Savings account</h2>-->
-<!--          <p class="left50px">User info plus IBAN <br>-->
-<!--            Limit &euro; moneys</p>-->
-<!--        </div>-->
-<!--        <div class="card-footer">-->
-<!--          <h4 class="p-2 blue">Show more <img class="Small_pointer" src="../assets/icons/caret-right.svg" alt=""></h4>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
     </div>
   </section>
 </template>

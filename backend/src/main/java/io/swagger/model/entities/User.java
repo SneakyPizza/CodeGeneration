@@ -51,7 +51,8 @@ public class User {
     @NonNull
     private String pincode;
 
-    @OneToMany(cascade=CascadeType.PERSIST)
+    @OneToMany()
+    @JoinColumn(name = "USER_ID")
     private List<Account> accounts;
 
     @ElementCollection(fetch = FetchType.EAGER)

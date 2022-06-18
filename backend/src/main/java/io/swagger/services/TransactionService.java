@@ -74,6 +74,29 @@ public class TransactionService {
         return (List<Transaction>) transactionRepository.findByIBANAndTimestampBetween(iban, startDate, endDate);
     }
 
+    public List<Transaction> getAllTransactionsByAccount(Account acc) {
+        //find by ORIGIN_ID
+        List<Transaction> origin = (List<Transaction>) transactionRepository.findByOriginId(acc.getId());
+        //find by TARGET_ID
+        List<Transaction> target = (List<Transaction>) transactionRepository.findByTargetId(acc.getId());
+
+        origin.addAll(target);
+        origin.sort((t1, t2) -> t1.getTimestamp().compareTo(t2.getTimestamp()));
+        return origin;
+    }
+
+    public List<Transaction> getAllTransactionsByAccount(Account acc, LocalDateTime startDate, LocalDateTime endDate) {
+        //find by ORIGIN_ID
+        List<Transaction> origin = (List<Transaction>) transactionRepository.findByOriginIdAndTimestampBetween(acc.getId(), startDate, endDate);
+        //find by TARGET_ID
+        List<Transaction> target = (List<Transaction>) transactionRepository.findByTargetIdAndTimestampBetween(acc.getId(), startDate, endDate);
+
+        origin.addAll(target);
+        origin.sort((t1, t2) -> t1.getTimestamp().compareTo(t2.getTimestamp()));
+        return origin;
+    }
+
+
     private Transaction executeTransaction(Transaction transaction) {
         transaction.execute();
         transactionRepository.save(transaction);
@@ -262,7 +285,9 @@ public class TransactionService {
     /////Get History/////
     public List<GetTransactionDTO> getHistory(String iban) {
         validationForGetHistory(iban);
-        List<Transaction> transactions = getTransactions(iban);
+        //get account from iban
+        Account account = (Account) accountService.findByIBAN(iban);
+        List<Transaction> transactions = getAllTransactionsByAccount(account);
         return transactions.stream().map(Transaction::toGetTransactionDTO).collect(java.util.stream.Collectors.toList());
     }
 
@@ -270,7 +295,8 @@ public class TransactionService {
         validationForGetHistory(iban);
         LocalDateTime dateOne = LocalDateTime.of(LocalDate.parse(date1), LocalTime.of(0, 0, 0));
         LocalDateTime dateTwo = LocalDateTime.of(LocalDate.parse(date2), LocalTime.of(0, 0, 0));
-        List<Transaction> transactions = findByIBANAndTimestampBetween(iban, dateOne, dateTwo);
+        Account account = (Account) accountService.findByIBAN(iban);
+        List<Transaction> transactions = getAllTransactionsByAccount(account, dateOne, dateTwo);
         if(transactions.isEmpty()){
             throw new IllegalArgumentException("No transactions found for given period: " + date1 + " - " + date2);
         }
