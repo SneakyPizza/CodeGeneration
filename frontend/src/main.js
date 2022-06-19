@@ -6,6 +6,8 @@ import UserOverview from './components/UserOverview.vue';
 import Login from "./components/Login";
 import axios from "axios";
 import store from "./store";
+import TransactionHistory from "./components/TransactionHistory";
+
 
 axios.defaults.baseURL = 'http://localhost:8080'
 
@@ -14,6 +16,7 @@ axios.defaults.headers.common['Authorization'] = `Bearer ${store.state.token}`;
 const routes = [
     { path: '/UserOverview', component: UserOverview, meta: {reqToken: true, adminOnly: false, }},
     { path: '/login', component: Login, meta: {reqToken: false, adminOnly: false, }},
+    { path: '/History/:iban', name: 'History', component: TransactionHistory, meta: {reqToken: true, adminOnly: false, params: true}},
 ];
 
 

@@ -33,7 +33,7 @@
                     Limit &euro; {{user.transactionLimit}}</p>
                 </div>
                 <div class="card-footer">
-                  <h4 class="p-2 blue">Show more <img class="Small_pointer" src="../assets/icons/caret-right.svg" alt=""></h4>
+                  <router-link :to="{name: 'History', params: {iban: account.IBAN}}" class="blue bigText nav-link" active-class="active">View history<img class="Small_pointer" src="../assets/icons/caret-right.svg" alt=""></router-link>
                 </div>
               </div>
             </div>
@@ -68,14 +68,10 @@ export default {
       //get token from store
       const token = this.$store.state.token;
       //for account in this.user.accounts
-      console.log("going in loop" + this.user.accounts);
       for (let account in this.user.Accounts) {
-        console.log('getting account')
         const resp = await AccountService.getAccount(this.user.Accounts[account], token);
         this.accounts.push(resp.data);
       }
-      console.log("accounts: " + this.accounts);
-      console.log("done");
 
     }
     catch (error) {
@@ -139,4 +135,9 @@ export default {
 }
 .left {
   float: left;}
+
+.bigText {
+  font-size: 25px;
+  font-weight: bold;
+}
 </style>
