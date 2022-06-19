@@ -96,7 +96,10 @@ public class AccountServiceTest {
 
     @Test
     public void B_getAllAccounts(){
-        //get all accounts
+        when(securityContext.getAuthentication().getName()).thenReturn("Bank");
+        testUser = userRepository.findByUsername("Bank");
+        //List<NameSearchAccountDTO> dtos = accountService.searchAccountDTOs(fullname, 10, 10, testUser);
+        List<AccountDTO> dtos = accountService.getAllAccounts(testUser);
     }
 
     @Test
@@ -110,8 +113,8 @@ public class AccountServiceTest {
 
     @Test
     public void D_searchAccountDTOs(){
-        when(securityContext.getAuthentication().getName()).thenReturn("Bank");
-        testUser = userRepository.findByUsername("Bank");
+        when(securityContext.getAuthentication().getName()).thenReturn("test");
+        testUser = userRepository.findByUsername("test");
         List<NameSearchAccountDTO> dtos = accountService.searchAccountDTOs(fullname, 10, 10, testUser);
     }
 
