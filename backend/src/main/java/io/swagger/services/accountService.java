@@ -4,12 +4,15 @@ import io.swagger.exeption.custom.InvalidIbanException;
 import io.swagger.exeption.custom.NotFoundException;
 import io.swagger.exeption.custom.UnauthorizedException;
 import io.swagger.model.AccountDTO;
-import io.swagger.model.GetUserDTO.Role;
+//import io.swagger.model.GetUserDTO.Role;
+import io.swagger.model.entities.Role;
 import io.swagger.model.dto.NameSearchAccountDTO;
 import io.swagger.model.dto.PostAccountDTO;
 import io.swagger.model.entities.Account;
 import io.swagger.model.entities.User;
+import io.swagger.models.Model;
 import io.swagger.repositories.AccountRepository;
+import io.swagger.repositories.UserRepository;
 import io.swagger.utils.ibanGenerator;
 
 import java.math.BigDecimal;
@@ -96,24 +99,29 @@ public class accountService {
         a.setAccountType(Account.AccountTypeEnum.fromValue(account.getAccountType().toString()));
         a.setActive(Account.ActiveEnum.fromValue(account.getActive().toString()));
         a.setAbsoluteLimit(account.getAbsoluteLimit());
+        a.setBalance(account.getBalance());
         a.setIBAN(account.getIBAN());
+        a.setUser(userService.getUser(account.getUserid()));
         accountRepository.save(a);
         return account;
     }
 
-    public List<Account> findByUserId(UUID userid){
+    private List<Account> findByUserId(UUID userid){
         return accountRepository.findByUserId(userid);
     }
+
     public Object findByIBAN(String iban) {return accountRepository.findByIBAN(iban);}
 
     //Boolean checks / Validations
     
     private boolean checkIfUserRoleAdmin(User user){
-        return user.getRoles().contains(Role.ADMIN);
+        //return user.getRoles().contains(Role.ROLE_ADMIN);
+        return user.getRoles().get(0).equals(Role.ROLE_ADMIN);
     }
 
     private boolean checkIfUserRoleUser(User user){
-        return user.getRoles().contains(Role.USER);
+        //return user.getRoles().contains(Role.ROLE_USER);
+        return user.getRoles().get(0).equals(Role.ROLE_USER);
     }
 
     private boolean checkIban(String iban){
@@ -144,23 +152,25 @@ public class accountService {
     }
 
     private boolean checkPostAccountType(PostAccountDTO postaccountdto){
+        
         int enumcheck = 0;
         for (PostAccountDTO.AccountTypeEnum accountType : PostAccountDTO.AccountTypeEnum.values()){
             if(accountType.name().equalsIgnoreCase(postaccountdto.getAccountType().name())){
                 enumcheck++;
             }
         }
-        return enumcheck == 0;
+        return enumcheck == 1;
+
     }
 
     private boolean checkPostAccountActive(PostAccountDTO postaccountdto){
         int enumcheck = 0;
-        for (PostAccountDTO.ActiveEnum accountType : PostAccountDTO.ActiveEnum.values()){
-            if(accountType.name().equalsIgnoreCase(postaccountdto.getAccountType().name())){
+        for (PostAccountDTO.ActiveEnum accountActive : PostAccountDTO.ActiveEnum.values()){
+            if(accountActive.name().equalsIgnoreCase(postaccountdto.getActive().name())){
                 enumcheck++;
             }
         }
-        return enumcheck == 0;
+        return enumcheck == 1;
     }
 
     private boolean checkAccountType(AccountDTO accountdto) {
@@ -170,17 +180,17 @@ public class accountService {
                 enumcheck++;
             }
         }
-        return enumcheck == 0;
+        return enumcheck == 1;
     }
 
     private boolean checkAccountActive(AccountDTO accountdto) {
         int enumcheck = 0;
-        for (AccountDTO.ActiveEnum accountType : AccountDTO.ActiveEnum.values()){
-            if(accountType.name().equalsIgnoreCase(accountdto.getAccountType().name())){
+        for (AccountDTO.ActiveEnum accountActive : AccountDTO.ActiveEnum.values()){
+            if(accountActive.name().equalsIgnoreCase(accountdto.getActive().name())){
                 enumcheck++;
             }
         }
-        return enumcheck == 0;
+        return enumcheck == 1;
     }
 
     private void validateUserRoleAdmin(User user){
@@ -226,8 +236,6 @@ public class accountService {
             throw new IllegalArgumentException("Invalid account type");
         } else if(!checkAccountActive(accountdto)){
             throw new IllegalArgumentException("Invalid active type");
-        } else if(getAccountdtoNullCheck(accountdto)){
-            throw new IllegalArgumentException("The accountdto is null");
         }
     }
 
