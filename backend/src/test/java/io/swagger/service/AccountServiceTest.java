@@ -100,6 +100,7 @@ public class AccountServiceTest {
         testUser = userRepository.findByUsername("Bank");
         //List<NameSearchAccountDTO> dtos = accountService.searchAccountDTOs(fullname, 10, 10, testUser);
         List<AccountDTO> dtos = accountService.getAllAccounts(testUser);
+        Assertions.assertEquals(dtos.size(), accountService.getAllAccounts(testUser).size());
     }
 
     @Test
@@ -116,6 +117,7 @@ public class AccountServiceTest {
         when(securityContext.getAuthentication().getName()).thenReturn("test");
         testUser = userRepository.findByUsername("test");
         List<NameSearchAccountDTO> dtos = accountService.searchAccountDTOs(fullname, 10, 10, testUser);
+        Assertions.assertEquals(dtos.size(), accountService.searchAccountDTOs(fullname, 10, 10, testUser).size());
     }
 
     @Test
