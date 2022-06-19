@@ -1,6 +1,7 @@
 package io.swagger.service;
 
 import io.swagger.model.AccountDTO;
+import io.swagger.model.dto.NameSearchAccountDTO;
 import io.swagger.model.dto.PostAccountDTO;
 import io.swagger.model.dto.PostAccountDTO.AccountTypeEnum;
 import io.swagger.model.dto.PostAccountDTO.ActiveEnum;
@@ -11,6 +12,7 @@ import io.swagger.services.UserService;
 import io.swagger.services.accountService;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -51,6 +53,7 @@ public class AccountServiceTest {
     public User adminUser;
     public PostAccountDTO postaccountdto;
     public AccountDTO accountdto;
+    public String fullname;
 
     @BeforeEach
     void setup(){
@@ -65,6 +68,7 @@ public class AccountServiceTest {
 
         testUser = userRepository.findByUsername("test");
         adminUser = userRepository.findByUsername("Bank");
+        fullname = new String("test-test");
 
         postaccountdto = new PostAccountDTO();
         postaccountdto.setAbsoluteLimit(new BigDecimal(1337));
@@ -106,7 +110,9 @@ public class AccountServiceTest {
 
     @Test
     public void D_searchAccountDTOs(){
-
+        when(securityContext.getAuthentication().getName()).thenReturn("Bank");
+        testUser = userRepository.findByUsername("Bank");
+        List<NameSearchAccountDTO> dtos = accountService.searchAccountDTOs(fullname, 10, 10, testUser);
     }
 
     @Test

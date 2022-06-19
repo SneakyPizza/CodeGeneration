@@ -83,9 +83,9 @@ public class accountService {
     public void validateNameSearchRequest(String fullname, int limit, int offset){
         if(!checkSearchAccountFullname(fullname)){
             throw new IllegalArgumentException("Invalid fullname, please use '-' between the first and last name once.");
-        } else if(checkLimit(limit)){
+        } else if(!checkLimit(limit)){
             throw new IllegalArgumentException("Invalid limit, limit needs to be between 1 and 20");
-        } else if(checkOffset(offset)){
+        } else if(!checkOffset(offset)){
             throw new IllegalArgumentException("Invalid offset value, needs to be between 1 and 50");
         }
     }
@@ -129,11 +129,11 @@ public class accountService {
     }
 
     private boolean checkOffset(int offset){
-        return (offset > 0 || offset < 51);
+        return (offset > 0 && offset < 51);
     }
 
     private boolean checkLimit(int limit){
-        return (limit > 0 || limit < 21);
+        return (limit > 0 && limit < 21);
     }
 
     private boolean getAccountdtoNullCheck(AccountDTO accountdto){
@@ -200,7 +200,7 @@ public class accountService {
     }
 
     private void validateUserRoleUser(User user){
-        if(!checkIfUserRoleUser(user) || !checkIfUserRoleAdmin(user)){
+        if(!checkIfUserRoleUser(user) && !checkIfUserRoleAdmin(user)){
             throw new UnauthorizedException("You need to be a User to preform this action");
         }
     }
