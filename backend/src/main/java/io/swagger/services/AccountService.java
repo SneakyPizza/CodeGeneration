@@ -1,8 +1,8 @@
 package io.swagger.services;
 
 import io.swagger.exeption.custom.InvalidIbanException;
-import io.swagger.exeption.custom.NotFoundException;
-import io.swagger.exeption.custom.UnauthorizedException;
+import io.swagger.exception.custom.NotFoundException;
+import io.swagger.exception.custom.UnauthorizedException;
 import io.swagger.model.AccountDTO;
 //import io.swagger.model.GetUserDTO.Role;
 import io.swagger.model.entities.Role;
