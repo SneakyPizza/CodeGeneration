@@ -100,8 +100,8 @@ public class AccountsApiController implements AccountsApi {
         return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Accept header is invalid", 415, "UNSUPPORTED_MEDIA_TYPE"), HttpStatus.UNSUPPORTED_MEDIA_TYPE);
         */
 
-        User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-        PostAccountDTO dto = accountservice.addAccount(body, user);
+        Users users = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        PostAccountDTO dto = accountservice.addAccount(body, users);
         return new ResponseEntity<PostAccountDTO>(dto, HttpStatus.CREATED);
     }
 
@@ -128,8 +128,8 @@ public class AccountsApiController implements AccountsApi {
         }*/
         //return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Accept header is invalid", 403, "FORBIDDEN"), HttpStatus.FORBIDDEN);
 
-        User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-        AccountDTO dto = accountservice.getAccountDTOWithIBAN(IBAN, user);
+        Users users = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        AccountDTO dto = accountservice.getAccountDTOWithIBAN(IBAN, users);
         return new ResponseEntity<AccountDTO>(dto, HttpStatus.OK);
     }
 
@@ -166,63 +166,63 @@ public class AccountsApiController implements AccountsApi {
         }
         return new ResponseEntity<List<AccountDTO>>(HttpStatus.CONFLICT);
         */
-        User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        Users users = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
         //AccountDTO dto = accountservice.getAccountDTOWithIBAN(IBAN, user);
-        List<AccountDTO> dto = accountservice.getAllAccounts(user);
+        List<AccountDTO> dto = accountservice.getAllAccounts(users);
         return new ResponseEntity<List<AccountDTO>>(dto, HttpStatus.OK);
     }
 
     public ResponseEntity<? extends Object> searchAccount(@NotNull @Parameter(in = ParameterIn.QUERY, description = "" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "fullName", required = true) String fullName,@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the result set." ,schema=@Schema(allowableValues={  }
 )) @Valid @RequestParam(value = "offset", required = false) Integer offset,@Min(1) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return." ,schema=@Schema(allowableValues={  }, minimum="1", maximum="50"
 , defaultValue="20")) @Valid @RequestParam(value = "limit", required = false, defaultValue="20") Integer limit) {
-        String accept = request.getHeader("Search");
+//        String accept = request.getHeader("Search");
+//
+//            try {
+//                Users logged_users = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+//                if(logged_users.getRoles().contains(Role.ROLE_ADMIN) || logged_users.getRoles().contains(Role.ROLE_USER)){
+//                    List<Users> users = new ArrayList<Users>();
+//                if(fullName.contains("-")){
+//                    //add both parts of the string to array
+//                    String[] split = fullName.toLowerCase().split("-");
+//                    for(int i = 0; i < split.length;i++){
+//                        if(!split[i].isEmpty()){
+//                            //search once on firstame inside user -> return list
+//                            List<Users> user_fname = userService.findByFirstName(split[i]);
+//                            //search once on lastname inside user -> return list
+//                            List<Users> user_lname = userService.findByLastName(split[i]);
+//                            //Add everything from both lists to
+//                            users.addAll(user_fname);
+//                            users.addAll(user_lname);
+//                        }
+//                    }
+//                } else {
+//                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Please use '-' between the first-and lastname. ", 400, "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
+//                }
+//
+//                List<NameSearchAccountDTO> dtos = new ArrayList<NameSearchAccountDTO>();
+//                for (Users user : users) {
+//                    List<Account> user_accounts = accountservice.findByUserId(user.getId());
+//                    for (Account account : user_accounts){
+//                        NameSearchAccountDTO dto = user.toNameSearchAccountDTO(account.getIBAN());
+//
+//                        //filter duplicates
+//                        if(!dtos.contains(dto)){
+//                            System.out.println(dto.toString());
+//                            dtos.add(dto);
+//                        }
+//                    }
+//                }
+//                return new ResponseEntity<List<NameSearchAccountDTO>>(dtos ,HttpStatus.OK);
+//                } else {
+//                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "User role is invalid", 401, "FORBIDDEN"), HttpStatus.FORBIDDEN);
+//                }
+//            } catch (Exception e) {
+//                log.error("Couldn't serialize response for content type application/json", e);
+//                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Couldn't serialize response for content type application/json", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
+//            }
 
-            try {
-                User logged_user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-                if(logged_user.getRoles().contains(Role.ROLE_ADMIN) || logged_user.getRoles().contains(Role.ROLE_USER)){
-                    List<Users> users = new ArrayList<Users>();
-                if(fullName.contains("-")){
-                    //add both parts of the string to array
-                    String[] split = fullName.toLowerCase().split("-");
-                    for(int i = 0; i < split.length;i++){
-                        if(!split[i].isEmpty()){
-                            //search once on firstame inside user -> return list
-                            List<Users> user_fname = userService.findByFirstName(split[i]);
-                            //search once on lastname inside user -> return list
-                            List<Users> user_lname = userService.findByLastName(split[i]);
-                            //Add everything from both lists to
-                            users.addAll(user_fname);
-                            users.addAll(user_lname);
-                        }
-                    }
-                } else {
-                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Please use '-' between the first-and lastname. ", 400, "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
-                }
-
-                List<NameSearchAccountDTO> dtos = new ArrayList<NameSearchAccountDTO>();
-                for (Users user : users) {
-                    List<Account> user_accounts = accountservice.findByUserId(user.getId());
-                    for (Account account : user_accounts){
-                        NameSearchAccountDTO dto = user.toNameSearchAccountDTO(account.getIBAN());
-
-                        //filter duplicates
-                        if(!dtos.contains(dto)){
-                            System.out.println(dto.toString());
-                            dtos.add(dto);
-                        }
-                    }
-                }
-                return new ResponseEntity<List<NameSearchAccountDTO>>(dtos ,HttpStatus.OK);
-                } else {
-                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "User role is invalid", 401, "FORBIDDEN"), HttpStatus.FORBIDDEN);
-                }
-            } catch (Exception e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Couldn't serialize response for content type application/json", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        */
-        User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-        List<NameSearchAccountDTO> dtos = accountservice.searchAccountDTOs(fullName, limit, offset, user);
+        Users users = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        List<NameSearchAccountDTO> dtos = accountservice.searchAccountDTOs(fullName, limit, offset, users);
         return new ResponseEntity<List<NameSearchAccountDTO>>(dtos, HttpStatus.OK);
     }
 
@@ -246,8 +246,8 @@ public class AccountsApiController implements AccountsApi {
             }
         */
 
-        User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-        AccountDTO dto = accountservice.updateAccount(IBAN, body, user);
+        Users users = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        AccountDTO dto = accountservice.updateAccount(IBAN, body, users);
         return new ResponseEntity<AccountDTO>(dto, HttpStatus.CREATED);
     }
 }

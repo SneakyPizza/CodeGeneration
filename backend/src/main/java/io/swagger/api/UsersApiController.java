@@ -1,12 +1,14 @@
 package io.swagger.api;
 
 import io.swagger.annotations.Api;
+import io.swagger.model.dto.GetUserDTO;
 import io.swagger.model.dto.PostAsUserDTO;
 import io.swagger.model.dto.PostUserDTO;
 import io.swagger.model.entities.Users;
 import io.swagger.jwt.JwtTokenProvider;
 
 
+import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
