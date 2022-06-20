@@ -6,6 +6,10 @@
       <li>
            <router-link to="/AccountSearch" class="Dark_Blue nav-link" active-class="active">Accounts</router-link>
       </li>
+<!--        logout-->
+      <li>
+           <router-link to="/Logout" class="Dark_Blue nav-link" active-class="active">Logout</router-link>
+      </li>
       </ul>
 
     </div>

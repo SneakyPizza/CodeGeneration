@@ -13,5 +13,13 @@ export default {
         return axios
             .get(url + '/Transactions/' + iban + "?dateONE=" + date1 + "dateTWO=" + date2)
             .then(response => response);
-    }
+    },
+    doTransaction(data, token) {
+        //create Authorization header from token
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        return axios
+            .post(url + '/Transactions', data)
+            .then(response => response);
+
+    },
 }

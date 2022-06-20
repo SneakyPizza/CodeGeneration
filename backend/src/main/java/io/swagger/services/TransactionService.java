@@ -63,12 +63,6 @@ public class TransactionService {
         return transactionRepository.existsById(id);
     }
 
-    //Get today's transactions from a user
-    public List<Transaction> getTodaysTransactions(Transaction transaction) {
-        LocalDateTime now = LocalDateTime.now();
-        return (List<Transaction>) transactionRepository.findByIBANAndTimestamp(transaction.getIBAN(), now);
-    }
-
     //findByIBANAndTimestampBetween()
     public List<Transaction> findByIBANAndTimestampBetween(String iban, LocalDateTime startDate, LocalDateTime endDate){
         return (List<Transaction>) transactionRepository.findByIBANAndTimestampBetween(iban, startDate, endDate);
@@ -165,15 +159,19 @@ public class TransactionService {
             //if performer owns origin
             return true;
         }
-        //get all transactions from origin
-        List<Transaction> transactions = getTodaysTransactions(transaction);
+
+        LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
+        LocalDateTime tomorrow = LocalDateTime.now().plusDays(1);
+        List<Transaction> transactions = getAllTransactionsByAccount(transaction.getOrigin(), yesterday, tomorrow);
         if(transactions.isEmpty()){
             return true;
         }
         //get sum of all transactions
         BigDecimal sum = BigDecimal.ZERO;
         for(Transaction t : transactions){
-            sum = sum.add(t.getAmount());
+            if(t.getOrigin().getIBAN().equals(transaction.getOrigin().getIBAN())){
+                sum = sum.add(t.getAmount());
+            }
         }
         //check if sum is greater than day limit
         return sum.add(transaction.getAmount()).doubleValue() <= transaction.getPerformer().getDayLimit().doubleValue();

@@ -52,7 +52,7 @@ public class MyApplicationRunner implements ApplicationRunner {
         testUser.setCity("test");
         testUser.setZipcode("test");
         testUser.setUserstatus(UserStatus.ACTIVE);
-        testUser.setDayLimit(new BigDecimal(10000));
+        testUser.setDayLimit(new BigDecimal(1000));
         testUser.setTransactionLimit(new BigDecimal(500));
         testUser.setRoles(new ArrayList<>(List.of(Role.ROLE_USER)));
 
