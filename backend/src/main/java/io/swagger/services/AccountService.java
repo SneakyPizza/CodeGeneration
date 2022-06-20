@@ -64,7 +64,7 @@ public class AccountService {
     
     //Get a Account with IBAN (GET)
     public AccountDTO getAccountDTOWithIBAN(String iban, User user){
-        validateUserRoleAdmin(user);
+        validateUserRoleAdmin(user, iban);
         validateIban(iban);
         Account<User> account = getAccountWithIBAN(iban);
         if(account == null){
@@ -202,6 +202,12 @@ public class AccountService {
     private void validateUserRoleUser(User user){
         if(!checkIfUserRoleUser(user) && !checkIfUserRoleAdmin(user)){
             throw new UnauthorizedException("You need to be a User to preform this action");
+        }
+    }
+
+    private void validateUserRoleAdmin(User users, String iban){
+        if(!checkIfUserRoleAdmin(users) && users.getAccounts().stream().noneMatch(a -> a.getIBAN().equals(iban))){
+            throw new UnauthorizedException("You need to be a admin to preform this action or own the account");
         }
     }
 
