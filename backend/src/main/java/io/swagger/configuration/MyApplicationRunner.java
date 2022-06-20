@@ -41,7 +41,7 @@ public class MyApplicationRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
-        User testUser = new User();
+        Users testUser = new Users();
         testUser.setUsername("test");
         testUser.setPincode("1234");
         testUser.setPassword(passwordEncoder.encode("test"));
@@ -56,7 +56,7 @@ public class MyApplicationRunner implements ApplicationRunner {
         testUser.setTransactionLimit(new BigDecimal(500));
         testUser.setRoles(new ArrayList<>(List.of(Role.ROLE_USER)));
 
-        User testUser2 = new User();
+        Users testUser2 = new Users();
         testUser2.setUsername("test2");
         testUser2.setPincode("1234");
         testUser2.setPassword(passwordEncoder.encode("test2"));
@@ -71,7 +71,7 @@ public class MyApplicationRunner implements ApplicationRunner {
         testUser2.setTransactionLimit(new BigDecimal(500));
         testUser2.setRoles(new ArrayList<>(List.of(Role.ROLE_USER)));
 
-        User Bank = new User();
+        Users Bank = new Users();
         Bank.setUsername("Bank");
         Bank.setPincode("1234");
         Bank.setPassword(passwordEncoder.encode("Bank"));

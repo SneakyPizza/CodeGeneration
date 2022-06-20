@@ -8,7 +8,7 @@ import io.swagger.model.dto.JwtDTO;
 import io.swagger.model.dto.PostAsUserDTO;
 import io.swagger.model.entities.Role;
 import io.swagger.model.dto.PostUserDTO;
-import io.swagger.model.entities.User;
+import io.swagger.model.entities.Users;
 import io.swagger.model.entities.UserStatus;
 import io.swagger.repositories.UserRepository;
 import io.swagger.jwt.JwtTokenProvider;
@@ -20,7 +20,6 @@ import java.util.UUID;
 import io.swagger.utils.PincodeGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -198,7 +197,7 @@ public class UserService {
     }
 
     private boolean validateOffset(Integer offset) {
-        List<User> users = (List<User>) userRepository.findAll();
+        List<Users> users = (List<Users>) userRepository.findAll();
         return offset != null && offset >= 0 && offset < (users.size() - 1);
     }
 
@@ -210,9 +209,9 @@ public class UserService {
         return jwtDTO;
     }
 
-    private List<GetUserDTO> getUserDTOs(List<User> users) {
+    private List<GetUserDTO> getUserDTOs(List<Users> users) {
         List<GetUserDTO> getUserDTOs = new java.util.ArrayList<>();
-        for (User user : users) {
+        for (Users user : users) {
             getUserDTOs.add(user.getGetUserDTO());
         }
         return getUserDTOs;

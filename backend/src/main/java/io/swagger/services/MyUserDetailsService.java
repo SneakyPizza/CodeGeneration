@@ -2,7 +2,7 @@ package io.swagger.services;
 
 
 import io.swagger.exception.custom.NotFoundException;
-import io.swagger.model.entities.User;
+import io.swagger.model.entities.Users;
 import io.swagger.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,7 +20,7 @@ public class MyUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        final User user = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("User not found"));
+        final Users user = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("User not found"));
 
         if (user == null) {
             throw new UsernameNotFoundException("User '" + username + "' not found");
