@@ -74,13 +74,13 @@ public class UsersApiController implements UsersApi {
         return new ResponseEntity<>(getUserDTOS, HttpStatus.OK);
     }
 
-    public ResponseEntity<? extends Object> getUser(/*@DecimalMin("1")*/@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") UUID id) {
+    public ResponseEntity<? extends Object> getUser(/*@DecimalMin("1")*/@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") String id) {
         User user = userService.getUser(id);
         return new ResponseEntity<>(user.getGetUserDTO(), HttpStatus.OK);
     }
 
-    public ResponseEntity<? extends Object> updateUser(/*@DecimalMin("1")*/@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") UUID id, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostUserDTO postUserDTO) {
-        User user = userService.updateUser(postUserDTO);
+    public ResponseEntity<? extends Object> updateUser(/*@DecimalMin("1")*/@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") String id, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostUserDTO postUserDTO) {
+        User user = userService.updateUser(postUserDTO, id);
         return new ResponseEntity<>(user.getPostUserDTO(), HttpStatus.OK);
     }
 }

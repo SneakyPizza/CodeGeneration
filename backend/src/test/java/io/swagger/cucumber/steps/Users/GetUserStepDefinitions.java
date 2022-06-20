@@ -26,8 +26,6 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
     @Value("${io.swagger.api.token_ADMIN}")
     private String VALID_TOKEN_ADMIN;
 
-    private static final String INVALID_TOKEN = "invalid";
-
     private static final String INVALID_USER_ID = "3fa85f64-5717-4562-b3fc-2c963f66afa6";
 
     private static final String WRONG_FORMAT_USER_ID = "3fa85f64-5717-4562-b3fc";
@@ -57,28 +55,8 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
             token = VALID_TOKEN_ADMIN;
         });
 
-        Given("^I have a valid token for an user", () -> {
+        Given("^I have a valid token for a user", () -> {
             token = VALID_TOKEN_USER;
-        });
-
-        Given("^The limit is higher than 50", () -> {
-            limit = 51;
-            offset = 0;
-        });
-
-        Given("^The limit is lower than 1", () -> {
-            limit = -10;
-            offset = 0;
-        });
-
-        Given("^The offset is lower than 0", () -> {
-            limit = 10;
-            offset = -10;
-        });
-
-        Given("^The offset is higher than the total number of users", () -> {
-            limit = 10;
-            offset = 1000000000;
         });
 
         When("^I call the GetAllUsers endpoint", () -> {
@@ -88,16 +66,35 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
             // query with limit and offset
             getAllResponse = restTemplate.exchange( getBaseUrl() + "/Users?limit=" + limit + "&offset=" + offset, HttpMethod.GET, request, String.class);
             status = getAllResponse.getStatusCode().value();
+        });
 
-            if (Objects.equals(token, VALID_TOKEN_ADMIN)) {
-                // kaputt
-                userList = objectMapper.readValue(getAllResponse.getBody(), objectMapper.getTypeFactory().constructCollectionType(List.class, GetUserDTO.class));
-            }
+        And("^I get a list of users", () -> {
+            userList = objectMapper.readValue(getAllResponse.getBody(), objectMapper.getTypeFactory().constructCollectionType(List.class, GetUserDTO.class));
         });
 
         And("^I have a valid limit and offset", () -> {
             limit = 10;
             offset = 0;
+        });
+
+        And("^The limit is higher than 50", () -> {
+            limit = 51;
+            offset = 0;
+        });
+
+        And("^The limit is lower than 1", () -> {
+            limit = -10;
+            offset = 0;
+        });
+
+        And("^The offset is lower than 0", () -> {
+            limit = 10;
+            offset = -10;
+        });
+
+        And("^The offset is higher than the total number of users", () -> {
+            limit = 10;
+            offset = 1000000000;
         });
 
         And("^I should see a list of users", () -> {
@@ -119,7 +116,7 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
         });
 
         And("^I get an error object with message \"([^\"]*)\"$", (String arg0) -> {
-            errorDTO =  objectMapper.readValue(response.getBody(), ErrorDTO.class);
+            errorDTO =  objectMapper.readValue(getAllResponse.getBody(), ErrorDTO.class);
             Assertions.assertEquals(arg0, errorDTO.getMessage());
             Assertions.assertNotNull(errorDTO.getTimestamp());
             Assertions.assertNotNull(errorDTO.getStatus());
@@ -129,7 +126,15 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
         //
         // GetUser
         //
-        Given("^I provide a correct user id", () -> {
+        And("^I provide a correct user id from the GetAllUsers endpoint", () -> {
+            httpHeaders.clear();
+            httpHeaders.add("Authorization", "Bearer " +  VALID_TOKEN_ADMIN);
+            request = new HttpEntity<>(httpHeaders);
+            getAllResponse = restTemplate.exchange( getBaseUrl() + "/Users?limit=" + limit + "&offset=" + offset, HttpMethod.GET, request, String.class);
+            status = getAllResponse.getStatusCode().value();
+            userList = objectMapper.readValue(getAllResponse.getBody(), objectMapper.getTypeFactory().constructCollectionType(List.class, GetUserDTO.class));
+
+            id = String.valueOf(userList.get(0).getUserid());
         });
 
         Given("^I have a user id that is in wrong format", () -> {
@@ -138,24 +143,6 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
 
         Given("^I have a user id that is not in the database", () -> {
             id = INVALID_USER_ID;
-        });
-
-        When("^I call the GetAllUser endpoint i get all users and use the id of the first user to get a user from GetUser", () -> {
-            httpHeaders.clear();
-            httpHeaders.add("Authorization", "Bearer " +  VALID_TOKEN_ADMIN);
-            request = new HttpEntity<>(null, httpHeaders);
-            getAllResponse = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.GET, request, String.class);
-            status = getAllResponse.getStatusCode().value();
-            userList = objectMapper.readValue(getAllResponse.getBody(), objectMapper.getTypeFactory().constructCollectionType(List.class, GetUserDTO.class));
-
-            id = String.valueOf(userList.get(0).getUserid());
-
-            httpHeaders.clear();
-            // get id from /Users/{id}
-            httpHeaders.add("Authorization", "Bearer " +  token);
-            request = new HttpEntity<>(id, httpHeaders);
-            response = restTemplate.exchange(getBaseUrl() + "/Users/" + id, HttpMethod.GET, request, String.class);
-            status = response.getStatusCode().value();
         });
 
         When("^I call the GetUser endpoint", () -> {
@@ -188,12 +175,16 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
             assertNotNull(getUserDTO.getAccounts());
         });
 
-        And("^I have a valid user token", () -> {
-            token = VALID_TOKEN_USER;
-        });
-
         And("^I have a valid admin token", () -> {
             token = VALID_TOKEN_ADMIN;
+        });
+
+        And("^I get an user error with message \"([^\"]*)\"$", (String arg0) -> {
+            errorDTO =  objectMapper.readValue(response.getBody(), ErrorDTO.class);
+            Assertions.assertEquals(arg0, errorDTO.getMessage());
+            Assertions.assertNotNull(errorDTO.getTimestamp());
+            Assertions.assertNotNull(errorDTO.getStatus());
+            Assertions.assertNotNull(errorDTO.getError());
         });
     }
 }
