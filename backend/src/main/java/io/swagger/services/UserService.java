@@ -56,7 +56,7 @@ public class UserService {
         if (!validateUUID(id)) {
             throw new IllegalArgumentException("Invalid UUID");
         }
-        else if (!validateIfUserOwnsThisUser(id) || !validateIfAdmin()) {
+        else if (!validateIfUserOwnsThisUser(id) && !validateIfAdmin()) {
             throw new UnauthorizedException(UNAUTHORIZED);
         }
 
