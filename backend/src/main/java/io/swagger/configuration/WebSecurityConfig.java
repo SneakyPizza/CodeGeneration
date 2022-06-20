@@ -45,7 +45,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         
         http.csrf().disable();    // no CSRF protection needed
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);  // no sessions needed
-
+        http.cors().and().authorizeRequests(); // authorize all requests
         http.authorizeRequests()
                 .antMatchers(AUTH_WHITELIST).permitAll() // allow some URLs for unauthenticated users
                 .anyRequest().authenticated(); // disallow any other URL for unauthenticated users
