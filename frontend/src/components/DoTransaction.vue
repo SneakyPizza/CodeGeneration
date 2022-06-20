@@ -52,41 +52,43 @@ import TransactionService from "@/Services/TransactionService";
 import AccountService from "@/Services/AccountService";
 
 export default {
-  name: "Home",
+  name: "transaction",
   components: {
     Navigation,
+  },
+  data() {
+    return {
+      errorMessage: null,
+      account: null,
+      amount: null,
+      fromIBAN: "",
+      fromUserId: "",
+      pincode: "",
+      toIBAN: ""
+    };
   },
   computed:{
     user(){
       return this.$store.state.user;
     },
   },
+  async created() {
+    console.log("I'm created");
+    try {
+      //get token from store
+      const token = this.$store.state.token;
+      //get account from $route.params.iban
+      const resp = await AccountService.getAccount(this.$route.params.iban, token);
+      this.account = resp.data;
+      console.log(this.account);
+    } catch (error) {
+      console.log(error);
+    }
+  },
   methods: {
-    data() {
-      return {
-        errorMessage: null,
-        account: null,
-        amount: null,
-        fromIBAN: "",
-        fromUserId: "",
-        pincode: "",
-        toIBAN: ""
-      };
-    },
-    async created() {
-      console.log("I'm created");
-      try {
-        //get token from store
-        const token = this.$store.state.token;
-        //get account from $route.params.iban
-        const resp = await AccountService.getAccount(this.$route.params.iban, token);
-        this.account = resp.data;
-      } catch (error) {
-        console.log(error);
-      }
-    },
     async doTransaction() {
       try {
+        console.log("doTransaction");
         const transaction = {
           fromIBAN: this.$route.params.iban,
           fromUserId: this.user.Id,
@@ -94,11 +96,16 @@ export default {
           toIBAN: this.toIBAN,
           amount: this.amount,
         };
+        console.log(transaction);
         //get token from store
         const token = this.$store.state.token;
+        console.log(token);
         //get account from $route.params.iban
         const resp = await TransactionService.doTransaction(transaction, token);
-        this.account = resp.data;
+        console.log(resp.data);
+        //go to history page
+        await this.$router.push({ name: 'History', params: { iban: this.$route.params.iban } });
+
       } catch (error) {
         this.errorMessage = error.response.data.message;
         console.log(error);

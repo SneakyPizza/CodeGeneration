@@ -10,8 +10,6 @@ import TransactionHistory from "./components/TransactionHistory";
 import DoTransaction from "./components/DoTransaction";
 
 
-axios.defaults.baseURL = 'http://localhost:8080'
-
 axios.defaults.headers.common['Authorization'] = `Bearer ${store.state.token}`;
 
 const routes = [

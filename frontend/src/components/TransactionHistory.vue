@@ -5,6 +5,9 @@
     <div class="container-lg">
       <h1 class="blue mt-3 mt-lg-3">Transaction history</h1>
       <div class="row mt-4 ">
+        <div v-if="errorMessage" class="alert alert-danger" role="alert">
+          {{ errorMessage }}
+        </div>
         <div class="list">
             <div class="card mt-3 transaction" v-for="transaction in transactions" v-bind:key="transaction">
               <div class="row">
@@ -51,6 +54,7 @@ export default {
   data() {
     return {
       transactions: [],
+      errorMessage: null,
     };
   },
   async created() {
@@ -62,6 +66,7 @@ export default {
       this.transactions = resp.data;
     }
     catch (error) {
+      this.errorMessage = error.response.data.message;
       console.log(error);
     }
   },
