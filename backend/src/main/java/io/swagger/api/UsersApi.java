@@ -6,6 +6,7 @@
 package io.swagger.api;
 
 import io.swagger.model.dto.ErrorDTO;
+import io.swagger.model.dto.GetUserDTO;
 import io.swagger.model.dto.PostAsUserDTO;
 import io.swagger.model.dto.PostUserDTO;
 
@@ -85,11 +86,11 @@ public interface UsersApi {
     @Operation(summary = "Get user by id", description = "Optional extended description in CommonMark or HTML.", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Users" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "JSON with 1 user", content = @Content(mediaType = "application/JSON", schema = @Schema(implementation = PostUserDTO.class))) })
+        @ApiResponse(responseCode = "200", description = "JSON with 1 user", content = @Content(mediaType = "application/JSON", schema = @Schema(implementation = GetUserDTO.class))) })
     @RequestMapping(value = "/Users/{id}",
         produces = { "application/JSON" }, 
         method = RequestMethod.GET)
-    ResponseEntity<? extends Object> getUser(/*@DecimalMin("1")*/@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") UUID id);
+    ResponseEntity<? extends Object> getUser(/*@DecimalMin("1")*/@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") String id);
 
 
     @Operation(summary = "Updates a user.", description = "Optional extended description in CommonMark or HTML.", security = {
@@ -100,7 +101,7 @@ public interface UsersApi {
         produces = { "application/json" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<? extends Object> updateUser(/*@DecimalMin("1")*/@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") UUID id, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostUserDTO body);
+    ResponseEntity<? extends Object> updateUser(/*@DecimalMin("1")*/@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") String id, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostUserDTO body);
 
 }
 

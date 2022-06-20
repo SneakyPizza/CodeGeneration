@@ -6,6 +6,7 @@ import io.swagger.model.dto.GetUserDTO;
 import io.swagger.model.dto.PostAsUserDTO;
 import io.swagger.model.dto.PostUserDTO;
 import io.swagger.model.dto.NameSearchAccountDTO;
+import io.swagger.services.AccountService;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -156,7 +157,7 @@ public class User {
         getUserDTO.setCity(this.city);
         getUserDTO.setZipcode(this.zipcode);
 
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         for (Account account : this.accounts) {
             list.add(account.getIBAN());
         }
@@ -228,11 +229,41 @@ public class User {
         return user;
     }
 
+    public User setPropertiesFromGetUserDTO(GetUserDTO getUserDTO) {
+        User user = new User();
+        user.setId(getUserDTO.getUserid());
+        user.setUsername(getUserDTO.getUsername());
+        user.setPassword(getUserDTO.getPassword());
+        user.setEmail(getUserDTO.getEmail());
+        user.setFirstName(getUserDTO.getFirstName());
+        user.setLastName(getUserDTO.getLastName());
+        user.setStreet(getUserDTO.getStreet());
+        user.setCity(getUserDTO.getCity());
+        user.setZipcode(getUserDTO.getZipcode());
+        user.setDayLimit(getUserDTO.getDayLimit());
+        user.setTransactionLimit(getUserDTO.getTransactionLimit());
+        if (getUserDTO.getUserstatus() == GetUserDTO.UserstatusEnum.ACTIVE) {
+            user.setUserstatus(UserStatus.ACTIVE);
+        } else if (getUserDTO.getUserstatus() == GetUserDTO.UserstatusEnum.DISABLED) {
+            user.setUserstatus(UserStatus.DISABLED);
+        }
+        if (getUserDTO.getRoles().contains(GetUserDTO.Role.ADMIN) && getUserDTO.getRoles().contains(GetUserDTO.Role.USER)) {
+            user.setRoles(List.of(Role.ROLE_ADMIN, Role.ROLE_USER));
+        } else if (getUserDTO.getRoles().contains(GetUserDTO.Role.ADMIN)) {
+            user.setRoles(List.of(Role.ROLE_ADMIN));
+        } else if (getUserDTO.getRoles().contains(GetUserDTO.Role.USER)) {
+            user.setRoles(List.of(Role.ROLE_USER));
+        } else {
+            user.setRoles(Collections.emptyList());
+        }
+        return user;
+    }
+
     public NameSearchAccountDTO toNameSearchAccountDTO(String iban){
         NameSearchAccountDTO dto = new NameSearchAccountDTO();
         dto.setFirstName(this.getFirstName());
         dto.setLastName(this.getLastName());
         dto.setIBAN(iban);
         return dto;
-      }
+    }
 }
