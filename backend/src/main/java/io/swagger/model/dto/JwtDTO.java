@@ -2,11 +2,8 @@ package io.swagger.model.dto;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
 
 /**
  * InlineResponse200
@@ -15,15 +12,15 @@ import javax.validation.constraints.*;
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-06-08T13:48:19.049Z[GMT]")
 
 
-public class JWT_DTO   {
+public class JwtDTO {
   @JsonProperty("JWTtoken")
-  private String jwTtoken = null;
+  private String jwtToken = null;
 
   @JsonProperty("Id")
   private String id = null;
 
-  public JWT_DTO jwTtoken(String jwTtoken) {
-    this.jwTtoken = jwTtoken;
+  public JwtDTO jwTtoken(String jwTtoken) {
+    this.jwtToken = jwTtoken;
     return this;
   }
 
@@ -33,15 +30,15 @@ public class JWT_DTO   {
    **/
   @Schema(description = "")
 
-  public String getJwTtoken() {
-    return jwTtoken;
+  public String getJwtToken() {
+    return jwtToken;
   }
 
-  public void setJwTtoken(String jwTtoken) {
-    this.jwTtoken = jwTtoken;
+  public void setJwtToken(String jwtToken) {
+    this.jwtToken = jwtToken;
   }
 
-  public JWT_DTO id(String id) {
+  public JwtDTO id(String id) {
     this.id = id;
     return this;
   }
@@ -69,14 +66,14 @@ public class JWT_DTO   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    JWT_DTO inlineResponse200 = (JWT_DTO) o;
-    return Objects.equals(this.jwTtoken, inlineResponse200.jwTtoken) &&
+    JwtDTO inlineResponse200 = (JwtDTO) o;
+    return Objects.equals(this.jwtToken, inlineResponse200.jwtToken) &&
             Objects.equals(this.id, inlineResponse200.id);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(jwTtoken, id);
+    return Objects.hash(jwtToken, id);
   }
 
   @Override
@@ -84,7 +81,7 @@ public class JWT_DTO   {
     StringBuilder sb = new StringBuilder();
     sb.append("class InlineResponse200 {\n");
 
-    sb.append("    jwTtoken: ").append(toIndentedString(jwTtoken)).append("\n");
+    sb.append("    jwTtoken: ").append(toIndentedString(jwtToken)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("}");
     return sb.toString();

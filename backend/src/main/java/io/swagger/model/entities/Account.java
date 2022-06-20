@@ -81,7 +81,7 @@ public class Account<Users> {
 
   private AccountTypeEnum accountType;
 
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToOne
   private User user;
 
   @NonNull

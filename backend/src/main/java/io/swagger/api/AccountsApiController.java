@@ -11,7 +11,7 @@ import io.swagger.model.dto.*;
 import io.swagger.model.entities.*;
 import io.swagger.services.TransactionService;
 import io.swagger.services.UserService;
-import io.swagger.services.accountService;
+import io.swagger.services.AccountService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -62,7 +62,7 @@ public class AccountsApiController implements AccountsApi {
     UserService userService;
 
     @Autowired
-    private accountService accountservice;
+    private AccountService accountservice;
 
     @org.springframework.beans.factory.annotation.Autowired
     public AccountsApiController(ObjectMapper objectMapper, HttpServletRequest request) {
@@ -103,7 +103,7 @@ public class AccountsApiController implements AccountsApi {
         try {
             if(accountservice.validateIban(IBAN)){
                 User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-                if(user.getRoles().contains(Role.ROLE_ADMIN)){
+                if(user.getRoles().contains(Role.ROLE_ADMIN) || user.getAccounts().stream().anyMatch(a -> a.getIBAN().equals(IBAN))){
                     AccountDTO dto = accountservice.getAccountDTOWithIBAN(IBAN);
                     if(dto == null){
                         return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Account is not found", 404, "NOT_FOUND"), HttpStatus.NOT_FOUND);

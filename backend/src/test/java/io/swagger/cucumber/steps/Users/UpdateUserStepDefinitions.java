@@ -3,10 +3,8 @@ package io.swagger.cucumber.steps.Users;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java8.En;
 import io.swagger.cucumber.steps.BaseStepDefinitions;
-import io.swagger.model.GetUserDTO;
-import io.swagger.model.UserDTO;
-import io.swagger.model.entities.UserStatus;
-import org.aspectj.weaver.ast.And;
+import io.swagger.model.dto.GetUserDTO;
+import io.swagger.model.dto.PostUserDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -18,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static org.h2.value.DataType.readValue;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
@@ -39,53 +36,51 @@ public class UpdateUserStepDefinitions extends BaseStepDefinitions implements En
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private String token;
-    private ResponseEntity<UserDTO> response;
+    private ResponseEntity<PostUserDTO> response;
     private ResponseEntity<String> getAllResponse;
 
     private List<GetUserDTO> userList;
     private HttpEntity<String> request;
     private Integer status;
 
-    private UserDTO userDTO;
+    private PostUserDTO postUserDTO;
     private String id;
 
     public UpdateUserStepDefinitions() {
         Given("^I give valid user information", () -> {
-            userDTO = new UserDTO();
-            userDTO.setUsername("test");
-            userDTO.setFirstName("Test");
-            userDTO.setLastName("Test");
-            userDTO.setEmail("test@test.nl");
-            userDTO.setPassword("test");
-            userDTO.setStreet("Test");
-            userDTO.setCity("Test");
-            userDTO.setZipcode("Test");
-            userDTO.setUserstatus(UserDTO.UserstatusEnum.DISABLED);
-            userDTO.setDayLimit(BigDecimal.valueOf(10));
-            userDTO.setTransactionLimit(BigDecimal.valueOf(10));
-            userDTO.setRoles(Collections.singletonList(UserDTO.Role.ADMIN));
+            postUserDTO = new PostUserDTO();
+            postUserDTO.setUsername("test");
+            postUserDTO.setFirstName("Test");
+            postUserDTO.setLastName("Test");
+            postUserDTO.setEmail("test@test.nl");
+            postUserDTO.setPassword("test");
+            postUserDTO.setStreet("Test");
+            postUserDTO.setCity("Test");
+            postUserDTO.setZipcode("Test");
+            postUserDTO.setDayLimit(BigDecimal.valueOf(10));
+            postUserDTO.setTransactionLimit(BigDecimal.valueOf(10));
+            postUserDTO.setRoles(Collections.singletonList(PostUserDTO.Role.ADMIN));
         });
 
         Given("^I give invalid user information", () -> {
-            userDTO = new UserDTO();
-            userDTO.setUsername("test");
-            userDTO.setFirstName("Test");
-            userDTO.setLastName(null);
-            userDTO.setEmail("test@test.nl");
-            userDTO.setPassword("test");
-            userDTO.setStreet(null);
-            userDTO.setCity(null);
-            userDTO.setZipcode("Test");
-            userDTO.setUserstatus(UserDTO.UserstatusEnum.DISABLED);
-            userDTO.setDayLimit(BigDecimal.valueOf(10));
-            userDTO.setTransactionLimit(BigDecimal.valueOf(10));
-            userDTO.setRoles(Collections.singletonList(UserDTO.Role.ADMIN));
+            postUserDTO = new PostUserDTO();
+            postUserDTO.setUsername("test");
+            postUserDTO.setFirstName("Test");
+            postUserDTO.setLastName(null);
+            postUserDTO.setEmail("test@test.nl");
+            postUserDTO.setPassword("test");
+            postUserDTO.setStreet(null);
+            postUserDTO.setCity(null);
+            postUserDTO.setZipcode("Test");
+            postUserDTO.setDayLimit(BigDecimal.valueOf(10));
+            postUserDTO.setTransactionLimit(BigDecimal.valueOf(10));
+            postUserDTO.setRoles(Collections.singletonList(PostUserDTO.Role.ADMIN));
         });
 
         When("^I call the UpdateUser endpoint", () -> {
             httpHeaders.clear();
             // first set userdto to json
-            String json = objectMapper.writeValueAsString(userDTO);
+            String json = objectMapper.writeValueAsString(postUserDTO);
             // then set the token
             httpHeaders.set("Authorization", "Bearer " + token);
             // then set the content type
@@ -93,17 +88,17 @@ public class UpdateUserStepDefinitions extends BaseStepDefinitions implements En
             // then set the request
             request = new HttpEntity<>(json, httpHeaders);
             // then call the endpoint
-            response = restTemplate.exchange(getBaseUrl() + "/Users/" + id, HttpMethod.PUT, request, UserDTO.class);
+            response = restTemplate.exchange(getBaseUrl() + "/Users/" + id, HttpMethod.PUT, request, PostUserDTO.class);
             // then get the status
             status = response.getStatusCodeValue();
             // then set the userdto from response
-            userDTO = response.getBody();
+            postUserDTO = response.getBody();
             httpHeaders.clear();
         });
 
         Then("^I should get my updated user and get a status code of (\\d+)", (Integer statusCode) -> {
             // checks if userdto is defined
-            assertNotNull(userDTO);
+            assertNotNull(postUserDTO);
             Assertions.assertEquals(statusCode, status);
         });
 
@@ -125,7 +120,6 @@ public class UpdateUserStepDefinitions extends BaseStepDefinitions implements En
 
         And("^The user id is not in the database", () -> {
             id = INVALID_USER_ID;
-            userDTO.setUserid(UUID.fromString(INVALID_USER_ID));
         });
 
         And("^I have a valid user id", () -> {
@@ -137,7 +131,6 @@ public class UpdateUserStepDefinitions extends BaseStepDefinitions implements En
             userList = objectMapper.readValue(getAllResponse.getBody(), objectMapper.getTypeFactory().constructCollectionType(List.class, GetUserDTO.class));
 
             id = String.valueOf(userList.get(0).getUserid());
-            userDTO.setUserid(UUID.fromString(id));
         });
     }
 }

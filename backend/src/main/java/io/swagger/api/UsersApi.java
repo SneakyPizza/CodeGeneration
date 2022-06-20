@@ -6,7 +6,8 @@
 package io.swagger.api;
 
 import io.swagger.model.dto.ErrorDTO;
-import io.swagger.model.UserDTO;
+import io.swagger.model.dto.PostAsUserDTO;
+import io.swagger.model.dto.PostUserDTO;
 
 import java.util.UUID;
 
@@ -35,20 +36,30 @@ import javax.validation.constraints.*;
 public interface UsersApi {
 
     @Operation(summary = "Creates a new user.", description = "Optional extended description in CommonMark or HTML.", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Users" })
+        @SecurityRequirement(name = "bearerAuth")    }, tags={ "signup" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "A JSON array of users", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserDTO.class)))) })
-    @RequestMapping(value = "/Users",
+        @ApiResponse(responseCode = "200", description = "A JSON array of users", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PostAsUserDTO.class)))) })
+    @RequestMapping(value = "/signup",
         produces = { "application/json" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<? extends Object> addUser(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody UserDTO body);
+    ResponseEntity<? extends Object> addUser(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostAsUserDTO body);
+
+    @Operation(summary = "Creates a new user as admin.", description = "Optional extended description in CommonMark or HTML.", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Users" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "A JSON array of users", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PostUserDTO.class)))) })
+    @RequestMapping(value = "/Users",
+            produces = { "application/json" },
+            consumes = { "application/json" },
+            method = RequestMethod.POST)
+    ResponseEntity<? extends Object> addUserAdmin(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostUserDTO body);
 
 
     @Operation(summary = "Returns a list of users.", description = "Optional extended description in CommonMark or HTML.", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Users" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "A JSON array of users", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserDTO.class)))),
+        @ApiResponse(responseCode = "200", description = "A JSON array of users", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PostUserDTO.class)))),
         
         @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorDTO.class))),
         
@@ -74,7 +85,7 @@ public interface UsersApi {
     @Operation(summary = "Get user by id", description = "Optional extended description in CommonMark or HTML.", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Users" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "JSON with 1 user", content = @Content(mediaType = "application/JSON", schema = @Schema(implementation = UserDTO.class))) })
+        @ApiResponse(responseCode = "200", description = "JSON with 1 user", content = @Content(mediaType = "application/JSON", schema = @Schema(implementation = PostUserDTO.class))) })
     @RequestMapping(value = "/Users/{id}",
         produces = { "application/JSON" }, 
         method = RequestMethod.GET)
@@ -84,12 +95,12 @@ public interface UsersApi {
     @Operation(summary = "Updates a user.", description = "Optional extended description in CommonMark or HTML.", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Users" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "A JSON array of users", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class))) })
+        @ApiResponse(responseCode = "200", description = "A JSON array of users", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PostUserDTO.class))) })
     @RequestMapping(value = "/Users/{id}",
         produces = { "application/json" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<? extends Object> updateUser(/*@DecimalMin("1")*/@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") UUID id, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody UserDTO body);
+    ResponseEntity<? extends Object> updateUser(/*@DecimalMin("1")*/@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") UUID id, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostUserDTO body);
 
 }
 

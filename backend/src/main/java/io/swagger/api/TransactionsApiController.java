@@ -6,6 +6,7 @@ import io.swagger.model.dto.ErrorDTO;
 import io.swagger.model.dto.GetTransactionDTO;
 import io.swagger.model.dto.PostTransactionDTO;
 import io.swagger.model.entities.*;
+import io.swagger.services.AccountService;
 import io.swagger.services.TransactionService;
 import io.swagger.services.UserService;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -48,7 +49,7 @@ public class TransactionsApiController implements TransactionsApi {
     UserService userService;
 
     @Autowired
-    io.swagger.services.accountService accountService;
+    AccountService accountService;
 
     @org.springframework.beans.factory.annotation.Autowired
     public TransactionsApiController(ObjectMapper objectMapper, HttpServletRequest request) {

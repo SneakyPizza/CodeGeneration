@@ -1,14 +1,14 @@
 package io.swagger.api;
 
 import io.swagger.annotations.Api;
-import io.swagger.model.GetUserDTO;
+import io.swagger.model.dto.GetUserDTO;
 import io.swagger.model.dto.ErrorDTO;
-import io.swagger.model.UserDTO;
+import io.swagger.model.dto.PostAsUserDTO;
+import io.swagger.model.dto.PostUserDTO;
 import io.swagger.model.entities.User;
 import io.swagger.jwt.JwtTokenProvider;
 
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -57,28 +57,16 @@ public class UsersApiController implements UsersApi {
         this.request = request;
     }
 
-    public ResponseEntity<? extends Object> addUser(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody UserDTO userDTO) {
-        try {
-            // checks if all fields are filled
-            if (userDTO.getUserid() == null || userDTO.getUsername() == null || userDTO.getPassword() == null || userDTO.getEmail() == null || userDTO.getFirstName() == null || userDTO.getLastName() == null || userDTO.getStreet() == null || userDTO.getCity() == null || userDTO.getZipcode() == null || userDTO.getUserstatus() == null || userDTO.getDayLimit() == null || userDTO.getTransactionLimit() == null || userDTO.getRoles() == null) {
-                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Bad request: given user is incomplete", HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
-            }
-            else {
-                if (userService.checkIfUserExistsByUsername(userDTO.getUsername())) {
-                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Conflict: given user already exists", HttpStatus.CONFLICT.value(), "CONFLICT"), HttpStatus.CONFLICT);
-                }
-                else {
-                    User user = new User();
-                    User userModel = user.getUserModel(userDTO);
-                    // creates user in db
-                    User createdUser = userService.createUser(userModel);
-                    return new ResponseEntity<UserDTO>(createdUser.getUserDTO(), HttpStatus.OK);
-                }
-            }
-        } catch (Exception e) { // no IOException because object mapper does not work
-            log.error("Internal server error", e);
-            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "An internal server error had occured!", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<? extends Object> addUser(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostAsUserDTO postAsUserDTO) {
+        User user = userService.createUser(postAsUserDTO);
+        return new ResponseEntity<>(user.getPostAsUserDTO(), HttpStatus.CREATED);
+    }
+
+    // checks if endpoint is called by an admin
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<? extends Object> addUserAdmin(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostUserDTO postUserDTO) {
+        User user = userService.createUserAdmin(postUserDTO);
+        return new ResponseEntity<>(user.getPostUserDTO(), HttpStatus.CREATED);
     }
 
     // checks if endpoint is called by an admin
@@ -86,92 +74,16 @@ public class UsersApiController implements UsersApi {
     public ResponseEntity<? extends Object> getAllUsers(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the result set." ,schema=@Schema(allowableValues={  }
 )) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Min(1) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return." ,schema=@Schema(allowableValues={  }, minimum="1", maximum="50"
 , defaultValue="20")) @Valid @RequestParam(value = "limit", required = false, defaultValue="20") Integer limit) {
-        String accept = request.getHeader("Accept");
-        try {
-            // if unset or too low set to default value
-            if (limit == null || limit < 1) {
-                limit = 1;
-            }
-
-            // if unset or too low set to default value
-            if (offset == null || offset < 0) {
-                offset = 0;
-            }
-
-            // checks if request is within limits
-            if (limit > 50) {
-                // checks if too high
-                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Bad request: the limit is too high!", HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
-            } else if (offset > userService.getAllUsers().size() - 1) {
-                // checks if too high
-                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Bad request: the offset is too high!", HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
-            } else {
-                if (userService.getAllUsers().size() == 0) {
-                    // checks if there are no users
-                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Not found: there are no users!", HttpStatus.NOT_FOUND.value(), "NOT_FOUND"), HttpStatus.NOT_FOUND);
-                } else {
-                    // get all users
-                    List<User> users = (List<User>) userService.getAllUsers();
-                    List<GetUserDTO> getUserDTOs = new ArrayList<>();
-                    // turns all users in userdtos
-                    for (User user : users) {
-                        GetUserDTO getUserDTO = user.getGetUserDTO();
-                        getUserDTOs.add(getUserDTO);
-                    }
-                    return new ResponseEntity<List<GetUserDTO>>(getUserDTOs, HttpStatus.OK);
-                }
-            }
-        } catch (Exception e) { // no IOException because object mapper does not work
-            log.error("Internal server error", e);
-            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "An internal server error had occured!", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(userService.getAllUsers(offset, limit), HttpStatus.OK);
     }
 
     public ResponseEntity<? extends Object> getUser(/*@DecimalMin("1")*/@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") UUID id) {
-        try {
-            // checks if id is in uuid format
-            if (id == null || id.toString().length() != 36) {
-                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Bad request: id is wrong", HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
-            }
-            else {
-                // checks if user exists
-                if (!userService.checkIfUserExists(id)) {
-                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Not found: user doesn't exist", HttpStatus.NOT_FOUND.value(), "NOT_FOUND"), HttpStatus.NOT_FOUND);
-                }
-                else {
-                    User user = userService.getUser(id);
-                    GetUserDTO getUserDTO = user.getGetUserDTO();
-                    return new ResponseEntity<GetUserDTO>(getUserDTO, HttpStatus.OK);
-                }
-            }
-
-        } catch (Exception e) { // no IOException because object mapper does not work
-            log.error("Internal server error", e);
-            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "An internal server error had occured!", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        User user = userService.getUser(id);
+        return new ResponseEntity<>(user.getGetUserDTO(), HttpStatus.OK);
     }
 
-    public ResponseEntity<? extends Object> updateUser(/*@DecimalMin("1")*/@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") UUID id, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody UserDTO userDTO) {
-        try {
-            if (userDTO.getUserid() == null || userDTO.getUsername() == null || userDTO.getPassword() == null || userDTO.getEmail() == null || userDTO.getFirstName() == null || userDTO.getLastName() == null || userDTO.getStreet() == null || userDTO.getCity() == null || userDTO.getZipcode() == null || userDTO.getUserstatus() == null || userDTO.getDayLimit() == null || userDTO.getTransactionLimit() == null || userDTO.getRoles() == null) {
-                return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Bad request: user is incomplete", HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST"), HttpStatus.BAD_REQUEST);
-            }
-            else {
-                // checks if user exists
-                if (!userService.checkIfUserExists(userDTO.getUserid())) {
-                    return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Not found: user not found", HttpStatus.NOT_FOUND.value(), "NOT_FOUND"), HttpStatus.NOT_FOUND);
-                }
-                else {
-                    User user = new User();
-                    User user2 = user.getUserModel(userDTO);
-                    UserDTO userDTO1 = userService.updateUser(user2).getUserDTO();
-                    return new ResponseEntity<UserDTO>(userDTO1, HttpStatus.OK);
-                }
-            }
-        } catch (Exception e) { // no IOException because object mapper does not work
-            log.error("Internal server error", e);
-            return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "An internal server error had occured!", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<? extends Object> updateUser(/*@DecimalMin("1")*/@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") UUID id, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostUserDTO postUserDTO) {
+        User user = userService.updateUser(postUserDTO);
+        return new ResponseEntity<>(user.getPostUserDTO(), HttpStatus.OK);
     }
-
 }

@@ -1,6 +1,6 @@
 package io.swagger.services;
 
-import io.swagger.exeption.custom.*;
+import io.swagger.exception.custom.*;
 import io.swagger.model.dto.GetTransactionDTO;
 import io.swagger.model.dto.PostTransactionDTO;
 import io.swagger.model.entities.*;
@@ -34,7 +34,7 @@ public class TransactionService {
     UserRepository userRepository;
 
     @Autowired
-    io.swagger.services.accountService accountService;
+    AccountService accountService;
 
     @Autowired
     private TransactionRepository transactionRepository;
@@ -73,6 +73,29 @@ public class TransactionService {
     public List<Transaction> findByIBANAndTimestampBetween(String iban, LocalDateTime startDate, LocalDateTime endDate){
         return (List<Transaction>) transactionRepository.findByIBANAndTimestampBetween(iban, startDate, endDate);
     }
+
+    public List<Transaction> getAllTransactionsByAccount(Account acc) {
+        //find by ORIGIN_ID
+        List<Transaction> origin = (List<Transaction>) transactionRepository.findByOriginId(acc.getId());
+        //find by TARGET_ID
+        List<Transaction> target = (List<Transaction>) transactionRepository.findByTargetId(acc.getId());
+
+        origin.addAll(target);
+        origin.sort((t1, t2) -> t1.getTimestamp().compareTo(t2.getTimestamp()));
+        return origin;
+    }
+
+    public List<Transaction> getAllTransactionsByAccount(Account acc, LocalDateTime startDate, LocalDateTime endDate) {
+        //find by ORIGIN_ID
+        List<Transaction> origin = (List<Transaction>) transactionRepository.findByOriginIdAndTimestampBetween(acc.getId(), startDate, endDate);
+        //find by TARGET_ID
+        List<Transaction> target = (List<Transaction>) transactionRepository.findByTargetIdAndTimestampBetween(acc.getId(), startDate, endDate);
+
+        origin.addAll(target);
+        origin.sort((t1, t2) -> t1.getTimestamp().compareTo(t2.getTimestamp()));
+        return origin;
+    }
+
 
     private Transaction executeTransaction(Transaction transaction) {
         transaction.execute();
@@ -195,10 +218,10 @@ public class TransactionService {
         }
     }
 
-    private User getUserFromSecurityContext(){
+    public User getUserFromSecurityContext(){
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
         //get user if not null
-        User user = userRepository.findByUsername(name);
+        User user = userRepository.findByUsername(name).orElseThrow();
         if(user == null){
             throw new UnauthorizedException("Could not find user from provided token");
         }
@@ -262,7 +285,9 @@ public class TransactionService {
     /////Get History/////
     public List<GetTransactionDTO> getHistory(String iban) {
         validationForGetHistory(iban);
-        List<Transaction> transactions = getTransactions(iban);
+        //get account from iban
+        Account account = (Account) accountService.findByIBAN(iban);
+        List<Transaction> transactions = getAllTransactionsByAccount(account);
         return transactions.stream().map(Transaction::toGetTransactionDTO).collect(java.util.stream.Collectors.toList());
     }
 
@@ -270,7 +295,8 @@ public class TransactionService {
         validationForGetHistory(iban);
         LocalDateTime dateOne = LocalDateTime.of(LocalDate.parse(date1), LocalTime.of(0, 0, 0));
         LocalDateTime dateTwo = LocalDateTime.of(LocalDate.parse(date2), LocalTime.of(0, 0, 0));
-        List<Transaction> transactions = findByIBANAndTimestampBetween(iban, dateOne, dateTwo);
+        Account account = (Account) accountService.findByIBAN(iban);
+        List<Transaction> transactions = getAllTransactionsByAccount(account, dateOne, dateTwo);
         if(transactions.isEmpty()){
             throw new IllegalArgumentException("No transactions found for given period: " + date1 + " - " + date2);
         }
@@ -286,7 +312,7 @@ public class TransactionService {
         //check if user is owner of the account or is admin
         validateAccessToAccount(iban, user);
         if (getTransactions(iban).isEmpty()) {
-            throw new NoContentException("Account has no transactions");
+            throw new NotFoundException("Account has no transactions");
         }
     }
 

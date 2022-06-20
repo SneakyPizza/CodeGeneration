@@ -2,7 +2,7 @@ package io.swagger.cucumber.steps.Account;
 
 import io.cucumber.java8.En;
 import io.swagger.cucumber.steps.BaseStepDefinitions;
-import io.swagger.model.GetUserDTO;
+import io.swagger.model.dto.GetUserDTO;
 
 import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;

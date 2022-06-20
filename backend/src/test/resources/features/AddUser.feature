@@ -1,25 +1,25 @@
 Feature: Everything AddUser related
 
-    Scenario: AddUser with valid data
+    Scenario: Adding a user with no account
         Given I provide valid user details
-        And I have a valid token jwt
         When I call the AddUser endpoint
-        Then The user is added to the database and i get status code 200
+        Then I should see a user status code of 200
+        And I should receive the user added to the database
 
-    Scenario: AddUser with fields that are null
+    Scenario: Adding a user with no account with fields that are null
         Given I provide wrong user details with null values
-        And I have a valid token jwt
         When I call the AddUser endpoint
-        Then The user is not added to the database and i get status code 400
+        Then I should see a user status code of 400
+        And I should receive an error message with "Bad Request"
 
     Scenario: AddUser but the user already exists
         Given I provide valid user details
-        And I have a valid token jwt
         When I call the AddUser endpoint twice
-        Then The user is not added to the database and i get status code 409
+        Then I should see a user status code of 409
+        And I should receive an error message with "safx"
 
     Scenario: AddUser with invalid jwt token
         Given I provide valid user details
-        And I have an invalid token jwt
         When I call the AddUser endpoint
-        Then The user is not added to the database and i get status code 403
+        Then I should see a user status code of 403
+        And I should receive an error message with "asffxcz"

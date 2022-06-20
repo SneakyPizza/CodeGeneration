@@ -1,15 +1,13 @@
-package io.swagger.exeption;
+package io.swagger.exception;
 
-import io.swagger.exeption.custom.*;
+import io.swagger.exception.custom.*;
 import io.swagger.model.dto.ErrorDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.time.DateTimeException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -26,23 +24,10 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDTO, HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler(DateTimeParseException.class)
-    public ResponseEntity<ErrorDTO> handleDateTimeParseException(DateTimeParseException e) {
-        ErrorDTO errorDTO = new ErrorDTO(LocalDateTime.now().toString(), e.getMessage(), HttpStatus.BAD_REQUEST.value(), "Given date or time is invalid");
-        return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
-    }
-
-
     @ExceptionHandler(InvalidTransactionsException.class)
     public ResponseEntity<ErrorDTO> handleInvalidTransactionsException(InvalidTransactionsException e) {
         ErrorDTO errorDTO = new ErrorDTO(LocalDateTime.now().toString(), e.getMessage(), HttpStatus.BAD_REQUEST.value(), "Invalid Transactions");
         return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(NoContentException.class)
-    public ResponseEntity<ErrorDTO> handleNoContentException(NoContentException e) {
-        ErrorDTO errorDTO = new ErrorDTO(LocalDateTime.now().toString(), e.getMessage(), HttpStatus.NO_CONTENT.value(), "No Content");
-        return new ResponseEntity<>(errorDTO, HttpStatus.NO_CONTENT);
     }
 
     @ExceptionHandler(NullPointerException.class)
