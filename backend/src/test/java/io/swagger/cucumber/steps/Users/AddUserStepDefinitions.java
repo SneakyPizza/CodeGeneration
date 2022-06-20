@@ -15,8 +15,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -64,30 +64,51 @@ public class AddUserStepDefinitions extends BaseStepDefinitions implements En {
             postAsUserDTO.setTransactionLimit(BigDecimal.valueOf(100));
         });
 
-        Given("^I provide wrong user details with null values", () -> {
+        Given("^I provide valid user details as admin", () -> {
             postUserDTO = new PostUserDTO();
-            postUserDTO.setUsername(null);
+            postUserDTO.setUsername("Klaas");
+            postUserDTO.setFirstName("Jansen");
+            postUserDTO.setLastName("Test");
+            postUserDTO.setEmail("klaasjansen@test.nl");
+            postUserDTO.setPassword("test");
+            postUserDTO.setStreet("Test");
+            postUserDTO.setCity("Test");
+            postUserDTO.setZipcode("Test");
+            postUserDTO.setDayLimit(BigDecimal.valueOf(1000));
+            postUserDTO.setTransactionLimit(BigDecimal.valueOf(100));
+            postUserDTO.setUserstatus(PostUserDTO.UserstatusEnum.ACTIVE);
+            List<PostUserDTO.Role> roles = new ArrayList<>();
+            roles.add(PostUserDTO.Role.ADMIN);
+            postUserDTO.setRoles(roles);
+        });
+
+        Given("^I provide wrong user details with null values", () -> {
+            postAsUserDTO = new PostAsUserDTO();
+            postAsUserDTO.setUsername(null);
+        });
+
+        And("^I am logged in as an admin", () -> {
+            token = VALID_TOKEN_ADMIN;
+        });
+
+        And("^I am logged in as user", () -> {
+            token = VALID_TOKEN_USER;
+        });
+
+        When("I call the signup endpoint", () -> {
+            httpHeaders.clear();
+            httpHeaders.add("Content-Type", "application/json");
+            request = new HttpEntity<>(objectMapper.writeValueAsString(postAsUserDTO), httpHeaders);
+            response = restTemplate.exchange(getBaseUrl() + "/signup", HttpMethod.POST, request, String.class);
+            status = response.getStatusCode().value();
         });
 
         When("I call the AddUser endpoint", () -> {
             httpHeaders.clear();
             httpHeaders.add("Content-Type", "application/json");
+            httpHeaders.add("Authorization", "Bearer " + token);
             request = new HttpEntity<>(objectMapper.writeValueAsString(postUserDTO), httpHeaders);
-            response = restTemplate.exchange(getBaseUrl() + "/signup", HttpMethod.POST, request, String.class);
-            status = response.getStatusCode().value();
-        });
-
-        When("I call the AddUser endpoint twice", () -> {
-            httpHeaders.clear();
-            httpHeaders.add("Content-Type", "application/json");
-            request = new HttpEntity<>(objectMapper.writeValueAsString(postUserDTO), httpHeaders);
-            response = restTemplate.exchange(getBaseUrl() + "/signup", HttpMethod.POST, request, String.class);
-            status = response.getStatusCode().value();
-
-            httpHeaders.clear();
-            httpHeaders.add("Content-Type", "application/json");
-            request = new HttpEntity<>(objectMapper.writeValueAsString(postUserDTO), httpHeaders);
-            response = restTemplate.exchange(getBaseUrl() + "/signup", HttpMethod.POST, request, String.class);
+            response = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.POST, request, String.class);
             status = response.getStatusCode().value();
         });
 

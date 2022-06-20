@@ -90,7 +90,8 @@ public class GetUserStepDefinitions extends BaseStepDefinitions implements En {
             status = getAllResponse.getStatusCode().value();
 
             if (Objects.equals(token, VALID_TOKEN_ADMIN)) {
-                userList = objectMapper.readValue(getAllResponse.getBody(), objectMapper.getTypeFactory().constructCollectionType(List.class, String.class));
+                // kaputt
+                userList = objectMapper.readValue(getAllResponse.getBody(), objectMapper.getTypeFactory().constructCollectionType(List.class, GetUserDTO.class));
             }
         });
 

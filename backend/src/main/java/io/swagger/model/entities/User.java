@@ -147,6 +147,7 @@ public class User {
         GetUserDTO getUserDTO = new GetUserDTO();
         getUserDTO.setUserid(this.id);
         getUserDTO.setUsername(this.username);
+        getUserDTO.setPassword(this.password);
         getUserDTO.setEmail(this.email);
         getUserDTO.setFirstName(this.firstName);
         getUserDTO.setLastName(this.lastName);
@@ -192,11 +193,18 @@ public class User {
         user.setZipcode(postUserDTO.getZipcode());
         user.setDayLimit(postUserDTO.getDayLimit());
         user.setTransactionLimit(postUserDTO.getTransactionLimit());
-        if (postUserDTO.getRoles().contains(GetUserDTO.Role.ADMIN) && postUserDTO.getRoles().contains(GetUserDTO.Role.USER)) {
+        if (postUserDTO.getUserstatus() == PostUserDTO.UserstatusEnum.ACTIVE) {
+            user.setUserstatus(UserStatus.ACTIVE);
+        }
+        else if (postUserDTO.getUserstatus() == PostUserDTO.UserstatusEnum.DISABLED) {
+            user.setUserstatus(UserStatus.DISABLED);
+        }
+
+        if (postUserDTO.getRoles().contains(PostUserDTO.Role.ADMIN) && postUserDTO.getRoles().contains(PostUserDTO.Role.USER)) {
             user.setRoles(List.of(Role.ROLE_ADMIN, Role.ROLE_USER));
-        } else if(postUserDTO.getRoles().contains(GetUserDTO.Role.ADMIN)) {
+        } else if(postUserDTO.getRoles().contains(PostUserDTO.Role.ADMIN)) {
             user.setRoles(List.of(Role.ROLE_ADMIN));
-        } else if(postUserDTO.getRoles().contains(GetUserDTO.Role.USER)) {
+        } else if(postUserDTO.getRoles().contains(PostUserDTO.Role.USER)) {
             user.setRoles(List.of(Role.ROLE_USER));
         } else {
             user.setRoles(Collections.emptyList());
