@@ -3,7 +3,7 @@ package io.swagger.services;
 import io.swagger.model.AccountDTO;
 import io.swagger.model.dto.PostAccountDTO;
 import io.swagger.model.entities.Account;
-import io.swagger.model.entities.User;
+import io.swagger.model.entities.Users;
 import io.swagger.repositories.AccountRepository;
 import io.swagger.utils.ibanGenerator;
 
@@ -26,7 +26,7 @@ public class AccountService {
 
     //Add a new account object to the database (POST)
     public void addAccount(PostAccountDTO account) {
-        Account a = new Account<User>();
+        Account a = new Account<Users>();
         a.setAbsoluteLimit(account.getAbsoluteLimit());
         a.setBalance(new BigDecimal(0));
         a.setAccountType(Account.AccountTypeEnum.fromValue(account.getAccountType().toString()));

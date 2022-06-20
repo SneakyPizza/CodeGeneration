@@ -83,7 +83,7 @@ public class AccountsApiController implements AccountsApi {
         String accept = request.getHeader("Content-Type");
         if (accept != null && accept.contains("application/json")) {
             try{
-                User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+                Users user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
                 if(user.getRoles().contains(Role.ROLE_ADMIN)){
                     accountservice.addAccount(body);   
                     return new ResponseEntity<PostAccountDTO>(HttpStatus.OK);
@@ -102,7 +102,7 @@ public class AccountsApiController implements AccountsApi {
 
         try {
             if(accountservice.validateIban(IBAN)){
-                User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+                Users user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
                 if(user.getRoles().contains(Role.ROLE_ADMIN) || user.getAccounts().stream().anyMatch(a -> a.getIBAN().equals(IBAN))){
                     AccountDTO dto = accountservice.getAccountDTOWithIBAN(IBAN);
                     if(dto == null){
@@ -133,7 +133,7 @@ public class AccountsApiController implements AccountsApi {
         if (accept != null && accept.contains("application/json")) {
             
             try {
-                User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+                Users user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
                 if(user.getRoles().contains(Role.ROLE_ADMIN)) {
                     //Convert iterable to list
                     List<Account> accountlist = StreamSupport.stream(accountservice.getAllAccounts()
@@ -165,18 +165,18 @@ public class AccountsApiController implements AccountsApi {
         String accept = request.getHeader("Search");
 
             try {
-                User logged_user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+                Users logged_user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
                 if(logged_user.getRoles().contains(Role.ROLE_ADMIN) || logged_user.getRoles().contains(Role.ROLE_USER)){
-                    List<User> users = new ArrayList<User>();
+                    List<Users> users = new ArrayList<Users>();
                 if(fullName.contains("-")){
                     //add both parts of the string to array
                     String[] split = fullName.toLowerCase().split("-");
                     for(int i = 0; i < split.length;i++){
                         if(!split[i].isEmpty()){
                             //search once on firstame inside user -> return list
-                            List<User> user_fname = userService.findByFirstName(split[i]);
+                            List<Users> user_fname = userService.findByFirstName(split[i]);
                             //search once on lastname inside user -> return list
-                            List<User> user_lname = userService.findByLastName(split[i]);
+                            List<Users> user_lname = userService.findByLastName(split[i]);
                             //Add everything from both lists to
                             users.addAll(user_fname);
                             users.addAll(user_lname);
@@ -187,7 +187,7 @@ public class AccountsApiController implements AccountsApi {
                 }
 
                 List<NameSearchAccountDTO> dtos = new ArrayList<NameSearchAccountDTO>();
-                for (User user : users) {
+                for (Users user : users) {
                     List<Account> user_accounts = accountservice.findByUserId(user.getId());
                     for (Account account : user_accounts){
                         NameSearchAccountDTO dto = user.toNameSearchAccountDTO(account.getIBAN());
@@ -213,7 +213,7 @@ public class AccountsApiController implements AccountsApi {
     public ResponseEntity<? extends Object> updateAccountStatus(@Parameter(in = ParameterIn.PATH, description = "Gets the account of the IBAN", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody AccountDTO body) {
 
             try {
-                User logged_user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+                Users logged_user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
                 if(logged_user.getRoles().contains(Role.ROLE_ADMIN)){
                     if(accountservice.validateIban(IBAN)){
                         accountservice.updateAccount(IBAN, body);

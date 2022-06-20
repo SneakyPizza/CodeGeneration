@@ -7,7 +7,7 @@ import io.swagger.model.dto.JwtDTO;
 import io.swagger.model.dto.PostAsUserDTO;
 import io.swagger.model.entities.Role;
 import io.swagger.model.dto.PostUserDTO;
-import io.swagger.model.entities.User;
+import io.swagger.model.entities.Users;
 import io.swagger.model.entities.UserStatus;
 import io.swagger.repositories.UserRepository;
 import io.swagger.jwt.JwtTokenProvider;
@@ -19,7 +19,6 @@ import java.util.UUID;
 import io.swagger.utils.PincodeGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -41,7 +40,7 @@ public class UserService {
 
     private final PincodeGenerator pincodeGenerator;
 
-    private User u;
+    private Users u;
 
     private static final String userNotFound = "User not found";
 
@@ -50,7 +49,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User getUser(UUID id) {
+    public Users getUser(UUID id) {
         return userRepository.findById(id).orElseThrow(() -> new NotFoundException(userNotFound));
     }
 
@@ -64,8 +63,8 @@ public class UserService {
         return getUserDTOs(userRepository.findAll(PageRequest.of(offset, limit)).getContent());
     }
 
-    public User createUser(PostAsUserDTO postAsUserDTO) {
-        User user = u.getUserModelFromPostAsUserDTO(postAsUserDTO);
+    public Users createUser(PostAsUserDTO postAsUserDTO) {
+        Users user = u.getUserModelFromPostAsUserDTO(postAsUserDTO);
         user.setId(UUID.randomUUID());
         user.setPincode(pincodeGenerator.generatePincode());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -74,29 +73,29 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User createUserAdmin(PostUserDTO postUserDTO) {
-        User user = u.getUserModelFromPostUserDTO(postUserDTO);
+    public Users createUserAdmin(PostUserDTO postUserDTO) {
+        Users user = u.getUserModelFromPostUserDTO(postUserDTO);
         user.setId(UUID.randomUUID());
         user.setPincode(pincodeGenerator.generatePincode());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
-    public User updateUser(PostUserDTO postUserDTO) {
-        User user = new User();
+    public Users updateUser(PostUserDTO postUserDTO) {
+        Users user = new Users();
         user = user.getUserModelFromPostUserDTO(postUserDTO);
         return userRepository.save(user);
     }
 
-    public List<User> findByFirstName(String firstname){
+    public List<Users> findByFirstName(String firstname){
         return userRepository.findByFirstName(firstname).orElseThrow(() -> new NotFoundException(userNotFound));
     }
 
-    public List<User> findByLastName(String lastname){
+    public List<Users> findByLastName(String lastname){
         return userRepository.findByLastName(lastname).orElseThrow(() -> new NotFoundException(userNotFound));
     }
 
-    public User findByUsername(String username) {
+    public Users findByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException(userNotFound));
     }
 
@@ -109,7 +108,7 @@ public class UserService {
     }
 
     private boolean validateLogin (String username, String password) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException(userNotFound));
+        Users user = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException(userNotFound));
         if (user == null) {
             return false;
         }
@@ -121,21 +120,21 @@ public class UserService {
     }
 
     private boolean validateOffset(Integer offset) {
-        List<User> users = (List<User>) userRepository.findAll();
+        List<Users> users = (List<Users>) userRepository.findAll();
         return offset != null && offset >= 0 && offset < (users.size() - 1);
     }
 
     private JwtDTO createJwtDTO(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException(userNotFound));
+        Users user = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException(userNotFound));
         JwtDTO jwtDTO = new JwtDTO();
         jwtDTO.setJwtToken(tokenProvider.createToken(user.getUsername(), user.getRoles()));
         jwtDTO.setId(user.getId().toString());
         return jwtDTO;
     }
 
-    private List<GetUserDTO> getUserDTOs(List<User> users) {
+    private List<GetUserDTO> getUserDTOs(List<Users> users) {
         List<GetUserDTO> getUserDTOs = new java.util.ArrayList<>();
-        for (User user : users) {
+        for (Users user : users) {
             getUserDTOs.add(user.getGetUserDTO());
         }
         return getUserDTOs;

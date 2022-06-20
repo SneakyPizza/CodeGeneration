@@ -218,17 +218,17 @@ public class TransactionService {
         }
     }
 
-    public User getUserFromSecurityContext(){
+    public Users getUserFromSecurityContext(){
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
         //get user if not null
-        User user = userRepository.findByUsername(name).orElseThrow();
+        Users user = userRepository.findByUsername(name).orElseThrow();
         if(user == null){
             throw new UnauthorizedException("Could not find user from provided token");
         }
         return user;
     }
 
-    private void validateAccessToAccount (String iban, User user){
+    private void validateAccessToAccount (String iban, Users user){
         List<Account> accountList = user.getAccounts();
         if(accountList.isEmpty()){
             throw new InvalidTransactionsException("User has no accounts");
@@ -241,7 +241,7 @@ public class TransactionService {
     //////Do Transaction//////
     public Transaction doTransaction(PostTransactionDTO transaction, TransactionType type) {
         //get curent user from security context
-        User user = getUserFromSecurityContext();
+        Users user = getUserFromSecurityContext();
         //check if user is owner of the account or is admin
         if(type != TransactionType.DEPOSIT){
             validateAccessToAccount(transaction.getFromIBAN(), user);
@@ -256,7 +256,7 @@ public class TransactionService {
         return executeTransaction(newTransaction);
     }
 
-    private Transaction createTransactionFromPostTransaction(PostTransactionDTO transaction, User user, TransactionType type) {
+    private Transaction createTransactionFromPostTransaction(PostTransactionDTO transaction, Users user, TransactionType type) {
         //create transaction object
         Transaction t = new Transaction();
         t.setPerformer(user);
@@ -308,7 +308,7 @@ public class TransactionService {
             throw new IllegalArgumentException("Account does not exist");
         }
         //get current user from security context
-        User user = getUserFromSecurityContext();
+        Users user = getUserFromSecurityContext();
         //check if user is owner of the account or is admin
         validateAccessToAccount(iban, user);
         if (getTransactions(iban).isEmpty()) {

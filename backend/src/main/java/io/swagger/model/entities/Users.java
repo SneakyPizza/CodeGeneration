@@ -20,7 +20,7 @@ import java.util.UUID;
 @Entity
 @Data
 @NoArgsConstructor
-public class User {
+public class Users {
     @Id
     @GeneratedValue
     @Type(type="uuid-char")
@@ -60,7 +60,7 @@ public class User {
     private List<Role> roles;
 
     // all args constructor
-    public User(String username, String password, String email, String firstName, String lastName, String street, String city, String zipcode, UserStatus userstatus, BigDecimal dayLimit, BigDecimal transactionLimit, String pincode, List<Account> accounts, List<Role> roles) {
+    public Users(String username, String password, String email, String firstName, String lastName, String street, String city, String zipcode, UserStatus userstatus, BigDecimal dayLimit, BigDecimal transactionLimit, String pincode, List<Account> accounts, List<Role> roles) {
         this.username = username;
         this.password = password;
         this.email = email;
@@ -197,8 +197,8 @@ public class User {
         return getUserDTO;
     }
 
-    public User getUserModelFromPostUserDTO(PostUserDTO postUserDTO) {
-        User user = new User();
+    public Users getUserModelFromPostUserDTO(PostUserDTO postUserDTO) {
+        Users user = new Users();
         user.setUsername(postUserDTO.getUsername());
         user.setPassword(postUserDTO.getPassword());
         user.setEmail(postUserDTO.getEmail());
@@ -221,8 +221,8 @@ public class User {
         return user;
     }
 
-    public User getUserModelFromPostAsUserDTO(PostAsUserDTO postAsUserDTO) {
-        User user = new User();
+    public Users getUserModelFromPostAsUserDTO(PostAsUserDTO postAsUserDTO) {
+        Users user = new Users();
         user.setUsername(postAsUserDTO.getUsername());
         user.setPassword(postAsUserDTO.getPassword());
         user.setEmail(postAsUserDTO.getEmail());
