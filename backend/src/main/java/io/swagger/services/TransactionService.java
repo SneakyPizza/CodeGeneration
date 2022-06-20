@@ -309,7 +309,7 @@ public class TransactionService {
             throw new IllegalArgumentException("Account does not exist");
         }
         //get current user from security context
-        Users user = getUserFromSecurityContext();
+        User user = getUserFromSecurityContext();
         //check if user is owner of the account or is admin
         validateAccessToAccount(iban, user);
         //get account from iban
