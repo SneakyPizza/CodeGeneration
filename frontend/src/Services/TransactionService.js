@@ -1,5 +1,5 @@
 import axios from 'axios';
-const url = 'http://localhost:8080'
+const url = 'https://api-inholland-bank.herokuapp.com'
 export default {
     getHistory(iban, token) {
         //create Authorization header from token
