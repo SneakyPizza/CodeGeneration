@@ -3,18 +3,6 @@
   <section>
     <div class="container-lg">
       <h1 class="blue mt-3 mt-lg-3">Overview</h1>
-      <div class="row mt-4">
-        <div class="card">
-          <div class="card-body">
-            <div class="">
-              <div class="round">
-                <img class="payment_icon" src="../assets/icons/box-arrow-in-down.svg" alt="img">
-              </div>
-              <p class="left">Transaction</p>
-            </div>
-          </div>
-        </div>
-      </div>
 <!--      v for account in account-->
       <div v-for="account in accounts" v-bind:key="account">
             <div class="row mt-4">
@@ -31,6 +19,11 @@
                   <p class="left50px">{{account.IBAN}}<br>
                     Balance &euro; {{account.balance}}<br>
                     Limit &euro; {{user.transactionLimit}}</p>
+                </div>
+                <div class="">
+                  <div class="right m-1">
+                    <router-link :to="{name: 'Transaction', params: {iban: account.IBAN}}" class=" nav-link" active-class="active"><h4>Perform a payment</h4></router-link>
+                  </div>
                 </div>
                 <div class="card-footer">
                   <router-link :to="{name: 'History', params: {iban: account.IBAN}}" class="blue bigText nav-link" active-class="active">View history<img class="Small_pointer" src="../assets/icons/caret-right.svg" alt=""></router-link>
@@ -139,5 +132,8 @@ export default {
 .bigText {
   font-size: 25px;
   font-weight: bold;
+}
+.nav-link{
+  flex-direction: row !important;
 }
 </style>

@@ -7,6 +7,7 @@ import Login from "./components/Login";
 import axios from "axios";
 import store from "./store";
 import TransactionHistory from "./components/TransactionHistory";
+import DoTransaction from "./components/DoTransaction";
 
 
 axios.defaults.baseURL = 'http://localhost:8080'
@@ -17,6 +18,7 @@ const routes = [
     { path: '/UserOverview', component: UserOverview, meta: {reqToken: true, adminOnly: false, }},
     { path: '/login', component: Login, meta: {reqToken: false, adminOnly: false, }},
     { path: '/History/:iban', name: 'History', component: TransactionHistory, meta: {reqToken: true, adminOnly: false, params: true}},
+    { path: '/Transaction/:iban', name: 'Transaction', component: DoTransaction, meta: {reqToken: true, adminOnly: false, params: true}},
 ];
 
 
@@ -25,6 +27,11 @@ const router = createRouter({
     routes
 })
 router.beforeEach((to, from, next) => {
+    //else if to is /logout, logout and redirect to /login
+     if (to.path === '/Logout') {
+        store.commit('logout');
+        next('/login');
+    }
     if (to.matched.some(record => record.meta.reqToken)) {
         if (!store.state.token) {
             next('/login');
@@ -45,7 +52,7 @@ router.beforeEach((to, from, next) => {
             next('/UserOverview');
         }
     }
-    else{
+  else{
         next();
     }
 
