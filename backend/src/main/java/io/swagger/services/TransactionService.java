@@ -81,7 +81,8 @@ public class TransactionService {
         List<Transaction> target = (List<Transaction>) transactionRepository.findByTargetId(acc.getId());
 
         origin.addAll(target);
-        origin.sort((t1, t2) -> t1.getTimestamp().compareTo(t2.getTimestamp()));
+        //sort and reverse
+        origin.sort((t1, t2) -> t2.getTimestamp().compareTo(t1.getTimestamp()));
         return origin;
     }
 
@@ -92,7 +93,7 @@ public class TransactionService {
         List<Transaction> target = (List<Transaction>) transactionRepository.findByTargetIdAndTimestampBetween(acc.getId(), startDate, endDate);
 
         origin.addAll(target);
-        origin.sort((t1, t2) -> t1.getTimestamp().compareTo(t2.getTimestamp()));
+        origin.sort((t1, t2) -> t2.getTimestamp().compareTo(t1.getTimestamp()));
         return origin;
     }
 
@@ -311,7 +312,10 @@ public class TransactionService {
         User user = getUserFromSecurityContext();
         //check if user is owner of the account or is admin
         validateAccessToAccount(iban, user);
-        if (getTransactions(iban).isEmpty()) {
+        //get account from iban
+        Account account = (Account) accountService.findByIBAN(iban);
+        //get all transactions from account
+        if ( account == null || getAllTransactionsByAccount(account).isEmpty()) {
             throw new NotFoundException("Account has no transactions");
         }
     }

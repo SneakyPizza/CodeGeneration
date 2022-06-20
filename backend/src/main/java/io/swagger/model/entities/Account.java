@@ -102,7 +102,7 @@ public class Account<Users> {
     AccountDTO.AccountTypeEnum accounttype_value = AccountDTO.AccountTypeEnum.fromValue(accountType.value);
     //= AccountDTO.AccountTypeEnum.valueOf(accountType.toString());
     dto.setAccountType(accounttype_value);
-
+    dto.setUserid(user.getId());
     String acct = active.value;
     AccountDTO.ActiveEnum accountactive_value = AccountDTO.ActiveEnum.fromValue(acct);
 

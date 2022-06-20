@@ -96,23 +96,6 @@ public class User {
             this.transactionLimit = transactionLimit;
         }
     }
-
-    public PostUserDTO toUserDTO(){
-        PostUserDTO dto = new PostUserDTO();
-        //missing username
-        dto.setEmail(email);
-        dto.setPassword(password);
-        dto.setFirstName(firstName);
-        dto.setLastName(lastName);
-        dto.setStreet(street);
-        dto.setCity(city);
-        dto.setZipcode(zipcode);
-        dto.setDayLimit(dayLimit);
-        dto.setTransactionLimit(transactionLimit);
-        return dto;
-    }
-
-
     
     public PostUserDTO getPostUserDTO() {
     	PostUserDTO postUserDTO = new PostUserDTO();
@@ -126,13 +109,14 @@ public class User {
     	postUserDTO.setZipcode(this.zipcode);
     	postUserDTO.setDayLimit(this.dayLimit);
     	postUserDTO.setTransactionLimit(this.transactionLimit);
-        //userstatus
+
         if (this.userstatus == UserStatus.ACTIVE) {
             postUserDTO.setUserstatus(PostUserDTO.UserstatusEnum.ACTIVE);
         }
         else if (this.userstatus == UserStatus.DISABLED) {
             postUserDTO.setUserstatus(PostUserDTO.UserstatusEnum.DISABLED);
         }
+
         if (this.roles.contains(Role.ROLE_ADMIN) && this.roles.contains(Role.ROLE_USER)) {
             postUserDTO.setRoles(List.of(PostUserDTO.Role.ADMIN, PostUserDTO.Role.USER));
         } else if(this.roles.contains(Role.ROLE_ADMIN)) {
@@ -164,6 +148,7 @@ public class User {
         GetUserDTO getUserDTO = new GetUserDTO();
         getUserDTO.setUserid(this.id);
         getUserDTO.setUsername(this.username);
+        getUserDTO.setPassword(this.password);
         getUserDTO.setEmail(this.email);
         getUserDTO.setFirstName(this.firstName);
         getUserDTO.setLastName(this.lastName);
@@ -197,7 +182,7 @@ public class User {
         return getUserDTO;
     }
 
-    public User getUserModelFromPostUserDTO(PostUserDTO postUserDTO) {
+    public User setPropertiesFromPostUserDTO(PostUserDTO postUserDTO) {
         User user = new User();
         user.setUsername(postUserDTO.getUsername());
         user.setPassword(postUserDTO.getPassword());
@@ -209,11 +194,18 @@ public class User {
         user.setZipcode(postUserDTO.getZipcode());
         user.setDayLimit(postUserDTO.getDayLimit());
         user.setTransactionLimit(postUserDTO.getTransactionLimit());
-        if (postUserDTO.getRoles().contains(GetUserDTO.Role.ADMIN) && postUserDTO.getRoles().contains(GetUserDTO.Role.USER)) {
+        if (postUserDTO.getUserstatus() == PostUserDTO.UserstatusEnum.ACTIVE) {
+            user.setUserstatus(UserStatus.ACTIVE);
+        }
+        else if (postUserDTO.getUserstatus() == PostUserDTO.UserstatusEnum.DISABLED) {
+            user.setUserstatus(UserStatus.DISABLED);
+        }
+
+        if (postUserDTO.getRoles().contains(PostUserDTO.Role.ADMIN) && postUserDTO.getRoles().contains(PostUserDTO.Role.USER)) {
             user.setRoles(List.of(Role.ROLE_ADMIN, Role.ROLE_USER));
-        } else if(postUserDTO.getRoles().contains(GetUserDTO.Role.ADMIN)) {
+        } else if(postUserDTO.getRoles().contains(PostUserDTO.Role.ADMIN)) {
             user.setRoles(List.of(Role.ROLE_ADMIN));
-        } else if(postUserDTO.getRoles().contains(GetUserDTO.Role.USER)) {
+        } else if(postUserDTO.getRoles().contains(PostUserDTO.Role.USER)) {
             user.setRoles(List.of(Role.ROLE_USER));
         } else {
             user.setRoles(Collections.emptyList());
@@ -221,7 +213,7 @@ public class User {
         return user;
     }
 
-    public User getUserModelFromPostAsUserDTO(PostAsUserDTO postAsUserDTO) {
+    public User setPropertiesFromPostAsUserDTO(PostAsUserDTO postAsUserDTO) {
         User user = new User();
         user.setUsername(postAsUserDTO.getUsername());
         user.setPassword(postAsUserDTO.getPassword());

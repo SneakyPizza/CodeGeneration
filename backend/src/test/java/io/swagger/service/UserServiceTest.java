@@ -2,6 +2,7 @@ package io.swagger.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.exception.custom.NotFoundException;
+import io.swagger.model.dto.GetUserDTO;
 import io.swagger.model.dto.PostAsUserDTO;
 import io.swagger.model.dto.PostUserDTO;
 import io.swagger.model.entities.Role;
@@ -12,15 +13,20 @@ import io.swagger.services.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.annotation.Order;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class UserServiceTest {
@@ -41,6 +47,9 @@ class UserServiceTest {
     private PostUserDTO postUserDTO;
     private PostAsUserDTO postAsUserDTO;
     private List<User> userList;
+
+    private Authentication authentication;
+    SecurityContext securityContext;
 
     @BeforeEach
     void setup() {
@@ -70,21 +79,29 @@ class UserServiceTest {
         postAsUserDTO.setZipcode("test");
         postAsUserDTO.setDayLimit(new BigDecimal(10000));
         postAsUserDTO.setTransactionLimit(new BigDecimal(500));
+
+        authentication = mock(Authentication.class);
+        securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication().getName()).thenReturn("test");
     }
 
     @Test
+    // mock securitycontext to test the user service
     void getUser() {
-//        userList = userService.getAllUsers(0, 1);
-        testUser = userService.getUser(UUID.fromString(String.valueOf(userList.get(0).getId())));
+        userService = mock(UserService.class);
+        List<GetUserDTO> userDTOS = userService.getAllUsers(0, 10);
+        testUser = userService.getUser(userDTOS.get(0).getUserid());
         assertUser(testUser);
     }
 
     @Test
     void getAllUsers() {
-//        userList = userService.getAllUsers(0, 1);
-        Assertions.assertEquals(1, userList.size());
-        Assertions.assertEquals("test", userList.get(0).getUsername());
-        Assertions.assertTrue(passwordEncoder.matches("test", userList.get(0).getPassword()));
+        List<GetUserDTO> userDTOS = userService.getAllUsers(0, 10);
+        Assertions.assertEquals(1, userDTOS.size());
+        Assertions.assertEquals("test", userDTOS.get(0).getUsername());
+        Assertions.assertTrue(passwordEncoder.matches("test", userDTOS.get(0).getPassword()));
     }
 
     @Test
