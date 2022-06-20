@@ -1,5 +1,6 @@
 package io.swagger.service;
 
+import io.swagger.exception.custom.NotFoundException;
 import io.swagger.model.AccountDTO;
 import io.swagger.model.dto.NameSearchAccountDTO;
 import io.swagger.model.dto.PostAccountDTO;
@@ -8,8 +9,8 @@ import io.swagger.model.dto.PostAccountDTO.ActiveEnum;
 import io.swagger.model.entities.User;
 import io.swagger.repositories.AccountRepository;
 import io.swagger.repositories.UserRepository;
+import io.swagger.services.AccountService;
 import io.swagger.services.UserService;
-import io.swagger.services.accountService;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -36,7 +37,7 @@ import static org.mockito.Mockito.when;
 public class AccountServiceTest {
 
     @Autowired
-    private accountService accountService;
+    private AccountService accountService;
 
     @Autowired
     private AccountRepository accountRepository;
@@ -66,8 +67,8 @@ public class AccountServiceTest {
         testUser = new User();
         adminUser = new User();
 
-        testUser = userRepository.findByUsername("test");
-        adminUser = userRepository.findByUsername("Bank");
+        testUser = userRepository.findByUsername("test").orElseThrow(() -> new NotFoundException("User not found"));;
+        adminUser = userRepository.findByUsername("Bank").orElseThrow(() -> new NotFoundException("User not found"));;
         fullname = new String("test-test");
 
         postaccountdto = new PostAccountDTO();
@@ -97,7 +98,7 @@ public class AccountServiceTest {
     @Test
     public void B_getAllAccounts(){
         when(securityContext.getAuthentication().getName()).thenReturn("Bank");
-        testUser = userRepository.findByUsername("Bank");
+        testUser = userRepository.findByUsername("Bank").orElseThrow(() -> new NotFoundException("User not found"));
         //List<NameSearchAccountDTO> dtos = accountService.searchAccountDTOs(fullname, 10, 10, testUser);
         List<AccountDTO> dtos = accountService.getAllAccounts(testUser);
         Assertions.assertEquals(dtos.size(), accountService.getAllAccounts(testUser).size());
@@ -115,7 +116,7 @@ public class AccountServiceTest {
     @Test
     public void D_searchAccountDTOs(){
         when(securityContext.getAuthentication().getName()).thenReturn("test");
-        testUser = userRepository.findByUsername("test");
+        testUser = userRepository.findByUsername("test").orElseThrow(() -> new NotFoundException("User not found"));
         List<NameSearchAccountDTO> dtos = accountService.searchAccountDTOs(fullname, 10, 10, testUser);
         Assertions.assertEquals(dtos.size(), accountService.searchAccountDTOs(fullname, 10, 10, testUser).size());
     }

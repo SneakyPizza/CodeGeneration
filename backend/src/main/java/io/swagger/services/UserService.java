@@ -217,6 +217,10 @@ public class UserService {
         }
         return getUserDTOs;
     }
+    
+    public boolean checkIfUserExists(UUID id) {
+        return userRepository.existsById(id);
+    }
 
 
 }
