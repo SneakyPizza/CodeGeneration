@@ -10,9 +10,11 @@ import TransactionHistory from "./components/TransactionHistory";
 import DoTransaction from "./components/DoTransaction";
 import PostUser from "@/components/PostUser";
 import Signup from "@/components/Signup";
+ import AdminManageUsers from "@/components/AdminManageUsers";
 
 
 axios.defaults.headers.common['Authorization'] = `Bearer ${store.state.token}`;
+axios.defaults.baseURL = "http://localhost:8080";
 
 const routes = [
     { path: '/UserOverview', component: UserOverview, meta: {reqToken: true, adminOnly: false, }},
@@ -21,6 +23,7 @@ const routes = [
     { path: '/Transaction/:iban', name: 'Transaction', component: DoTransaction, meta: {reqToken: true, adminOnly: false, params: true}},
     { path: '/postUser', name: 'postUser', component: PostUser, meta: {reqToken: true, adminOnly: true, params: true}},
     { path: '/signup', name: 'signup', component: Signup, meta: {reqToken: false, adminOnly: false, params: true}},
+    { path: '/AdminManageUsers', name: 'AdminManageUsers', component: AdminManageUsers, meta: {reqToken: true, adminOnly: true, params: true}},
 ];
 
 

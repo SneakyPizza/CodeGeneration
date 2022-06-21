@@ -14,5 +14,12 @@ export default {
         return axios
             .put(url + '/Users/' + id, data)
             .then(response => response);
+    },
+    getAllUsers(token, limit, offset) {
+        //create Authorization header from token
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        return axios
+            .get(url + '/Users?limit=' + limit + '&offset=' + offset)
+            .then(response => response);
     }
 }
