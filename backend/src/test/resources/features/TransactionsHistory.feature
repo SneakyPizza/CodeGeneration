@@ -5,8 +5,8 @@ Feature: Everything transaction history
     Given I have an valid user token
     And I provide the correct user IBAN
     When I call the transaction history endpoint
-    Then History the result is a status of 204
-    And Body is Null
+    Then History the result is a status of 404
+    And 'History 'I have a error object with message "Account has no transactions"
 
   Scenario: Getting transaction history admin
     Given I have an valid admin token

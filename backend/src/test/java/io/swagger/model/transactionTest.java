@@ -139,15 +139,17 @@ public class transactionTest {
         transaction.setTimestamp(l);
         User user = new User();
         transaction.setTarget(account);
+        transaction.setId(UUID.randomUUID());
         transaction.setOrigin(account);
         transaction.setPerformer(user);
+        transaction.setType(TransactionType.DEPOSIT);
         account.setUser(user);
         GetTransactionDTO transactionDTO = transaction.toGetTransactionDTO();
         assertEquals(iban, transactionDTO.getFromIBAN());
         assertEquals(iban, transactionDTO.getToIBAN());
         assertEquals(b, transactionDTO.getAmount());
         //timestamp must be formatted
-        assertEquals(l.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), LocalDateTime.parse(transactionDTO.getTimestamp()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        assertEquals(l.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), LocalDateTime.parse(transactionDTO.getTimestamp()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
         assertEquals(user.getId(), transactionDTO.getFromUserId());
     }
 
