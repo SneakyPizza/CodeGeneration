@@ -2,8 +2,11 @@
   <Navigation />
   <section>
     <div class="container-lg">
-      <h1 class="blue mt-3 mt-lg-3">All users</h1>
-      <div class="row mt-4 ">
+      <div class="row">
+        <div class="col-10"> <h1 class="blue mt-1">All users</h1></div>
+        <div class="col"> <button class="btn btn-primary float-right" @click="addUser">Add user</button></div>
+      </div>
+      <div class="row mt-2 ">
         <div v-if="errorMessage" class="alert alert-danger" role="alert">
           {{ errorMessage }}
         </div>
@@ -16,12 +19,16 @@
             <div class="card p-3">
 <!--              row with first and last Name-->
               <div class="row m-3">
-                <div class="col-6">
-                  <h4>First name: {{ user.firstName }} <br>Last name: {{ user.lastName }} <br/> Email: {{user.email}}</h4>
+                <div class="col-5">
+                  <h4>First name: {{ user.firstName }} <br>Last name: {{ user.lastName }} <br/> Email: {{user.email}}
+                    <br>DayLimit: {{user.dayLimit}} euro</h4>
                 </div>
-                <div class="col-6">
+                <div class="col-5">
                   <h4>Status: {{user.userstatus}}</h4>
                   <h4>Accounts:</h4> <h4 v-for="(Accounts,index) in user.Accounts" v-bind:key="Accounts">{{index + 1}}: {{Accounts}}</h4>
+                </div>
+                <div class="col">
+                  <button class="btn btn-primary" @click="updateUser(user.userid)">Edit</button>
                 </div>
               </div>
             </div>
@@ -56,6 +63,14 @@ export default {
                 return Users.firstName.match(this.search);
             });
         }
+    },
+    methods: {
+      async addUser() {
+        await this.$router.push({name: 'PostUser'});
+      },
+      async updateUser(id) {
+        await this.$router.push({name: 'UpdateUser', params: {id: id}});
+      },
     },
   async created() {
     console.log("Home created");
@@ -98,6 +113,11 @@ export default {
 /*  overflow scroll*/
   max-height: 700px;
   overflow-y: scroll;
+}
+.float-right{
+  float: right;
+/*  center hight*/
+  margin-top: 30px;
 }
 </style>
 
