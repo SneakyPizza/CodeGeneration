@@ -13,6 +13,7 @@ import io.swagger.model.entities.UserStatus;
 import io.swagger.repositories.UserRepository;
 import io.swagger.jwt.JwtTokenProvider;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -127,6 +128,7 @@ public class UserService {
         else {
             User user = new User();
             user = user.setPropertiesFromPostUserDTO(postUserDTO);
+            user.setId(id);
             return userRepository.save(user);
         }
     }
@@ -178,7 +180,7 @@ public class UserService {
     private boolean validateIfAdmin() {
         // gets user from security context
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUsername(name).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new UnauthorizedException(UNAUTHORIZED));
         return user.getRoles().get(0).equals(Role.ROLE_ADMIN);
     }
 
@@ -224,7 +226,7 @@ public class UserService {
     }
 
     private List<GetUserDTO> getUserDTOs(List<User> users) {
-        List<GetUserDTO> getUserDTOs = new java.util.ArrayList<>();
+        List<GetUserDTO> getUserDTOs = new ArrayList<>();
         for (User user : users) {
             getUserDTOs.add(user.getGetUserDTO());
         }
