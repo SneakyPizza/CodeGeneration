@@ -8,7 +8,7 @@ import io.swagger.model.dto.JwtDTO;
 import io.swagger.model.dto.PostAsUserDTO;
 import io.swagger.model.entities.Role;
 import io.swagger.model.dto.PostUserDTO;
-import io.swagger.model.entities.User;
+import io.swagger.model.entities.Users;
 import io.swagger.model.entities.UserStatus;
 import io.swagger.repositories.UserRepository;
 import io.swagger.jwt.JwtTokenProvider;
@@ -52,7 +52,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User getUser(String receivedId) {
+    public Users getUser(String receivedId) {
         if (validateUUID(receivedId)) {
             id = UUID.fromString(receivedId);
         }
@@ -89,7 +89,7 @@ public class UserService {
         }
     }
 
-    public User createUserAdmin(PostUserDTO postUserDTO) {
+    public Users createUserAdmin(PostUserDTO postUserDTO) {
         if (!validateIfAdmin()) {
             throw new ForbiddenException(UNAUTHORIZED);
         }
@@ -97,15 +97,15 @@ public class UserService {
             throw new IllegalArgumentException(WRONG_FIELDS_MESSAGE);
         }
         else {
-            User user = new User();
-            user = user.setPropertiesFromPostUserDTO(postUserDTO);
-            user.setPincode(pincodeGenerator.generatePincode());
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            return userRepository.save(user);
+            Users users = new Users();
+            users = users.setPropertiesFromPostUserDTO(postUserDTO);
+            users.setPincode(pincodeGenerator.generatePincode());
+            users.setPassword(passwordEncoder.encode(users.getPassword()));
+            return userRepository.save(users);
         }
     }
 
-    public User updateUser(PostUserDTO postUserDTO, String receivedId) {
+    public Users updateUser(PostUserDTO postUserDTO, String receivedId) {
         if (!validateIfAdmin()) {
             throw new ForbiddenException(UNAUTHORIZED);
         }
@@ -139,15 +139,15 @@ public class UserService {
         }
     }
 
-    public List<User> findByFirstName(String firstname){
+    public List<Users> findByFirstName(String firstname){
         return userRepository.findByFirstName(firstname).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
 
-    public List<User> findByLastName(String lastname){
+    public List<Users> findByLastName(String lastname){
         return userRepository.findByLastName(lastname).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
 
-    public User findByUsername(String username) {
+    public Users findByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
 
@@ -160,11 +160,11 @@ public class UserService {
     }
 
     private boolean validateLogin (String username, String password) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
-        if (user == null) {
+        Users users = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+        if (users == null) {
             return false;
         }
-        return passwordEncoder.matches(password, user.getPassword());
+        return passwordEncoder.matches(password, users.getPassword());
     }
 
     private boolean validateUUID(String id) {
@@ -174,9 +174,9 @@ public class UserService {
 
     private boolean validateIfUserOwnsThisUser(UUID id) {
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUsername(name).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
-        User userToCompare = userRepository.findById(id).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
-        return user.getId().equals(userToCompare.getId());
+        Users users = userRepository.findByUsername(name).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+        Users usersToCompare = userRepository.findById(id).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+        return users.getId().equals(usersToCompare.getId());
     }
 
     private boolean validateUserExists(UUID id) {
@@ -216,23 +216,23 @@ public class UserService {
         user.setDayLimit(postAsUserDTO.getDayLimit());
         user.setTransactionLimit(postAsUserDTO.getTransactionLimit());
 
-        user.setPincode(pincodeGenerator.generatePincode());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setUserstatus(UserStatus.DISABLED);
-        user.setRoles(Collections.singletonList(Role.ROLE_USER));
-        return user;
+        users.setPincode(pincodeGenerator.generatePincode());
+        users.setPassword(passwordEncoder.encode(users.getPassword()));
+        users.setUserstatus(UserStatus.DISABLED);
+        users.setRoles(Collections.singletonList(Role.ROLE_USER));
+        return users;
     }
 
     private boolean validateOffset(Integer offset) {
-        List<User> users = (List<User>) userRepository.findAll();
+        List<Users> users = (List<Users>) userRepository.findAll();
         return offset != null && offset >= 0 && offset < (users.size() - 1);
     }
 
     private JwtDTO createJwtDTO(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+        Users users = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
         JwtDTO jwtDTO = new JwtDTO();
-        jwtDTO.setJwtToken(tokenProvider.createToken(user.getUsername(), user.getRoles()));
-        jwtDTO.setId(user.getId().toString());
+        jwtDTO.setJwtToken(tokenProvider.createToken(users.getUsername(), users.getRoles()));
+        jwtDTO.setId(users.getId().toString());
         return jwtDTO;
     }
 

@@ -9,10 +9,8 @@ import io.swagger.model.entities.Role;
 import io.swagger.model.dto.NameSearchAccountDTO;
 import io.swagger.model.dto.PostAccountDTO;
 import io.swagger.model.entities.Account;
-import io.swagger.model.entities.User;
-import io.swagger.models.Model;
+import io.swagger.model.entities.Users;
 import io.swagger.repositories.AccountRepository;
-import io.swagger.repositories.UserRepository;
 import io.swagger.utils.ibanGenerator;
 
 import java.math.BigDecimal;
@@ -35,24 +33,24 @@ public class AccountService {
     private ibanGenerator ibanGen = new ibanGenerator();
 
     //Add a new account object to the database (POST)
-    public PostAccountDTO addAccount(PostAccountDTO account, User user) {
-        validateUserRoleAdmin(user);
+    public PostAccountDTO addAccount(PostAccountDTO account, Users users) {
+        validateUserRoleAdmin(users);
         validatePostAccountDTO(account);
 
-        Account<User> a = new Account<>();
+        Account<Users> a = new Account<>();
         a.setAbsoluteLimit(account.getAbsoluteLimit());
         a.setBalance(new BigDecimal(0));
         a.setAccountType(Account.AccountTypeEnum.fromValue(account.getAccountType().toString()));
         a.setActive(Account.ActiveEnum.fromValue(account.getActive().toString()));
-        a.setUser(userService.getUser(account.getUserid().toString()));
+        a.setUsers(userService.getUser(account.getUserid().toString()));
         a.setIBAN(ibanGen.GenerateIban());
         accountRepository.save(a);
         return account;
     }
     
     //Get all accounts (GET)
-    public List<AccountDTO> getAllAccounts(User user){
-        validateUserRoleAdmin(user);
+    public List<AccountDTO> getAllAccounts(Users users){
+        validateUserRoleAdmin(users);
         List<Account> accounts = (List<Account>) accountRepository.findAll();
         List<AccountDTO> dto = new ArrayList();
         for(Account account : accounts){
@@ -63,18 +61,18 @@ public class AccountService {
 
     
     //Get a Account with IBAN (GET)
-    public AccountDTO getAccountDTOWithIBAN(String iban, User user){
-        validateUserRoleAdmin(user, iban);
+    public AccountDTO getAccountDTOWithIBAN(String iban, Users users){
+        validateUserRoleAdmin(users, iban);
         validateIban(iban);
-        Account<User> account = getAccountWithIBAN(iban);
+        Account<Users> account = getAccountWithIBAN(iban);
         if(account == null){
             throw new IllegalArgumentException("account is not found");
         }
         return account.toAccountDTO();
     }
 
-    public List<NameSearchAccountDTO> searchAccountDTOs(String fullname, int limit, int offset, User user){
-    validateUserRoleUser(user);
+    public List<NameSearchAccountDTO> searchAccountDTOs(String fullname, int limit, int offset, Users users){
+    validateUserRoleUser(users);
     validateNameSearchRequest(fullname, limit, offset);
 
     return findAccountUsers(splitFullNameToUsers(fullname));
@@ -91,37 +89,37 @@ public class AccountService {
     }
 
     //update an account object to the database
-    public AccountDTO updateAccount(String iban, AccountDTO account, User user) {
+    public AccountDTO updateAccount(String iban, AccountDTO account, Users users) {
         validateIban(iban);
-        validateUserRoleAdmin(user);
+        validateUserRoleAdmin(users);
         validateAccountDTO(account);
-        Account<User> a = getAccountWithIBAN(iban);
+        Account<Users> a = getAccountWithIBAN(iban);
         a.setAccountType(Account.AccountTypeEnum.fromValue(account.getAccountType().toString()));
         a.setActive(Account.ActiveEnum.fromValue(account.getActive().toString()));
         a.setAbsoluteLimit(account.getAbsoluteLimit());
         a.setBalance(account.getBalance());
         a.setIBAN(account.getIBAN());
-        a.setUser(userService.getUser(account.getUserid().toString()));
+        a.setUsers(userService.getUser(account.getUserid().toString()));
         accountRepository.save(a);
         return account;
     }
 
     private List<Account> findByUserId(UUID userid){
-        return accountRepository.findByUserId(userid);
+        return accountRepository.findByUsersId(userid);
     }
 
     public Object findByIBAN(String iban) {return accountRepository.findByIBAN(iban);}
 
     //Boolean checks / Validations
     
-    private boolean checkIfUserRoleAdmin(User user){
+    private boolean checkIfUserRoleAdmin(Users users){
         //return user.getRoles().contains(Role.ROLE_ADMIN);
-        return user.getRoles().get(0).equals(Role.ROLE_ADMIN);
+        return users.getRoles().get(0).equals(Role.ROLE_ADMIN);
     }
 
-    private boolean checkIfUserRoleUser(User user){
+    private boolean checkIfUserRoleUser(Users users){
         //return user.getRoles().contains(Role.ROLE_USER);
-        return user.getRoles().get(0).equals(Role.ROLE_USER);
+        return users.getRoles().get(0).equals(Role.ROLE_USER);
     }
 
     private boolean checkIban(String iban){
@@ -193,19 +191,19 @@ public class AccountService {
         return enumcheck == 1;
     }
 
-    private void validateUserRoleAdmin(User user){
-        if(!checkIfUserRoleAdmin(user)){
+    private void validateUserRoleAdmin(Users users){
+        if(!checkIfUserRoleAdmin(users)){
             throw new UnauthorizedException("You need to be a admin to preform this action");
         }
     }
 
-    private void validateUserRoleUser(User user){
-        if(!checkIfUserRoleUser(user) && !checkIfUserRoleAdmin(user)){
+    private void validateUserRoleUser(Users users){
+        if(!checkIfUserRoleUser(users) && !checkIfUserRoleAdmin(users)){
             throw new UnauthorizedException("You need to be a User to preform this action");
         }
     }
 
-    private void validateUserRoleAdmin(User users, String iban){
+    private void validateUserRoleAdmin(Users users, String iban){
         if(!checkIfUserRoleAdmin(users) && users.getAccounts().stream().noneMatch(a -> a.getIBAN().equals(iban))){
             throw new UnauthorizedException("You need to be a admin to preform this action or own the account");
         }
@@ -217,8 +215,8 @@ public class AccountService {
         }
     }
 
-    private Account<User> getAccountWithIBAN (String iban){
-        return (Account<User>) accountRepository.findByIBAN(iban);
+    private Account<Users> getAccountWithIBAN (String iban){
+        return (Account<Users>) accountRepository.findByIBAN(iban);
     }
 
     public void validatePostAccountDTO(PostAccountDTO postaccountdto){
@@ -245,23 +243,23 @@ public class AccountService {
         }
     }
 
-    private List<User> splitFullNameToUsers(String fullname){
-        List<User> users = new ArrayList<User>();
+    private List<Users> splitFullNameToUsers(String fullname){
+        List<Users> users = new ArrayList<Users>();
         String[] split = fullname.toLowerCase().split("-");
         for(int i = 0; i < split.length;i++){
             if(!split[i].isEmpty()){
-                List<User> user_fname = userService.findByFirstName(split[i]);
-                List<User> user_lname = userService.findByLastName(split[i]);
-                users.addAll(user_fname);
-                users.addAll(user_lname);
+                List<Users> users_fname = userService.findByFirstName(split[i]);
+                List<Users> users_lname = userService.findByLastName(split[i]);
+                users.addAll(users_fname);
+                users.addAll(users_lname);
             }
         }
         return users;
     }
     
-    private List<NameSearchAccountDTO> findAccountUsers(List<User> users){
+    private List<NameSearchAccountDTO> findAccountUsers(List<Users> users){
         List<NameSearchAccountDTO> dtos = new ArrayList<NameSearchAccountDTO>();
-        for (User user : users) {
+        for (Users user : users) {
             List<Account> user_accounts = findByUserId(user.getId());
             for (Account account : user_accounts){
                 NameSearchAccountDTO dto = user.toNameSearchAccountDTO(account.getIBAN());
