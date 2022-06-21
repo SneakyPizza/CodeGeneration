@@ -10,8 +10,11 @@
       <li>
            <router-link to="/Logout" class="Dark_Blue nav-link" active-class="active">Logout</router-link>
       </li>
+<!--        v-if user from store has role admin-->
+      <li v-if="user.roles[0] === 'admin' || user.roles[1] === 'admin'">
+           <router-link to="/PostUser" class="Dark_Blue nav-link" active-class="active">Admin</router-link>
+      </li>
       </ul>
-
     </div>
   </nav>
 </template>
@@ -22,6 +25,11 @@ export default {
   name: "Navigation",
   data() {
 
+  },
+  computed:{
+    user(){
+      return this.$store.state.user;
+    },
   },
 }
 </script>

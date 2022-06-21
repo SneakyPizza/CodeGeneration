@@ -7,5 +7,12 @@ export default {
         return axios
             .get(url + '/Users/' + id)
             .then(response => response);
+    },
+    updateUser(id, data, token) {
+        //create Authorization header from token
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        return axios
+            .put(url + '/Users/' + id, data)
+            .then(response => response);
     }
 }

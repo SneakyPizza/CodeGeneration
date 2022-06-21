@@ -13,10 +13,7 @@ import io.swagger.model.entities.UserStatus;
 import io.swagger.repositories.UserRepository;
 import io.swagger.jwt.JwtTokenProvider;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import io.swagger.utils.PincodeGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +45,7 @@ public class UserService {
 
     private static final String USER_NOT_FOUND = "User not found";
     private static final String UNAUTHORIZED = "You are not authorized to perform this action";
-    private static final String NULL_MESSAGE = "All fields must be filled in";
+    private static final String WRONG_FIELDS_MESSAGE = "All fields must be filled in";
 
     public UserService (UserRepository userRepository) {
         pincodeGenerator = new PincodeGenerator();
@@ -84,8 +81,8 @@ public class UserService {
     }
 
     public User createUser(PostAsUserDTO postAsUserDTO) {
-        if (validateUserFieldsNullAsUser(postAsUserDTO)) {
-            throw new IllegalArgumentException(NULL_MESSAGE);
+        if (validateUserFieldsNullOrEmptyAsUser(postAsUserDTO)) {
+            throw new IllegalArgumentException(WRONG_FIELDS_MESSAGE);
         }
         else {
             return userRepository.save(convertPostAsUserDTOtoUser(postAsUserDTO));
@@ -96,8 +93,8 @@ public class UserService {
         if (!validateIfAdmin()) {
             throw new ForbiddenException(UNAUTHORIZED);
         }
-        else if (validateUserFieldsNullAsAdmin(postUserDTO)) {
-            throw new IllegalArgumentException(NULL_MESSAGE);
+        else if (validateUserFieldsNullOrEmptyAsAdmin(postUserDTO)) {
+            throw new IllegalArgumentException(WRONG_FIELDS_MESSAGE);
         }
         else {
             User user = new User();
@@ -119,8 +116,8 @@ public class UserService {
             id = UUID.fromString(receivedId);
         }
 
-        if (validateUserFieldsNullAsAdmin(postUserDTO)) {
-            throw new IllegalArgumentException(NULL_MESSAGE);
+        if (validateUserFieldsNullOrEmptyAsAdmin(postUserDTO)) {
+            throw new IllegalArgumentException(WRONG_FIELDS_MESSAGE);
         }
         else if (!validateUserExists(id)) {
             throw new NotFoundException(USER_NOT_FOUND);
@@ -184,12 +181,13 @@ public class UserService {
         return user.getRoles().get(0).equals(Role.ROLE_ADMIN);
     }
 
-    private boolean validateUserFieldsNullAsUser(PostAsUserDTO postAsUserDTO) {
-        return postAsUserDTO.getFirstName() == null || postAsUserDTO.getLastName() == null || postAsUserDTO.getUsername() == null || postAsUserDTO.getPassword() == null || postAsUserDTO.getEmail() == null || postAsUserDTO.getStreet() == null || postAsUserDTO.getCity() == null || postAsUserDTO.getZipcode() == null || postAsUserDTO.getDayLimit() == null || postAsUserDTO.getTransactionLimit() == null;
+    private boolean validateUserFieldsNullOrEmptyAsUser(PostAsUserDTO postAsUserDTO) {
+        return postAsUserDTO.getFirstName() == null || postAsUserDTO.getLastName() == null || postAsUserDTO.getUsername() == null || postAsUserDTO.getPassword() == null || postAsUserDTO.getEmail() == null || postAsUserDTO.getStreet() == null || postAsUserDTO.getCity() == null || postAsUserDTO.getZipcode() == null || postAsUserDTO.getDayLimit() == null || postAsUserDTO.getTransactionLimit() == null || Objects.equals(postAsUserDTO.getFirstName(), "") || Objects.equals(postAsUserDTO.getLastName(), "") || Objects.equals(postAsUserDTO.getUsername(), "") || Objects.equals(postAsUserDTO.getPassword(), "") || Objects.equals(postAsUserDTO.getEmail(), "") || Objects.equals(postAsUserDTO.getStreet(), "") || Objects.equals(postAsUserDTO.getCity(), "") || Objects.equals(postAsUserDTO.getZipcode(), "");
+
     }
 
-    private boolean validateUserFieldsNullAsAdmin(PostUserDTO postUserDTO) {
-        return postUserDTO.getFirstName() == null || postUserDTO.getLastName() == null || postUserDTO.getUsername() == null || postUserDTO.getPassword() == null || postUserDTO.getEmail() == null || postUserDTO.getStreet() == null || postUserDTO.getCity() == null || postUserDTO.getZipcode() == null || postUserDTO.getDayLimit() == null || postUserDTO.getTransactionLimit() == null || postUserDTO.getRoles() == null || postUserDTO.getUserstatus() == null;
+    private boolean validateUserFieldsNullOrEmptyAsAdmin(PostUserDTO postUserDTO) {
+        return postUserDTO.getFirstName() == null || postUserDTO.getLastName() == null || postUserDTO.getUsername() == null || postUserDTO.getPassword() == null || postUserDTO.getEmail() == null || postUserDTO.getStreet() == null || postUserDTO.getCity() == null || postUserDTO.getZipcode() == null || postUserDTO.getDayLimit() == null || postUserDTO.getTransactionLimit() == null || postUserDTO.getRoles() == null || postUserDTO.getUserstatus() == null || Objects.equals(postUserDTO.getFirstName(), "") || Objects.equals(postUserDTO.getLastName(), "") || Objects.equals(postUserDTO.getUsername(), "") || Objects.equals(postUserDTO.getPassword(), "") || Objects.equals(postUserDTO.getEmail(), "") || Objects.equals(postUserDTO.getStreet(), "") || Objects.equals(postUserDTO.getCity(), "") || Objects.equals(postUserDTO.getZipcode(), "");
     }
 
     private User convertPostAsUserDTOtoUser(PostAsUserDTO postAsUserDTO) {
