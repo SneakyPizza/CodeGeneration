@@ -3,11 +3,8 @@ package io.swagger.cucumber.steps.Transaction;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java8.En;
 import io.swagger.cucumber.steps.BaseStepDefinitions;
+import io.swagger.model.dto.ErrorDTO;
 import io.swagger.model.dto.GetTransactionDTO;
-import io.swagger.model.dto.JWT_DTO;
-import io.swagger.model.dto.LoginDTO;
-import lombok.extern.slf4j.Slf4j;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -26,7 +23,7 @@ public class HistoryStepDefinitions  extends BaseStepDefinitions implements En {
     @Value("${io.swagger.api.token_ADMIN}")
     private String VALID_TOKEN_ADMIN;
     private static final String INVALID_TOKEN = "invalid";
-    private static final String USER_IBAN = "NL01INHO0000000002";
+    private static final String USER_IBAN = "NL01INHO0000000003";
     private static final String ADMIN_IBAN = "NL01INHO0000000001";
     private static final String IBAN_INVALID = "invalid";
 
@@ -40,6 +37,7 @@ public class HistoryStepDefinitions  extends BaseStepDefinitions implements En {
 
     private Integer status;
     private List<GetTransactionDTO> dto;
+    private ErrorDTO error;
     private String token;
     private String IBAN;
 
@@ -84,6 +82,28 @@ public class HistoryStepDefinitions  extends BaseStepDefinitions implements En {
         Then("^The result is a list of transactions of size 1$", () -> {
             dto = mapper.readValue(response.getBody(), mapper.getTypeFactory().constructCollectionType(List.class, GetTransactionDTO.class));
             Assertions.assertEquals(1, dto.size());
+        });
+        And("^Body is Null$", () -> {
+            Assertions.assertNull(response.getBody());
+        });
+
+        And("^'History 'I have a error object with message \"([^\"]*)\"$", (String arg0) -> {
+            error = mapper.readValue(response.getBody(), ErrorDTO.class);
+            Assertions.assertEquals(arg0, error.getMessage());
+            Assertions.assertNotNull(error.getTimestamp());
+            Assertions.assertNotNull(error.getStatus());
+            Assertions.assertNotNull(error.getError());
+        });
+
+
+        And("^It contains a transaction object$", () -> {
+            dto = mapper.readValue(response.getBody(), mapper.getTypeFactory().constructCollectionType(List.class, GetTransactionDTO.class));
+            Assertions.assertNotNull(dto.get(0).getType());
+            Assertions.assertNotNull(dto.get(0).getAmount());
+            Assertions.assertNotNull(dto.get(0).getTimestamp());
+            Assertions.assertNotNull(dto.get(0).getFromUserId());
+            Assertions.assertNotNull(dto.get(0).getToIBAN());
+            Assertions.assertNotNull(dto.get(0).getFromIBAN());
         });
     }
 }

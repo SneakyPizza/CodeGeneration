@@ -67,7 +67,7 @@ public interface AccountsApi {
     @Operation(summary = "Creates a new bank account.", description = "", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "201", description = "Created") })
+        @ApiResponse(responseCode = "200", description = "OK") })
     @RequestMapping(value = "/Accounts",
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
@@ -91,7 +91,7 @@ public interface AccountsApi {
     @RequestMapping(value = "/Accounts",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<AccountDTO>> getAllAccounts(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the result set." ,schema=@Schema(allowableValues={  }
+    ResponseEntity<? extends Object> getAllAccounts(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the result set." ,schema=@Schema(allowableValues={  }
 )) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Min(1) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return." ,schema=@Schema(allowableValues={  }, minimum="1", maximum="50"
 , defaultValue="20")) @Valid @RequestParam(value = "limit", required = false, defaultValue="20") Integer limit);
 

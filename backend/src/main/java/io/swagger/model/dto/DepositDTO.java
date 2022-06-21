@@ -3,14 +3,12 @@ package io.swagger.model.dto;
 import java.math.BigDecimal;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.UUID;
 
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
-import javax.validation.constraints.*;
 
 /**
  * DepositDTO
@@ -176,5 +174,16 @@ public class DepositDTO   {
       return "null";
     }
     return o.toString().replace("\n", "\n    ");
+  }
+
+  public PostTransactionDTO toPostTransactionDTO(String iban) {
+    PostTransactionDTO postTransactionDTO = new PostTransactionDTO();
+    postTransactionDTO.setAmount(this.amount);
+    postTransactionDTO.setFromIBAN(iban);
+    postTransactionDTO.setToIBAN(this.toIBAN);
+    postTransactionDTO.setTimestamp(this.timestamp);
+    postTransactionDTO.setPincode(this.pincode);
+    postTransactionDTO.setFromUserId(this.fromUserId);
+    return postTransactionDTO;
   }
 }

@@ -2,25 +2,25 @@ package io.swagger.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.api.TransactionsApiController;
-import io.swagger.configuration.WebSecurityConfig;
+import io.swagger.model.dto.GetTransactionDTO;
+import io.swagger.model.dto.JwtDTO;
+import io.swagger.model.dto.PostTransactionDTO;
 import io.swagger.model.entities.*;
 import io.swagger.repositories.AccountRepository;
 import io.swagger.repositories.UserRepository;
-import io.swagger.services.transactionService;
+import io.swagger.services.TransactionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.MockBeans;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -41,8 +41,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@WebMvcTest(TransactionsApiController.class)
-public class TransactionAPIControllerTest {
+//@WebMvcTest(TransactionsApiController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+class TransactionAPIControllerTest {
 
     @Autowired
     private WebApplicationContext context;
@@ -51,7 +53,7 @@ public class TransactionAPIControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private transactionService transactionService;
+    private TransactionService transactionService;
 
     @MockBean
     private AccountRepository accountRepository;
@@ -73,12 +75,10 @@ public class TransactionAPIControllerTest {
 
     public Account BankAccount;
 
+    public JwtDTO jwt;
 
     @BeforeEach
-    void setup(){
-        mockMvc = MockMvcBuilders.webAppContextSetup(context)
-                .apply(springSecurity())
-                .build();
+    void setup() throws Exception {
 
         testUser = new User();
         testUser.setUsername("test");
@@ -133,22 +133,78 @@ public class TransactionAPIControllerTest {
         transaction.setPincode("1234");
         transaction.setPerformer(Bank);
         transaction.setIBAN(BankAccount.getIBAN());
+        transaction.setType(TransactionType.TRANSFER);
         transaction.execute();
     }
 
     @Test
-    //mock user bank
-    @WithMockUser(username = "Bank", password = "Bank", roles = "ADMIN")
-    public void getAllTransactions() throws Exception {
+    @WithMockUser(username="test", password = "test" ,roles={"USER"})
+    void getAllTransactions() throws Exception {
         //create new transaction
-        List<Transaction> transactions = List.of(transaction);
-        when(transactionService.getAllTransactions()).thenReturn(transactions);
+        List<GetTransactionDTO> transactions = List.of(transaction.toGetTransactionDTO());
+        when(transactionService.getHistory(any())).thenReturn(transactions);
 
-        mockMvc.perform(get("/Transactions/NL01INHO0000000001")
+        mockMvc.perform(get("/Transactions/NL01INHO0000000001")//provide jwt token
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)));
+                .andExpect(jsonPath("$", hasSize(1)))
+                //expect GetTransactionDTO to be returned
+                .andExpect(jsonPath("$[0].amount").value(transaction.getAmount().toString()))
+                .andExpect(jsonPath("$[0].timestamp").isNotEmpty())
+                .andExpect(jsonPath("$[0].toIBAN").value(transaction.getTarget().getIBAN()))
+                .andExpect(jsonPath("$[0].fromIBAN").value(transaction.getOrigin().getIBAN()))
+                .andExpect(jsonPath("$[0].fromUserId").value(transaction.getOrigin().getUser().getId()))
+                .andExpect(jsonPath("$[0].type").value(transaction.getType().toString()));
+
+
     }
 
+
+    @Test
+    @WithMockUser(username="test", password = "test" ,roles={"USER"})
+    void getHistoryBetweenDates() throws Exception {
+        //create new transaction
+        List<GetTransactionDTO> transactions = List.of(transaction.toGetTransactionDTO());
+        when(transactionService.getHistory(any(), any(), any())).thenReturn(transactions);
+
+        mockMvc.perform(get("/Transactions/NL01INHO0000000001?dateONE=2022-04-04&dateTWO=2022-06-14")
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                //expect GetTransactionDTO to be returned
+                .andExpect(jsonPath("$[0].amount").value(transaction.getAmount().toString()))
+                .andExpect(jsonPath("$[0].timestamp").isNotEmpty())
+                .andExpect(jsonPath("$[0].toIBAN").value(transaction.getTarget().getIBAN()))
+                .andExpect(jsonPath("$[0].fromIBAN").value(transaction.getOrigin().getIBAN()))
+                .andExpect(jsonPath("$[0].fromUserId").value(transaction.getOrigin().getUser().getId()))
+                .andExpect(jsonPath("$[0].type").value(transaction.getType().toString()));
+    }
+
+    @Test
+    @WithMockUser(username="test", password = "test" ,roles={"USER"})
+    void postTransaction() throws Exception {
+        when(transactionService.doTransaction(any(), any())).thenReturn(transaction);
+
+        String post ="{\n" +
+                "  \"amount\": 999,\n" +
+                "  \"fromIBAN\": \"NL01INHO0000000001\",\n" +
+                "  \"fromUserId\": \"d36dc67d-ed99-404f-9f0b-f66497e67983\",\n" +
+                "  \"pincode\": \"1234\",\n" +
+                "  \"toIBAN\": \"NL01INHO0000000002\"\n" +
+                "}";
+
+        mockMvc.perform(post("/Transactions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(post))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.amount").value(transaction.getAmount().toString()))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
+                .andExpect(jsonPath("$.toIBAN").value(transaction.getTarget().getIBAN()))
+                .andExpect(jsonPath("$.fromIBAN").value(transaction.getOrigin().getIBAN()))
+                .andExpect(jsonPath("$.fromUserId").value(transaction.getOrigin().getUser().getId()))
+                .andExpect(jsonPath("$.type").value(transaction.getType().toString()));
+    }
 }

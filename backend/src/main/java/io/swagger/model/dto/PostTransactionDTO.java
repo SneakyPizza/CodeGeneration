@@ -15,7 +15,6 @@ import java.util.UUID;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-28T11:30:29.125Z[GMT]")
 
-
 public class PostTransactionDTO   {
   @JsonProperty("fromIBAN")
   private String fromIBAN = null;
@@ -34,6 +33,19 @@ public class PostTransactionDTO   {
 
   @JsonProperty("fromUserId")
   private UUID fromUserId = null;
+
+//constructor full
+    public PostTransactionDTO(BigDecimal amount, String fromIBAN,UUID fromUserId,String pincode,String toIBAN  ) {
+        this.fromIBAN = fromIBAN;
+        this.toIBAN = toIBAN;
+        this.pincode = pincode;
+        this.amount = amount;
+        this.fromUserId = fromUserId;
+    }
+
+    //constructor empty
+    public PostTransactionDTO() {
+    }
 
   public PostTransactionDTO fromIBAN(String fromIBAN) {
     this.fromIBAN = fromIBAN;

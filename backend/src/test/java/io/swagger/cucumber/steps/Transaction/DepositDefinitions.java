@@ -21,7 +21,7 @@ public class DepositDefinitions extends BaseStepDefinitions implements En {
     @Value("${io.swagger.api.token_ADMIN}")
     private String VALID_TOKEN_ADMIN;
    private static final String INVALID_TOKEN = "invalid";
-    private static final String VALID_TRANSACTION_USER = "{\n  \"amount\": 500,\n  \"fromUserId\": \"d36dc67d-ed99-404f-9f0b-f66497e67983\",\n  \"pincode\": \"1234\",\n  \"toIBAN\": \"NL01INHO0000000002\"\n}";
+    private static final String VALID_TRANSACTION_USER = "{\n  \"amount\": 500,\n  \"fromUserId\": \"d36dc67d-ed99-404f-9f0b-f66497e67983\",\n  \"pincode\": \"1234\",\n  \"toIBAN\": \"NL01INHO0000000003\"\n}";
     private static final String VALID_TRANSACTION_ADMIN = "{\n  \"amount\": 500,\n  \"fromUserId\": \"d36dc67d-ed99-404f-9f0b-f66497e67983\",\n  \"pincode\": \"1234\",\n  \"toIBAN\": \"NL01INHO0000000002\"\n}";
     private static final String INVALID_PIN_TRANSACTION_ADMIN = "{\n  \"amount\": 500, \"fromUserId\": \"d36dc67d-ed99-404f-9f0b-f66497e67983\",\n  \"pincode\": \"1534\",\n  \"toIBAN\": \"NL01INHO0000000002\"\n}";
     private static final String INVALID_IBAN_TRANSACTION_ADMIN = "{\n  \"amount\": 500,\n  \"fromUserId\": \"d36dc67d-ed99-404f-9f0b-f66497e67983\",\n  \"pincode\": \"1234\",\n  \"toIBAN\": \"NL01INHO0000000502\"\n}";
@@ -89,6 +89,21 @@ public class DepositDefinitions extends BaseStepDefinitions implements En {
 
         And("^'deposit' IBAN does not exist!", () -> {
             transaction = INVALID_IBAN_TRANSACTION_ADMIN;
+        });
+        And("^'Deposit' I have a error object with message \"([^\"]*)\"$", (String arg0) -> {
+            errorDTO = mapper.readValue(response.getBody(), ErrorDTO.class);
+            Assertions.assertEquals(arg0, errorDTO.getMessage());
+            Assertions.assertNotNull(errorDTO.getTimestamp());
+            Assertions.assertNotNull(errorDTO.getStatus());
+            Assertions.assertNotNull(errorDTO.getError());
+        });
+        And("^'Deposit' I should have a transaction object with type \"([^\"]*)\"$", (String arg0) -> {
+            resultTransaction = mapper.readValue(response.getBody(), GetTransactionDTO.class);
+            Assertions.assertEquals(arg0, resultTransaction.getType());
+            Assertions.assertNotNull(resultTransaction.getFromUserId());
+            Assertions.assertEquals(dto.getToIBAN(), resultTransaction.getToIBAN());
+            Assertions.assertEquals(dto.getAmount(), resultTransaction.getAmount());
+            Assertions.assertNotNull(resultTransaction.getFromIBAN());
         });
 
     }

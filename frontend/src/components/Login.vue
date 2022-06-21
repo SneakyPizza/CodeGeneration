@@ -1,7 +1,8 @@
 <template>
   <section>
 
-    <div class="container-lg">
+    <div class="container-lg mt-5">
+      <h1 class="blue heading mt-3 mt-lg-3">Inholland bank</h1>
       <div class="row">
         <div class="card main">
           <div class="card-body">
@@ -33,6 +34,7 @@
                   <button type="button" @click="login()" class="btn btn-primary">
                     Login
                   </button>
+                  <router-link :to="{name: 'signup'}" class="blue nav-link" active-class="active">Sign Up</router-link>
                 </form>
               </div>
 
@@ -45,8 +47,8 @@
 </template>
 
 <script>
-import axios from "axios";
-
+import LoginService from "@/Services/LoginService";
+import UserService from "@/Services/UserService";
 
 export default {
   name: "Login",
@@ -58,46 +60,41 @@ export default {
     };
   },
   methods: {
-    data() {
-
-    },
     // login through a store action
-    login() {
-      //log in with axios
-      // with a aplication json header
-      axios
-        .post("http://localhost:8080/login", {
+    async login() {
+      try{
+        const data = {
           username: this.username,
-          password: this.password,
-        })
-        .then((response) => {
+          password: this.password
+        }
+        console.log(data);
+        const response = await LoginService.login(data)
+        const token = response.data.JWTtoken;
+        this.$store.dispatch('setToken', { token});
+        const userId = response.data.Id;
+        //get user
+        const resp = await UserService.getUser(userId, token);
+        const user = resp.data;
+        this.$store.dispatch('setUser', { user });
 
-            //set local storage token
-            localStorage.setItem("token", response.data.JWTtoken);
-            localStorage.setItem("user", response.data.Id);
-            //set dateTime to expire today plus 1 hour
-            var date = new Date();
-            date.setHours(date.getHours() + 1);
-            localStorage.setItem("expires", date);
-
-            // redirect to the home page
-
-            this.$router.push("/");
-
-        })
-        .catch((error) => {
-          // login was not successful
-          // set the error message
-          this.errorMessage = error.response.data.message;
-        });
-
+        await this.$router.push('/UserOverview')
+      } catch(error) {
+        // login was not successful
+        // set the error message
+        this.errorMessage = error.response.data.message;
+      }
     },
   },
 };
 </script>
 
 <style>
-/*center .main */
+
+.heading{
+  font-weight: bold;
+  font-size: 60px;
+  text-align: center;
+}
 .main {
   margin: 0 auto;
   max-width: 600px;

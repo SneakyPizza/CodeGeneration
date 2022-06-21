@@ -1,20 +1,26 @@
 package io.swagger.services;
 
-import io.swagger.model.dto.JWT_DTO;
+import io.swagger.exception.custom.ForbiddenException;
+import io.swagger.exception.custom.NotFoundException;
+import io.swagger.exception.custom.UnauthorizedException;
+import io.swagger.model.dto.GetUserDTO;
+import io.swagger.model.dto.JwtDTO;
+import io.swagger.model.dto.PostAsUserDTO;
+import io.swagger.model.entities.Role;
+import io.swagger.model.dto.PostUserDTO;
 import io.swagger.model.entities.User;
+import io.swagger.model.entities.UserStatus;
 import io.swagger.repositories.UserRepository;
 import io.swagger.jwt.JwtTokenProvider;
 
-import java.awt.print.Pageable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import io.swagger.utils.PincodeGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -33,56 +39,202 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private PincodeGenerator pincodeGenerator;
+    private final PincodeGenerator pincodeGenerator;
+
+    private UUID id;
+
+    private static final String USER_NOT_FOUND = "User not found";
+    private static final String UNAUTHORIZED = "You are not authorized to perform this action";
+    private static final String WRONG_FIELDS_MESSAGE = "All fields must be filled in";
 
     public UserService (UserRepository userRepository) {
         pincodeGenerator = new PincodeGenerator();
         this.userRepository = userRepository;
     }
 
-    public User getUser(UUID id) {
-        return userRepository.findById(id).get();
+    public User getUser(String receivedId) {
+        if (validateUUID(receivedId)) {
+            id = UUID.fromString(receivedId);
+        }
+        else {
+            throw new IllegalArgumentException("Invalid UUID");
+        }
+
+        if (!validateIfUserOwnsThisUser(id) && !validateIfAdmin()) {
+            throw new UnauthorizedException(UNAUTHORIZED);
+        }
+
+        return userRepository.findById(id).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
 
-    public List<User> getUserAsList(UUID id) {
-        List<UUID> userIds = new ArrayList<>(1);
-        userIds.add(id);
-        return (List<User>) userRepository.findAllById(userIds);
+    public List<GetUserDTO> getAllUsers(Integer offset, Integer limit) {
+        if (!validateIfAdmin()) {
+            throw new ForbiddenException(UNAUTHORIZED);
+        }
+        else if (!validateOffset(offset)) {
+            throw new IllegalArgumentException("Offset should be between 0 and the total number of users");
+        }
+        else {
+            Pageable pageable = PageRequest.of(offset, limit);
+            return getUserDTOs(userRepository.findAll(pageable).getContent());
+        }
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll(); // doesnt work properly yet
+    public User createUser(PostAsUserDTO postAsUserDTO) {
+        if (validateUserFieldsNullOrEmptyAsUser(postAsUserDTO)) {
+            throw new IllegalArgumentException(WRONG_FIELDS_MESSAGE);
+        }
+        else {
+            return userRepository.save(convertPostAsUserDTOtoUser(postAsUserDTO));
+        }
     }
 
-    public User createUser(User user) {
-        user.setId(UUID.randomUUID());
-        user.setPincode(pincodeGenerator.generatePincode());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+    public User createUserAdmin(PostUserDTO postUserDTO) {
+        if (!validateIfAdmin()) {
+            throw new ForbiddenException(UNAUTHORIZED);
+        }
+        else if (validateUserFieldsNullOrEmptyAsAdmin(postUserDTO)) {
+            throw new IllegalArgumentException(WRONG_FIELDS_MESSAGE);
+        }
+        else {
+            User user = new User();
+            user = user.setPropertiesFromPostUserDTO(postUserDTO);
+            user.setPincode(pincodeGenerator.generatePincode());
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            return userRepository.save(user);
+        }
     }
 
-    public User updateUser(User user) {
-        return userRepository.save(user);
-    }
+    public User updateUser(PostUserDTO postUserDTO, String receivedId) {
+        if (!validateIfAdmin()) {
+            throw new ForbiddenException(UNAUTHORIZED);
+        }
+        else if (!validateUUID(receivedId)) {
+            throw new IllegalArgumentException("Invalid UUID");
+        }
+        else {
+            id = UUID.fromString(receivedId);
+        }
 
-    // find by username
-    public User findByUsername(String userName) {
-        return userRepository.findByUsername(userName);
+        if (validateUserFieldsNullOrEmptyAsAdmin(postUserDTO)) {
+            throw new IllegalArgumentException(WRONG_FIELDS_MESSAGE);
+        }
+        else if (!validateUserExists(id)) {
+            throw new NotFoundException(USER_NOT_FOUND);
+        }
+        else {
+            User user = new User();
+            user = user.setPropertiesFromPostUserDTO(postUserDTO);
+            user.setId(id);
+            return userRepository.save(user);
+        }
     }
 
     public List<User> findByFirstName(String firstname){
-        return userRepository.findByFirstName(firstname);
+        return userRepository.findByFirstName(firstname).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
 
     public List<User> findByLastName(String lastname){
-        return userRepository.findByLastName(lastname);
+        return userRepository.findByLastName(lastname).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
-    public JWT_DTO login(String username, String password) {
-        JWT_DTO jwt_dto = new JWT_DTO();
-        User user = userRepository.findByUsername(username);
-        jwt_dto.setJwTtoken(tokenProvider.createToken(username, user.getRoles()));
-        jwt_dto.setId(user.getId().toString());
-        return jwt_dto;
+
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
     }
+
+    public JwtDTO login(String username, String password) {
+        if (validateLogin(username, password)) {
+            return createJwtDTO(username);
+        } else {
+            throw new UnauthorizedException("Invalid username or password");
+        }
+    }
+
+    private boolean validateLogin (String username, String password) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+        if (user == null) {
+            return false;
+        }
+        return passwordEncoder.matches(password, user.getPassword());
+    }
+
+    private boolean validateUUID(String id) {
+        // check if id is correct format
+        return id.matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
+    }
+
+    private boolean validateIfUserOwnsThisUser(UUID id) {
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+        User userToCompare = userRepository.findById(id).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+        return user.getId().equals(userToCompare.getId());
+    }
+
+    private boolean validateUserExists(UUID id) {
+        return userRepository.findById(id).isPresent();
+    }
+
+    private boolean validateIfAdmin() {
+        // gets user from security context
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new UnauthorizedException(UNAUTHORIZED));
+        return user.getRoles().get(0).equals(Role.ROLE_ADMIN);
+    }
+
+    private boolean validateUserFieldsNullOrEmptyAsUser(PostAsUserDTO postAsUserDTO) {
+        return postAsUserDTO.getFirstName() == null || postAsUserDTO.getLastName() == null || postAsUserDTO.getUsername() == null || postAsUserDTO.getPassword() == null || postAsUserDTO.getEmail() == null || postAsUserDTO.getStreet() == null || postAsUserDTO.getCity() == null || postAsUserDTO.getZipcode() == null || postAsUserDTO.getDayLimit() == null || postAsUserDTO.getTransactionLimit() == null || Objects.equals(postAsUserDTO.getFirstName(), "") || Objects.equals(postAsUserDTO.getLastName(), "") || Objects.equals(postAsUserDTO.getUsername(), "") || Objects.equals(postAsUserDTO.getPassword(), "") || Objects.equals(postAsUserDTO.getEmail(), "") || Objects.equals(postAsUserDTO.getStreet(), "") || Objects.equals(postAsUserDTO.getCity(), "") || Objects.equals(postAsUserDTO.getZipcode(), "");
+
+    }
+
+    private boolean validateUserFieldsNullOrEmptyAsAdmin(PostUserDTO postUserDTO) {
+        return postUserDTO.getFirstName() == null || postUserDTO.getLastName() == null || postUserDTO.getUsername() == null || postUserDTO.getPassword() == null || postUserDTO.getEmail() == null || postUserDTO.getStreet() == null || postUserDTO.getCity() == null || postUserDTO.getZipcode() == null || postUserDTO.getDayLimit() == null || postUserDTO.getTransactionLimit() == null || postUserDTO.getRoles() == null || postUserDTO.getUserstatus() == null || Objects.equals(postUserDTO.getFirstName(), "") || Objects.equals(postUserDTO.getLastName(), "") || Objects.equals(postUserDTO.getUsername(), "") || Objects.equals(postUserDTO.getPassword(), "") || Objects.equals(postUserDTO.getEmail(), "") || Objects.equals(postUserDTO.getStreet(), "") || Objects.equals(postUserDTO.getCity(), "") || Objects.equals(postUserDTO.getZipcode(), "");
+    }
+
+    private User convertPostAsUserDTOtoUser(PostAsUserDTO postAsUserDTO) {
+        User user = new User();
+        user.setUsername(postAsUserDTO.getUsername());
+        user.setPassword(postAsUserDTO.getPassword());
+        user.setEmail(postAsUserDTO.getEmail());
+        user.setFirstName(postAsUserDTO.getFirstName());
+        user.setLastName(postAsUserDTO.getLastName());
+        user.setStreet(postAsUserDTO.getStreet());
+        user.setCity(postAsUserDTO.getCity());
+        user.setZipcode(postAsUserDTO.getZipcode());
+        user.setDayLimit(postAsUserDTO.getDayLimit());
+        user.setTransactionLimit(postAsUserDTO.getTransactionLimit());
+
+        user.setPincode(pincodeGenerator.generatePincode());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setUserstatus(UserStatus.DISABLED);
+        user.setRoles(Collections.singletonList(Role.ROLE_USER));
+        return user;
+    }
+
+    private boolean validateOffset(Integer offset) {
+        List<User> users = (List<User>) userRepository.findAll();
+        return offset != null && offset >= 0 && offset < (users.size() - 1);
+    }
+
+    private JwtDTO createJwtDTO(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+        JwtDTO jwtDTO = new JwtDTO();
+        jwtDTO.setJwtToken(tokenProvider.createToken(user.getUsername(), user.getRoles()));
+        jwtDTO.setId(user.getId().toString());
+        return jwtDTO;
+    }
+
+    private List<GetUserDTO> getUserDTOs(List<User> users) {
+        List<GetUserDTO> getUserDTOs = new ArrayList<>();
+        for (User user : users) {
+            getUserDTOs.add(user.getGetUserDTO());
+        }
+        return getUserDTOs;
+    }
+    
+    public boolean checkIfUserExists(UUID id) {
+        return userRepository.existsById(id);
+    }
+
+
 }
 
