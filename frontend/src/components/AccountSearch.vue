@@ -25,9 +25,11 @@
 </template>
 
 <script>
+
 export default {
 
     name: "SearchResultList",
+
     data() {
         return {
             results: [
