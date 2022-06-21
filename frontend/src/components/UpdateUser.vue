@@ -1,6 +1,6 @@
 <template>
+  <navigation />
   <section>
-
     <div class="container-lg mt-5">
       <h1 class="blue heading mt-3 mt-lg-3">Inholland bank</h1>
       <div class="row">
@@ -13,105 +13,118 @@
                   {{ errorMessage }}
                 </div>
                 <form>
-                  <div class="row">
-                    <div class="col-6">
-                      <div class="mb-3">
-                        <label for="inputUsername" class="form-label">Username</label>
-                        <input
-                            id="inputUsername"
-                            type="text"
-                            class="form-control"
-                            v-model="username"
-                        />
-                      </div>
-                      <div class="mb-3">
-                        <label for="inputPassword" class="form-label">Password</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="inputPassword"
-                            v-model="password"
-                        />
-                      </div>
-                      <div class="mb-3">
-                        <label for="inputEmail" class="form-label">Email</label>
-                        <input
-                            type="email"
-                            class="form-control"
-                            id="inputEmail"
-                            v-model="email"
-                        />
-                      </div>
-                      <div class="mb-3">
-                        <label for="inputFirstName" class="form-label">First Name</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="inputFirstName"
-                            v-model="firstName"
-                        />
-                      </div>
-                      <div class="mb-3">
-                        <label for="inputLastName" class="form-label">Last Name</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="inputLastName"
-                            v-model="lastName"
-                        />
-                      </div>
-                    </div>
-                    <div class="col-6">
-
-                      <div class="mb-3">
-                        <label for="inputStreet" class="form-label">Street</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="inputStreet"
-                            v-model="street"
-                        />
-                      </div>
-                      <div class="mb-3">
-                        <label for="inputCity" class="form-label">City</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="inputCity"
-                            v-model="city"
-                        />
-                      </div>
-                      <div class="mb-3">
-                        <label for="inputZipcode" class="form-label">Zipcode</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="inputZipcode"
-                            v-model="zipcode"
-                        />
-                      </div>
-                      <div class="mb-3">
-                        <label for="inputDayLimit" class="form-label">Day Limit</label>
-                        <input
-                            type="number"
-                            class="form-control"
-                            id="inputDayLimit"
-                            v-model="dayLimit"
-                        />
-                      </div>
-                      <div class="mb-3">
-                        <label for="inputTransaction" class="form-label">Transaction Limit</label>
-                        <input
-                            type="number"
-                            class="form-control"
-                            id="inputTransaction"
-                            v-model="transactionLimit"
-                        />
-                      </div>
-                    </div>
+                  <div class="mb-3">
+                    <label for="inputUsername" class="form-label">Username</label>
+                    <input
+                        id="inputUsername"
+                        type="text"
+                        class="form-control"
+                        v-model="username"
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="inputPassword" class="form-label">Password</label>
+                    <input
+                        placeholder="Optional: enter new password"
+                        type="text"
+                        class="form-control"
+                        id="inputPassword"
+                        v-model="password"
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="inputEmail" class="form-label">Email</label>
+                    <input
+                        type="email"
+                        class="form-control"
+                        id="inputEmail"
+                        v-model="email"
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="inputFirstName" class="form-label">First Name</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="inputFirstName"
+                        v-model="firstName"
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="inputLastName" class="form-label">Last Name</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="inputLastName"
+                        v-model="lastName"
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="inputStreet" class="form-label">Street</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="inputStreet"
+                        v-model="street"
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="inputCity" class="form-label">City</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="inputCity"
+                        v-model="city"
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="inputZipcode" class="form-label">Zipcode</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="inputZipcode"
+                        v-model="zipcode"
+                    />
                   </div>
 
-                  <button type="button" @click="postUser()" class="btn btn-primary">
+                  <div class="mb-3">
+                    <label for="inputUserstatus" class="form-label">User Status</label>
+                    <select class="form-select" aria-label="Default select example" id="inputUserstatus" v-model="userstatus">
+                      <option selected>Select User Status</option>
+                      <option value="active">Active</option>
+                      <option value="disabled">Disabled</option>
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="inputDayLimit" class="form-label">Day Limit</label>
+                    <input
+                        type="number"
+                        class="form-control"
+                        id="inputDayLimit"
+                        v-model="dayLimit"
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="inputTransaction" class="form-label">Transaction Limit</label>
+                    <input
+                        type="number"
+                        class="form-control"
+                        id="inputTransaction"
+                        v-model="transactionLimit"
+                    />
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="inputRole" class="form-label">Role</label>
+                    <select class="form-select" aria-label="Default select example" id="inputRole" v-model="roles">
+                      <option selected>Select User Status</option>
+                      <option value="user">User</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </div>
+
+                  <button type="button" @click="updateUser()" class="btn btn-primary">
                     Create user
                   </button>
                 </form>
@@ -126,9 +139,35 @@
 
 <script>
 import UserService from "@/Services/UserService";
+import userService from "@/Services/UserService";
+import Navigation from './Navigation.vue';
 
 export default {
   name: "UpdateUser",
+  async created() {
+    console.log("I'm created");
+    const token = this.$store.state.token;
+    try {
+      const user = await userService.getUser(this.$route.params.id, token);
+      this.username = user.data("username");
+      this.email = user.data("email");
+      this.firstName = user.data("firstName");
+      this.lastName = user.data("lastName");
+      this.street = user.data("street");
+      this.city = user.data("city");
+      this.zipcode = user.data("zipcode");
+      this.userstatus = user.data("userstatus");
+      this.dayLimit = user.data("dayLimit");
+      this.transactionLimit = user.data("transactionLimit");
+      this.roles = user.data("roles");
+    }
+    catch (error) {
+      console.log(error + " in UpdateUser created");
+    }
+  },
+  components: {
+    Navigation,
+  },
   data() {
     return {
       username: "",
@@ -142,7 +181,7 @@ export default {
       userstatus: "",
       dayLimit: "",
       transactionLimit: "",
-      role: "",
+      roles: "",
       errorMessage: null,
     };
   },
@@ -161,7 +200,7 @@ export default {
           userstatus: this.userstatus,
           dayLimit: this.dayLimit,
           transactionLimit: this.transactionLimit,
-          role: this.role,
+          roles: this.roles,
         }
         console.log(user);
         const response = await UserService.updateUser(user);
@@ -184,9 +223,9 @@ export default {
   font-size: 60px;
   text-align: center;
 }
-.main {
+.main_signUp {
   margin: 0 auto;
-  max-width: 600px;
+  max-width: 1200px;
 }
 
 </style>

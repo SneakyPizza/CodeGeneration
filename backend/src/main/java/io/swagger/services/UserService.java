@@ -126,6 +126,7 @@ public class UserService {
             User user = new User();
             user = user.setPropertiesFromPostUserDTO(postUserDTO);
             user.setId(id);
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
             return userRepository.save(user);
         }
     }

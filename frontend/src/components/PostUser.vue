@@ -1,12 +1,12 @@
 <template>
+  <navigation />
   <section>
-
     <div class="container-lg mt-5">
       <h1 class="blue heading mt-3 mt-lg-3">Inholland bank</h1>
       <div class="row">
-        <div class="card main">
+        <div class="card main_signUp">
           <div class="card-body">
-            <h1 class="card-title">Sign Up User As Admin</h1>
+            <h1 class="card-title">Sign Up</h1>
             <div class="row">
               <div class="col">
                 <div v-if="errorMessage" class="alert alert-danger" role="alert">
@@ -85,16 +85,16 @@
                         v-model="zipcode"
                     />
                   </div>
+
                   <div class="mb-3">
                     <label for="inputUserstatus" class="form-label">User Status</label>
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownUserstatus" data-bs-toggle="dropdown" aria-expanded="false">
-                      User Status
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownUserstatus">
-                      <li><a class="dropdown-item" id="inputUserstatusActive" href="#">Active</a></li>
-                      <li><a class="dropdown-item" id="inputUserstatusDisabled" href="#">Disabled</a></li>
-                    </ul>
+                    <select class="form-select" aria-label="Default select example" id="inputUserstatus" v-model="userstatus">
+                      <option selected>Select User Status</option>
+                      <option value="active">Active</option>
+                      <option value="disabled">Disabled</option>
+                    </select>
                   </div>
+
                   <div class="mb-3">
                     <label for="inputDayLimit" class="form-label">Day Limit</label>
                     <input
@@ -113,17 +113,17 @@
                         v-model="transactionLimit"
                     />
                   </div>
+
                   <div class="mb-3">
                     <label for="inputRole" class="form-label">Role</label>
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownRole" data-bs-toggle="dropdown" aria-expanded="false">
-                      Role
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownRole">
-                      <li><a class="dropdown-item" id="inputRoleUser" href="#">User</a></li>
-                      <li><a class="dropdown-item" id="inputRoleAdmin" href="#">Admin</a></li>
-                    </ul>
+                    <select class="form-select" aria-label="Default select example" id="inputRole" v-model="roles">
+                      <option selected>Select User Status</option>
+                      <option value="user">User</option>
+                      <option value="admin">Admin</option>
+                    </select>
                   </div>
-                  <button type="button" @click="postUser()" class="btn btn-primary">
+
+                  <button type="button" @click="updateUser()" class="btn btn-primary">
                     Create user
                   </button>
                 </form>
@@ -138,9 +138,13 @@
 
 <script>
 import LoginService from "@/Services/LoginService";
+import Navigation from './Navigation.vue';
 
 export default {
   name: "PostUser",
+  components: {
+    Navigation,
+  },
   data() {
     return {
       username: "",
@@ -154,7 +158,7 @@ export default {
       userstatus: "",
       dayLimit: "",
       transactionLimit: "",
-      role: "",
+      roles: "",
       errorMessage: null,
     };
   },
@@ -173,7 +177,7 @@ export default {
           userstatus: this.userstatus,
           dayLimit: this.dayLimit,
           transactionLimit: this.transactionLimit,
-          role: this.role,
+          roles: this.roles,
         }
         console.log(user);
         const response = await LoginService.postUser(user);
