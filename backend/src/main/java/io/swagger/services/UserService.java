@@ -13,6 +13,7 @@ import io.swagger.model.entities.UserStatus;
 import io.swagger.repositories.UserRepository;
 import io.swagger.jwt.JwtTokenProvider;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -43,6 +44,8 @@ public class UserService {
 
     private final PincodeGenerator pincodeGenerator;
 
+    private UUID id;
+
     private static final String USER_NOT_FOUND = "User not found";
     private static final String UNAUTHORIZED = "You are not authorized to perform this action";
     private static final String NULL_MESSAGE = "All fields must be filled in";
@@ -52,11 +55,15 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User getUser(UUID id) {
-        if (!validateUUID(id)) {
+    public User getUser(String receivedId) {
+        if (validateUUID(receivedId)) {
+            id = UUID.fromString(receivedId);
+        }
+        else {
             throw new IllegalArgumentException("Invalid UUID");
         }
-        else if (!validateIfUserOwnsThisUser(id) && !validateIfAdmin()) {
+
+        if (!validateIfUserOwnsThisUser(id) && !validateIfAdmin()) {
             throw new UnauthorizedException(UNAUTHORIZED);
         }
 
@@ -66,9 +73,6 @@ public class UserService {
     public List<GetUserDTO> getAllUsers(Integer offset, Integer limit) {
         if (!validateIfAdmin()) {
             throw new ForbiddenException(UNAUTHORIZED);
-        }
-        else if (!validateLimit(limit)) {
-            throw new IllegalArgumentException("Limit must be between 1 and 50");
         }
         else if (!validateOffset(offset)) {
             throw new IllegalArgumentException("Offset should be between 0 and the total number of users");
@@ -104,18 +108,27 @@ public class UserService {
         }
     }
 
-    public User updateUser(PostUserDTO postUserDTO) {
-        // checks if user has permissions
-        UUID id = userRepository.findByUsername(postUserDTO.getUsername()).orElseThrow().getId();
-        if (!validateIfUserOwnsThisUser(id) || !validateIfAdmin()) {
-            throw new UnauthorizedException(UNAUTHORIZED);
+    public User updateUser(PostUserDTO postUserDTO, String receivedId) {
+        if (!validateIfAdmin()) {
+            throw new ForbiddenException(UNAUTHORIZED);
         }
-        else if (validateUserFieldsNullAsAdmin(postUserDTO)) {
+        else if (!validateUUID(receivedId)) {
+            throw new IllegalArgumentException("Invalid UUID");
+        }
+        else {
+            id = UUID.fromString(receivedId);
+        }
+
+        if (validateUserFieldsNullAsAdmin(postUserDTO)) {
             throw new IllegalArgumentException(NULL_MESSAGE);
+        }
+        else if (!validateUserExists(id)) {
+            throw new NotFoundException(USER_NOT_FOUND);
         }
         else {
             User user = new User();
             user = user.setPropertiesFromPostUserDTO(postUserDTO);
+            user.setId(id);
             return userRepository.save(user);
         }
     }
@@ -148,20 +161,26 @@ public class UserService {
         return passwordEncoder.matches(password, user.getPassword());
     }
 
-    private boolean validateUUID(UUID id) {
+    private boolean validateUUID(String id) {
         // check if id is correct format
-        return id.toString().matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
+        return id.matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
     }
 
     private boolean validateIfUserOwnsThisUser(UUID id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
-        return user.getId().equals(id);
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+        User userToCompare = userRepository.findById(id).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+        return user.getId().equals(userToCompare.getId());
+    }
+
+    private boolean validateUserExists(UUID id) {
+        return userRepository.findById(id).isPresent();
     }
 
     private boolean validateIfAdmin() {
         // gets user from security context
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUsername(name).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new UnauthorizedException(UNAUTHORIZED));
         return user.getRoles().get(0).equals(Role.ROLE_ADMIN);
     }
 
@@ -193,10 +212,6 @@ public class UserService {
         return user;
     }
 
-    private boolean validateLimit(Integer limit) {
-        return limit != null && limit >= 1 && limit <= 50;
-    }
-
     private boolean validateOffset(Integer offset) {
         List<User> users = (List<User>) userRepository.findAll();
         return offset != null && offset >= 0 && offset < (users.size() - 1);
@@ -211,7 +226,7 @@ public class UserService {
     }
 
     private List<GetUserDTO> getUserDTOs(List<User> users) {
-        List<GetUserDTO> getUserDTOs = new java.util.ArrayList<>();
+        List<GetUserDTO> getUserDTOs = new ArrayList<>();
         for (User user : users) {
             getUserDTOs.add(user.getGetUserDTO());
         }

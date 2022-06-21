@@ -124,8 +124,34 @@ public class AddUserStepDefinitions extends BaseStepDefinitions implements En {
             Assertions.assertNotNull(errorDTO.getError());
         });
 
-        And("^I should receive the user added to the database", () -> {
-            assertNotNull(response.getBody());
+        And("^I should receive the user added to the database as admin", () -> {
+            postUserDTO = objectMapper.readValue(response.getBody(), PostUserDTO.class);
+            assertNotNull(postUserDTO.getUsername());
+            assertNotNull(postUserDTO.getPassword());
+            assertNotNull(postUserDTO.getFirstName());
+            assertNotNull(postUserDTO.getLastName());
+            assertNotNull(postUserDTO.getEmail());
+            assertNotNull(postUserDTO.getStreet());
+            assertNotNull(postUserDTO.getCity());
+            assertNotNull(postUserDTO.getZipcode());
+            assertNotNull(postUserDTO.getDayLimit());
+            assertNotNull(postUserDTO.getTransactionLimit());
+            assertNotNull(postUserDTO.getRoles());
+            assertNotNull(postUserDTO.getUserstatus());
+        });
+
+        And("^I should receive the user added to the database as user", () -> {
+            postAsUserDTO = objectMapper.readValue(response.getBody(), PostAsUserDTO.class);
+            assertNotNull(postAsUserDTO.getUsername());
+            assertNotNull(postAsUserDTO.getPassword());
+            assertNotNull(postAsUserDTO.getFirstName());
+            assertNotNull(postAsUserDTO.getLastName());
+            assertNotNull(postAsUserDTO.getEmail());
+            assertNotNull(postAsUserDTO.getStreet());
+            assertNotNull(postAsUserDTO.getCity());
+            assertNotNull(postAsUserDTO.getZipcode());
+            assertNotNull(postAsUserDTO.getDayLimit());
+            assertNotNull(postAsUserDTO.getTransactionLimit());
         });
     }
 }

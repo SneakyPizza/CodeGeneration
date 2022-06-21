@@ -44,7 +44,7 @@ public class AccountService {
         a.setBalance(new BigDecimal(0));
         a.setAccountType(Account.AccountTypeEnum.fromValue(account.getAccountType().toString()));
         a.setActive(Account.ActiveEnum.fromValue(account.getActive().toString()));
-        a.setUser(userService.getUser(account.getUserid()));
+        a.setUser(userService.getUser(account.getUserid().toString()));
         a.setIBAN(ibanGen.GenerateIban());
         accountRepository.save(a);
         return account;
@@ -101,7 +101,7 @@ public class AccountService {
         a.setAbsoluteLimit(account.getAbsoluteLimit());
         a.setBalance(account.getBalance());
         a.setIBAN(account.getIBAN());
-        a.setUser(userService.getUser(account.getUserid()));
+        a.setUser(userService.getUser(account.getUserid().toString()));
         accountRepository.save(a);
         return account;
     }
