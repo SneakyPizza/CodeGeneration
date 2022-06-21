@@ -126,7 +126,12 @@ public class UserService {
             User user = new User();
             user = user.setPropertiesFromPostUserDTO(postUserDTO);
             user.setId(id);
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+            // checks if password is the same as the old one
+            User compareUser = userRepository.findById(id).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+            if (!validateIfPasswordIsTheSame(postUserDTO.getPassword(), compareUser.getPassword())) {
+                user.setPassword(passwordEncoder.encode(postUserDTO.getPassword()));
+            }
             return userRepository.save(user);
         }
     }
@@ -180,6 +185,10 @@ public class UserService {
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(name).orElseThrow(() -> new UnauthorizedException(UNAUTHORIZED));
         return user.getRoles().get(0).equals(Role.ROLE_ADMIN);
+    }
+
+    private boolean validateIfPasswordIsTheSame(String password, String confirmPassword) {
+        return passwordEncoder.matches(password, confirmPassword);
     }
 
     private boolean validateUserFieldsNullOrEmptyAsUser(PostAsUserDTO postAsUserDTO) {
