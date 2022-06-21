@@ -162,4 +162,34 @@ class TransactionRepositoryTest {
         Assertions.assertEquals(result.get(1).getTimestamp(), transaction.getTimestamp());
     }
 
+    //find transaction by origin an between dates
+    @Test
+    void findTransactionsByOriginAndDate() {
+        repository.save(transaction);
+        List<Transaction> resultList = (List<Transaction>) repository.findAll();
+        Transaction firstTransaction = resultList.get(0);
+        List<Transaction> result = ( List<Transaction>) repository.findByOriginIdAndTimestampBetween(firstTransaction.getOrigin().getId(), firstTransaction.getTimestamp().minusDays(1), firstTransaction.getTimestamp().plusDays(1));
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(result.get(1).getAmount(), new BigDecimal(100));
+        Assertions.assertEquals(result.get(1).getType(), TransactionType.TRANSFER);
+        Assertions.assertEquals(result.get(1).getOrigin().getIBAN(), transaction.getOrigin().getIBAN());
+        Assertions.assertEquals(result.get(1).getTarget().getIBAN(), transaction.getTarget().getIBAN());
+        Assertions.assertEquals(result.get(1).getTimestamp(), transaction.getTimestamp());
+    }
+
+    //find transaction by target an between dates
+    @Test
+    void findTransactionsByTargetAndDate() {
+        repository.save(transaction);
+        List<Transaction> resultList = (List<Transaction>) repository.findAll();
+        Transaction firstTransaction = resultList.get(0);
+        List<Transaction> result = ( List<Transaction>) repository.findByTargetIdAndTimestampBetween(firstTransaction.getTarget().getId(), firstTransaction.getTimestamp().minusDays(1), firstTransaction.getTimestamp().plusDays(1));
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(result.get(1).getAmount(), new BigDecimal(100));
+        Assertions.assertEquals(result.get(1).getType(), TransactionType.TRANSFER);
+        Assertions.assertEquals(result.get(1).getOrigin().getIBAN(), transaction.getOrigin().getIBAN());
+        Assertions.assertEquals(result.get(1).getTarget().getIBAN(), transaction.getTarget().getIBAN());
+        Assertions.assertEquals(result.get(1).getTimestamp(), transaction.getTimestamp());
+    }
+
 }
