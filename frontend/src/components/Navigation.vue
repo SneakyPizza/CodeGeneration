@@ -10,6 +10,10 @@
         <li v-if="user.roles[0] === 'admin' || user.roles[1] === 'admin'">
           <router-link to="/PostUser" class="Dark_Blue nav-link" active-class="active">AddUser</router-link>
         </li>
+        <!--        v-if user from store has role admin-->
+        <li v-if="user.roles[0] === 'admin' || user.roles[1] === 'admin'">
+          <router-link to="/AddAccount" class="Dark_Blue nav-link" active-class="active">AddAccount</router-link>
+        </li>
         <li v-if="user.roles[0] === 'admin' || user.roles[1] === 'admin'">
           <router-link to="/AdminManageUsers" class="Dark_Blue nav-link" active-class="active">ManageUsers</router-link>
         </li>
