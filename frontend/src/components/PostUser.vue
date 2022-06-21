@@ -13,116 +13,117 @@
                   {{ errorMessage }}
                 </div>
                 <form>
-                  <div class="mb-3">
-                    <label for="inputUsername" class="form-label">Username</label>
-                    <input
-                        id="inputUsername"
-                        type="text"
-                        class="form-control"
-                        v-model="username"
-                    />
-                  </div>
-                  <div class="mb-3">
-                    <label for="inputPassword" class="form-label">Password</label>
-                    <input
-                        type="text"
-                        class="form-control"
-                        id="inputPassword"
-                        v-model="password"
-                    />
-                  </div>
-                  <div class="mb-3">
-                    <label for="inputEmail" class="form-label">Email</label>
-                    <input
-                        type="email"
-                        class="form-control"
-                        id="inputEmail"
-                        v-model="email"
-                    />
-                  </div>
-                  <div class="mb-3">
-                    <label for="inputFirstName" class="form-label">First Name</label>
-                    <input
-                        type="text"
-                        class="form-control"
-                        id="inputFirstName"
-                        v-model="firstName"
-                    />
-                  </div>
-                  <div class="mb-3">
-                    <label for="inputLastName" class="form-label">Last Name</label>
-                    <input
-                        type="text"
-                        class="form-control"
-                        id="inputLastName"
-                        v-model="lastName"
-                    />
-                  </div>
-                  <div class="mb-3">
-                    <label for="inputStreet" class="form-label">Street</label>
-                    <input
-                        type="text"
-                        class="form-control"
-                        id="inputStreet"
-                        v-model="street"
-                    />
-                  </div>
-                  <div class="mb-3">
-                    <label for="inputCity" class="form-label">City</label>
-                    <input
-                        type="text"
-                        class="form-control"
-                        id="inputCity"
-                        v-model="city"
-                    />
-                  </div>
-                  <div class="mb-3">
-                    <label for="inputZipcode" class="form-label">Zipcode</label>
-                    <input
-                        type="text"
-                        class="form-control"
-                        id="inputZipcode"
-                        v-model="zipcode"
-                    />
-                  </div>
+                  <div class="row">
+                    <div class="col-6"> <div class="mb-3">
+                      <label for="inputUsername" class="form-label">Username</label>
+                      <input
+                          id="inputUsername"
+                          type="text"
+                          class="form-control"
+                          v-model="username"
+                      />
+                    </div>
+                      <div class="mb-3">
+                        <label for="inputPassword" class="form-label">Password</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="inputPassword"
+                            v-model="password"
+                        />
+                      </div>
+                      <div class="mb-3">
+                        <label for="inputEmail" class="form-label">Email</label>
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="inputEmail"
+                            v-model="email"
+                        />
+                      </div>
+                      <div class="mb-3">
+                        <label for="inputFirstName" class="form-label">First Name</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="inputFirstName"
+                            v-model="firstName"
+                        />
+                      </div>
+                      <div class="mb-3">
+                        <label for="inputLastName" class="form-label">Last Name</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="inputLastName"
+                            v-model="lastName"
+                        />
+                      </div>
+                      <div class="mb-3">
+                        <label for="inputStreet" class="form-label">Street</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="inputStreet"
+                            v-model="street"
+                        />
+                      </div></div>
+                    <div class="col-6"><div class="mb-3">
+                      <label for="inputCity" class="form-label">City</label>
+                      <input
+                          type="text"
+                          class="form-control"
+                          id="inputCity"
+                          v-model="city"
+                      />
+                    </div>
+                      <div class="mb-3">
+                        <label for="inputZipcode" class="form-label">Zipcode</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="inputZipcode"
+                            v-model="zipcode"
+                        />
+                      </div>
 
-                  <div class="mb-3">
-                    <label for="inputUserstatus" class="form-label">User Status</label>
-                    <select class="form-select" aria-label="Default select example" id="inputUserstatus" v-model="userstatus">
-                      <option selected>Select User Status</option>
-                      <option value="active">Active</option>
-                      <option value="disabled">Disabled</option>
-                    </select>
-                  </div>
+                      <div class="mb-3">
+                        <label for="inputUserstatus" class="form-label">User Status</label>
+                        <select class="form-select" aria-label="Default select example" id="inputUserstatus" v-model="userstatus">
+                          <option selected>Select User Status</option>
+                          <option value="active">Active</option>
+                          <option value="disabled">Disabled</option>
+                        </select>
+                      </div>
 
-                  <div class="mb-3">
-                    <label for="inputDayLimit" class="form-label">Day Limit</label>
-                    <input
-                        type="number"
-                        class="form-control"
-                        id="inputDayLimit"
-                        v-model="dayLimit"
-                    />
-                  </div>
-                  <div class="mb-3">
-                    <label for="inputTransaction" class="form-label">Transaction Limit</label>
-                    <input
-                        type="number"
-                        class="form-control"
-                        id="inputTransaction"
-                        v-model="transactionLimit"
-                    />
-                  </div>
+                      <div class="mb-3">
+                        <label for="inputDayLimit" class="form-label">Day Limit</label>
+                        <input
+                            type="number"
+                            class="form-control"
+                            id="inputDayLimit"
+                            v-model="dayLimit"
+                        />
+                      </div>
+                      <div class="mb-3">
+                        <label for="inputTransaction" class="form-label">Transaction Limit</label>
+                        <input
+                            type="number"
+                            class="form-control"
+                            id="inputTransaction"
+                            v-model="transactionLimit"
+                        />
+                      </div>
 
-                  <div class="mb-3">
-                    <label for="inputRole" class="form-label">Role</label>
-                    <select class="form-select" aria-label="Default select example" id="inputRole" v-model="roles">
-                      <option selected>Select User Status</option>
-                      <option value="user">user</option>
-                      <option value="admin">admin</option>
-                    </select>
+                      <div class="mb-3">
+                        <label for="inputRole" class="form-label">Role</label>
+                        <select class="form-select" aria-label="Default select example" id="inputRole" v-model="roles">
+                          <option selected>Select User Status</option>
+                          <option value="user">user</option>
+                          <option value="admin">admin</option>
+                        </select>
+                      </div></div>
                   </div>
-
                   <button type="button" @click="postUser()" class="btn btn-primary">
                     Create user
                   </button>
@@ -177,13 +178,12 @@ export default {
           userstatus: this.userstatus,
           dayLimit: this.dayLimit,
           transactionLimit: this.transactionLimit,
-          roles: this.roles,
+          roles: [this.roles],
         }
         console.log(user);
         const response = await LoginService.postUser(user);
-        if (response.data() != null) {
-          await this.$router.push('/UserOverview');
-        }
+        console.log(response);
+        await this.$router.push({ name: 'AdminManageUsers' });
       }
       catch (error) {
         this.errorMessage = error.response.data.message;
