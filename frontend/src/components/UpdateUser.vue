@@ -125,7 +125,7 @@
                       </div></div>
                   </div>
                   <button type="button" @click="updateUser()" class="btn btn-primary">
-                    Create user
+                    Update
                   </button>
                 </form>
               </div>
