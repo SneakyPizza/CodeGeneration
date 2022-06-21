@@ -52,7 +52,7 @@ public class Users {
     private String pincode;
 
     @OneToMany()
-    @JoinColumn(name = "USER_ID")
+    @JoinColumn(name = "USERS_ID")
     private List<Account> accounts;
 
     @ElementCollection(fetch = FetchType.EAGER)
