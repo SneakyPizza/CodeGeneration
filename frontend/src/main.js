@@ -8,6 +8,8 @@ import axios from "axios";
 import store from "./store";
 import TransactionHistory from "./components/TransactionHistory";
 import DoTransaction from "./components/DoTransaction";
+import PostUser from "@/components/PostUser";
+import Signup from "@/components/Signup";
 
 
 axios.defaults.headers.common['Authorization'] = `Bearer ${store.state.token}`;
@@ -17,6 +19,8 @@ const routes = [
     { path: '/login', component: Login, meta: {reqToken: false, adminOnly: false, }},
     { path: '/History/:iban', name: 'History', component: TransactionHistory, meta: {reqToken: true, adminOnly: false, params: true}},
     { path: '/Transaction/:iban', name: 'Transaction', component: DoTransaction, meta: {reqToken: true, adminOnly: false, params: true}},
+    { path: '/postUser', name: 'postUser', component: PostUser, meta: {reqToken: true, adminOnly: true, params: true}},
+    { path: '/signup', name: 'signup', component: Signup, meta: {reqToken: false, adminOnly: false, params: true}},
 ];
 
 
@@ -29,6 +33,9 @@ router.beforeEach((to, from, next) => {
      if (to.path === '/Logout') {
         store.commit('logout');
         next('/login');
+    }
+    if (to.path === '/signup') {
+        next();
     }
     if (to.matched.some(record => record.meta.reqToken)) {
         if (!store.state.token) {

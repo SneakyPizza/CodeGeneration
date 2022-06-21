@@ -34,6 +34,7 @@
                   <button type="button" @click="login()" class="btn btn-primary">
                     Login
                   </button>
+                  <router-link :to="{name: 'signup'}" class="blue nav-link" active-class="active">Sign Up</router-link>
                 </form>
               </div>
 
