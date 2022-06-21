@@ -3,6 +3,7 @@ package io.swagger.cucumber.steps.Account;
 import io.cucumber.java8.En;
 import io.swagger.cucumber.steps.BaseStepDefinitions;
 import io.swagger.model.AccountDTO;
+import io.swagger.model.dto.ErrorDTO;
 import io.swagger.model.dto.GetUserDTO;
 
 import java.util.List;
@@ -16,10 +17,16 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 public class AddAccountDefinitions extends BaseStepDefinitions implements En {
     
     @Value("${io.swagger.api.token_ADMIN}")
     private String VALID_TOKEN_ADMIN;
+
+    @Value("${io.swagger.api.token_USER}")
+    private String VALID_TOKEN_USER;
 
     private static final String INVALID_TOKEN = "invalid";
     private static final String VALID_HEADER = "Content-Type";
@@ -42,6 +49,7 @@ public class AddAccountDefinitions extends BaseStepDefinitions implements En {
     private ResponseEntity<String> response;
     private Integer status;
     private List<GetUserDTO> users;
+    private ErrorDTO errorDTO;
     
     public AddAccountDefinitions(){
 
@@ -49,12 +57,16 @@ public class AddAccountDefinitions extends BaseStepDefinitions implements En {
             token = VALID_TOKEN_ADMIN;
         });
 
+        Given("^'add-account' I provide invalid admin credentials", () -> {
+            token = VALID_TOKEN_USER;
+        });
+
         And("^'add-account' My account object is valid", () -> {
             
             httpHeaders.clear();
             httpHeaders.add("Authorization", "Bearer " + VALID_TOKEN_ADMIN);
             request = new HttpEntity<>(null, httpHeaders);
-            response = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.GET, request, String.class);
+            response = restTemplate.exchange(getBaseUrl() + "/Users?limit=1&offset=2", HttpMethod.GET, request, String.class);
             status = response.getStatusCode().value();
             users = mapper.readValue(response.getBody(), mapper.getTypeFactory().constructCollectionType(List.class, GetUserDTO.class));
 
@@ -81,6 +93,14 @@ public class AddAccountDefinitions extends BaseStepDefinitions implements En {
             Assertions.assertEquals(statusCode, status);
             System.out.println("\u001B[32m" +"Status code: " + response.getStatusCode() + "\u001B[0m");
             System.out.println("\u001B[32m" +"Response: " + response.getBody() + "\u001B[0m");
+        });
+        
+        And("^I should receive an add account error message with \"([^\"]*)\"$", (String arg0) -> {
+            errorDTO =  mapper.readValue(response.getBody(), ErrorDTO.class);
+            Assertions.assertEquals(arg0, errorDTO.getMessage());
+            Assertions.assertNotNull(errorDTO.getTimestamp());
+            Assertions.assertNotNull(errorDTO.getStatus());
+            Assertions.assertNotNull(errorDTO.getError());
         });
 
         And("^'add-account' My account object is invalid", () -> {

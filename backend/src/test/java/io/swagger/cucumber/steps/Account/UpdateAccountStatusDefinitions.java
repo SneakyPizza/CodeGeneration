@@ -2,7 +2,12 @@ package io.swagger.cucumber.steps.Account;
 
 import io.cucumber.java8.En;
 import io.swagger.cucumber.steps.BaseStepDefinitions;
+import io.swagger.model.AccountDTO;
+import io.swagger.model.dto.ErrorDTO;
 import io.swagger.model.dto.GetUserDTO;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,6 +49,8 @@ public class UpdateAccountStatusDefinitions extends BaseStepDefinitions implemen
     private String iban;
     private String account;
     private List<GetUserDTO> users;
+    private ErrorDTO errorDTO;
+    private AccountDTO accountDTO;
 
     public UpdateAccountStatusDefinitions(){
         Given("^'update-account' I provide valid admin credentials", () -> {
@@ -62,7 +69,7 @@ public class UpdateAccountStatusDefinitions extends BaseStepDefinitions implemen
             httpHeaders.clear();
             httpHeaders.add("Authorization", "Bearer " + VALID_TOKEN_ADMIN);
             request = new HttpEntity<>(null, httpHeaders);
-            response = restTemplate.exchange(getBaseUrl() + "/Users", HttpMethod.GET, request, String.class);
+            response = restTemplate.exchange(getBaseUrl() + "/Users?limit=1&offset=2", HttpMethod.GET, request, String.class);
             status = response.getStatusCode().value();
             users = mapper.readValue(response.getBody(), mapper.getTypeFactory().constructCollectionType(List.class, GetUserDTO.class));
 
@@ -84,6 +91,24 @@ public class UpdateAccountStatusDefinitions extends BaseStepDefinitions implemen
             Assertions.assertEquals(statusCode, status);
             System.out.println("\u001B[32m" +"Status code: " + response.getStatusCode() + "\u001B[0m");
             System.out.println("\u001B[32m" +"Response: " + response.getBody() + "\u001B[0m");
+        });
+
+        And("^I should receive an update account error message with \"([^\"]*)\"$", (String arg0) -> {
+            errorDTO =  mapper.readValue(response.getBody(), ErrorDTO.class);
+            Assertions.assertEquals(arg0, errorDTO.getMessage());
+            Assertions.assertNotNull(errorDTO.getTimestamp());
+            Assertions.assertNotNull(errorDTO.getStatus());
+            Assertions.assertNotNull(errorDTO.getError());
+        });
+
+        And("^I should receive the updated account added to the database", () -> {
+            accountDTO = mapper.readValue(response.getBody(), AccountDTO.class);
+            assertNotNull(accountDTO.getAbsoluteLimit());
+            assertNotNull(accountDTO.getAccountType());
+            assertNotNull(accountDTO.getActive());
+            assertNotNull(accountDTO.getBalance());
+            assertNotNull(accountDTO.getIBAN());
+            assertNotNull(accountDTO.getUserid());
         });
 
         And("^'update-account' My account is invalid", () -> {

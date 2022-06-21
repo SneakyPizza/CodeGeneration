@@ -3,6 +3,8 @@ package io.swagger.cucumber.steps.Account;
 import io.cucumber.java8.En;
 import io.swagger.cucumber.steps.BaseStepDefinitions;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.swagger.model.AccountDTO;
 import io.swagger.model.dto.ErrorDTO;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +28,7 @@ public class GetAllAccountsDefinitions extends BaseStepDefinitions implements En
 
     private final HttpHeaders httpHeaders = new HttpHeaders();
     private final TestRestTemplate restTemplate = new TestRestTemplate();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     private HttpEntity<String> request;
     private ResponseEntity<String> response;
@@ -33,6 +36,8 @@ public class GetAllAccountsDefinitions extends BaseStepDefinitions implements En
 
     private String token;
     private String header;
+    private ErrorDTO errorDTO;
+    private AccountDTO dto;
 
     public GetAllAccountsDefinitions(){
         Given("^'getall-account' I provide valid admin credentials", () -> {
@@ -48,7 +53,7 @@ public class GetAllAccountsDefinitions extends BaseStepDefinitions implements En
             httpHeaders.add("Authorization", "Bearer " + token);
             httpHeaders.add(header, "application/json");
             request = new HttpEntity<>(header, httpHeaders);
-            response = restTemplate.exchange(getBaseUrl() + "/Accounts" + "?offset=1&limit=20", HttpMethod.GET, request, String.class);
+            response = restTemplate.exchange(getBaseUrl() + "/Accounts?offset=1&limit=20", HttpMethod.GET, request, String.class);
             status = response.getStatusCode().value();
         });
 
@@ -56,6 +61,14 @@ public class GetAllAccountsDefinitions extends BaseStepDefinitions implements En
             Assertions.assertEquals(statusCode, status);
             System.out.println("\u001B[32m" +"Status code: " + response.getStatusCode() + "\u001B[0m");
             System.out.println("\u001B[32m" +"Response: " + response.getBody() + "\u001B[0m");
+        });
+
+        And("^I should receive an get all accounts error message with \"([^\"]*)\"$", (String arg0) -> {
+            errorDTO =  mapper.readValue(response.getBody(), ErrorDTO.class);
+            Assertions.assertEquals(arg0, errorDTO.getMessage());
+            Assertions.assertNotNull(errorDTO.getTimestamp());
+            Assertions.assertNotNull(errorDTO.getStatus());
+            Assertions.assertNotNull(errorDTO.getError());
         });
 
         And("^'getall-account' I provide invalid admin credentials", () -> {
