@@ -79,6 +79,7 @@ export default {
 
         await this.$router.push('/UserOverview')
       } catch(error) {
+        console.log(error);
         // login was not successful
         // set the error message
         this.errorMessage = error.response.data.message;
