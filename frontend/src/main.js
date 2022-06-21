@@ -10,6 +10,7 @@ import TransactionHistory from "./components/TransactionHistory";
 import DoTransaction from "./components/DoTransaction";
 import PostUser from "@/components/PostUser";
 import Signup from "@/components/Signup";
+ import UpdateUser from "@/components/UpdateUser";
 
 
 axios.defaults.headers.common['Authorization'] = `Bearer ${store.state.token}`;
@@ -19,7 +20,8 @@ const routes = [
     { path: '/login', component: Login, meta: {reqToken: false, adminOnly: false, }},
     { path: '/History/:iban', name: 'History', component: TransactionHistory, meta: {reqToken: true, adminOnly: false, params: true}},
     { path: '/Transaction/:iban', name: 'Transaction', component: DoTransaction, meta: {reqToken: true, adminOnly: false, params: true}},
-    { path: '/postUser', name: 'postUser', component: PostUser, meta: {reqToken: true, adminOnly: true, params: true}},
+    { path: '/UpdateUser/:id', name: 'UpdateUser', component: UpdateUser, meta: {reqToken: true, adminOnly: true, params: true}},
+    { path: '/PostUser', name: 'PostUser', component: PostUser, meta: {reqToken: true, adminOnly: true, params: true}},
     { path: '/signup', name: 'signup', component: Signup, meta: {reqToken: false, adminOnly: false, params: true}},
 ];
 
