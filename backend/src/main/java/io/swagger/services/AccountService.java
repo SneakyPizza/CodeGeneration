@@ -101,7 +101,7 @@ public class AccountService {
         a.setAbsoluteLimit(account.getAbsoluteLimit());
         a.setBalance(account.getBalance());
         a.setIBAN(account.getIBAN());
-        a.setUser(userService.getUser(account.getUserid()));
+        a.setUser(userService.getUser(account.getUserid().toString()));
         accountRepository.save(a);
         return account;
     }
