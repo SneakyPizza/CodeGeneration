@@ -162,6 +162,8 @@ public class Users {
         }
         getUserDTO.setAccounts(list);
 
+
+
         if (this.userstatus == UserStatus.ACTIVE) {
             getUserDTO.setUserstatus(GetUserDTO.UserstatusEnum.ACTIVE);
         }

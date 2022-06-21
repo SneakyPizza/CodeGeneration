@@ -12,6 +12,7 @@ import org.hibernate.annotations.Type;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+
 @Entity
 @Data
 @NoArgsConstructor
