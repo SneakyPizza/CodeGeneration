@@ -118,12 +118,12 @@
                     <label for="inputRole" class="form-label">Role</label>
                     <select class="form-select" aria-label="Default select example" id="inputRole" v-model="roles">
                       <option selected>Select User Status</option>
-                      <option value="user">User</option>
-                      <option value="admin">Admin</option>
+                      <option value="user">user</option>
+                      <option value="admin">admin</option>
                     </select>
                   </div>
 
-                  <button type="button" @click="updateUser()" class="btn btn-primary">
+                  <button type="button" @click="postUser()" class="btn btn-primary">
                     Create user
                   </button>
                 </form>

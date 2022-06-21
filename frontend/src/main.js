@@ -11,6 +11,7 @@ import DoTransaction from "./components/DoTransaction";
 import PostUser from "@/components/PostUser";
 import Signup from "@/components/Signup";
  import AdminManageUsers from "@/components/AdminManageUsers";
+ import UpdateUser from "@/components/UpdateUser";
 
 
 axios.defaults.headers.common['Authorization'] = `Bearer ${store.state.token}`;
