@@ -2,16 +2,11 @@ package io.swagger.api;
 
 import io.swagger.annotations.Api;
 import io.swagger.model.dto.GetUserDTO;
-import io.swagger.model.dto.ErrorDTO;
 import io.swagger.model.dto.PostAsUserDTO;
 import io.swagger.model.dto.PostUserDTO;
-import io.swagger.model.entities.User;
+import io.swagger.model.entities.Users;
 import io.swagger.jwt.JwtTokenProvider;
 
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.services.UserService;
@@ -23,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.*;
@@ -56,13 +50,13 @@ public class UsersApiController implements UsersApi {
     }
 
     public ResponseEntity<? extends Object> addUser(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostAsUserDTO postAsUserDTO) {
-        User user = userService.createUser(postAsUserDTO);
-        return new ResponseEntity<>(user.getPostAsUserDTO(), HttpStatus.CREATED);
+        Users users = userService.createUser(postAsUserDTO);
+        return new ResponseEntity<>(users.getPostAsUserDTO(), HttpStatus.CREATED);
     }
 
     public ResponseEntity<? extends Object> addUserAdmin(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostUserDTO postUserDTO) {
-        User user = userService.createUserAdmin(postUserDTO);
-        return new ResponseEntity<>(user.getPostUserDTO(), HttpStatus.CREATED);
+        Users users = userService.createUserAdmin(postUserDTO);
+        return new ResponseEntity<>(users.getPostUserDTO(), HttpStatus.CREATED);
     }
 
     public ResponseEntity<? extends Object> getAllUsers(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the result set." ,schema=@Schema(allowableValues={  }
@@ -73,12 +67,12 @@ public class UsersApiController implements UsersApi {
     }
 
     public ResponseEntity<? extends Object> getUser(/*@DecimalMin("1")*/@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") String id) {
-        User user = userService.getUser(id);
-        return new ResponseEntity<>(user.getGetUserDTO(), HttpStatus.OK);
+        Users users = userService.getUser(id);
+        return new ResponseEntity<>(users.getGetUserDTO(), HttpStatus.OK);
     }
 
     public ResponseEntity<? extends Object> updateUser(/*@DecimalMin("1")*/@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("id") String id, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostUserDTO postUserDTO) {
-        User user = userService.updateUser(postUserDTO, id);
-        return new ResponseEntity<>(user.getPostUserDTO(), HttpStatus.OK);
+        Users users = userService.updateUser(postUserDTO, id);
+        return new ResponseEntity<>(users.getPostUserDTO(), HttpStatus.OK);
     }
 }

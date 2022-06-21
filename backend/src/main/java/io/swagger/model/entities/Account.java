@@ -7,11 +7,9 @@ import lombok.NonNull;
 import javax.persistence.*;
 
 import io.swagger.model.AccountDTO;
-import io.swagger.model.AccountDTO.AccountTypeEnum;
 import org.hibernate.annotations.Type;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -82,7 +80,7 @@ public class Account<Users> {
   private AccountTypeEnum accountType;
 
   @ManyToOne
-  private User user;
+  private io.swagger.model.entities.Users users;
 
   @NonNull
   private String IBAN;
@@ -102,7 +100,7 @@ public class Account<Users> {
     AccountDTO.AccountTypeEnum accounttype_value = AccountDTO.AccountTypeEnum.fromValue(accountType.value);
     //= AccountDTO.AccountTypeEnum.valueOf(accountType.toString());
     dto.setAccountType(accounttype_value);
-    dto.setUserid(user.getId());
+    dto.setUserid(users.getId());
     String acct = active.value;
     AccountDTO.ActiveEnum accountactive_value = AccountDTO.ActiveEnum.fromValue(acct);
 

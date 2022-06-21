@@ -155,7 +155,7 @@ public class TransactionService {
             return true;
         }
        //check if performer is admin and if so, return true
-        if(transaction.getPerformer().getRoles().contains(Role.ROLE_ADMIN)  && !transaction.getOrigin().getUser().getId().equals(transaction.getPerformer().getId())) {
+        if(transaction.getPerformer().getRoles().contains(Role.ROLE_ADMIN)  && !transaction.getOrigin().getUsers().getId().equals(transaction.getPerformer().getId())) {
             //if performer owns origin
             return true;
         }
@@ -183,10 +183,10 @@ public class TransactionService {
             return true;
         }
         else if(transaction.getType() == TransactionType.DEPOSIT){
-            return transaction.getTarget().getUser().getTransactionLimit().doubleValue() >= transaction.getAmount().doubleValue();
+            return transaction.getTarget().getUsers().getTransactionLimit().doubleValue() >= transaction.getAmount().doubleValue();
         }
         else{
-            return transaction.getOrigin().getUser().getTransactionLimit().doubleValue() >= transaction.getAmount().doubleValue();
+            return transaction.getOrigin().getUsers().getTransactionLimit().doubleValue() >= transaction.getAmount().doubleValue();
 
         }
     }
@@ -194,7 +194,7 @@ public class TransactionService {
         //check if origin is a savings account
         if(transaction.getOrigin().getAccountType() == Account.AccountTypeEnum.SAVINGS || transaction.getTarget().getAccountType() == Account.AccountTypeEnum.SAVINGS){
             //origin mus have the same owner as the target
-            return transaction.getOrigin().getUser().getId().equals(transaction.getTarget().getUser().getId());
+            return transaction.getOrigin().getUsers().getId().equals(transaction.getTarget().getUsers().getId());
         }
         else {
             //this part of the transaction is approved
@@ -213,26 +213,26 @@ public class TransactionService {
         }
         else {
             //check if performer is the owner of the account
-            return transaction.getOrigin().getUser().getId().equals(transaction.getPerformer().getId());
+            return transaction.getOrigin().getUsers().getId().equals(transaction.getPerformer().getId());
         }
     }
 
-    public User getUserFromSecurityContext(){
+    public Users getUserFromSecurityContext(){
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
         //get user if not null
-        User user = userRepository.findByUsername(name).orElseThrow();
-        if(user == null){
+        Users users = userRepository.findByUsername(name).orElseThrow();
+        if(users == null){
             throw new UnauthorizedException("Could not find user from provided token");
         }
-        return user;
+        return users;
     }
 
-    private void validateAccessToAccount (String iban, User user){
-        List<Account> accountList = user.getAccounts();
+    private void validateAccessToAccount (String iban, Users users){
+        List<Account> accountList = users.getAccounts();
         if(accountList.isEmpty()){
             throw new InvalidTransactionsException("User has no accounts");
         }
-        if (accountList.stream().noneMatch(a -> a.getIBAN().equals(iban)) && !user.getRoles().contains(Role.ROLE_ADMIN)) {
+        if (accountList.stream().noneMatch(a -> a.getIBAN().equals(iban)) && !users.getRoles().contains(Role.ROLE_ADMIN)) {
             throw new UnauthorizedException("You are not the owner of this account");
         }
     }
@@ -240,25 +240,25 @@ public class TransactionService {
     //////Do Transaction//////
     public Transaction doTransaction(PostTransactionDTO transaction, TransactionType type) {
         //get curent user from security context
-        User user = getUserFromSecurityContext();
+        Users users = getUserFromSecurityContext();
         //check if user is owner of the account or is admin
         if(type != TransactionType.DEPOSIT){
-            validateAccessToAccount(transaction.getFromIBAN(), user);
+            validateAccessToAccount(transaction.getFromIBAN(), users);
         }
         else{
-            validateAccessToAccount(transaction.getToIBAN(), user);
+            validateAccessToAccount(transaction.getToIBAN(), users);
         }
 
-        Transaction newTransaction = createTransactionFromPostTransaction(transaction, user, type);
+        Transaction newTransaction = createTransactionFromPostTransaction(transaction, users, type);
         //validate transaction
         isValidTransaction(newTransaction);
         return executeTransaction(newTransaction);
     }
 
-    private Transaction createTransactionFromPostTransaction(PostTransactionDTO transaction, User user, TransactionType type) {
+    private Transaction createTransactionFromPostTransaction(PostTransactionDTO transaction, Users users, TransactionType type) {
         //create transaction object
         Transaction t = new Transaction();
-        t.setPerformer(user);
+        t.setPerformer(users);
         if(type == TransactionType.DEPOSIT){
             t.setIBAN(transaction.getToIBAN());
         }
@@ -307,9 +307,9 @@ public class TransactionService {
             throw new IllegalArgumentException("Account does not exist");
         }
         //get current user from security context
-        User user = getUserFromSecurityContext();
+        Users users = getUserFromSecurityContext();
         //check if user is owner of the account or is admin
-        validateAccessToAccount(iban, user);
+        validateAccessToAccount(iban, users);
         //get account from iban
         Account account = (Account) accountService.findByIBAN(iban);
         //get all transactions from account

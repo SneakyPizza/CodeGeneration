@@ -1,22 +1,17 @@
 package io.swagger.model.entities;
 
 import io.swagger.model.dto.GetTransactionDTO;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;
-import org.hibernate.validator.constraints.Range;
-import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -53,10 +48,10 @@ public class Transaction   {
   private Account Origin;
   @NonNull
   @OneToOne
-  private User Performer;
+  private Users Performer;
 
   //all args constructor
-    public Transaction(TransactionType type, String IBAN, Account Target, String pincode, BigDecimal amount, LocalDateTime timestamp, Account Origin, User Performer) {
+    public Transaction(TransactionType type, String IBAN, Account Target, String pincode, BigDecimal amount, LocalDateTime timestamp, Account Origin, Users Performer) {
         this.type = type;
         this.IBAN = IBAN;
         this.Target = Target;
@@ -75,7 +70,7 @@ public class Transaction   {
     //set timestamp is current datetime
     transactionDTO.setTimestamp(LocalDateTime.now().toString());
 
-    transactionDTO.setFromUserId(Origin.getUser().getId());
+    transactionDTO.setFromUserId(Origin.getUsers().getId());
     transactionDTO.setType(type.toString());
     return transactionDTO;
   }

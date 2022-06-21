@@ -1,8 +1,6 @@
 package io.swagger.repositories;
 
-import io.swagger.model.AccountDTO;
 import io.swagger.model.entities.Account;
-import io.swagger.model.entities.User;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,5 +12,5 @@ public interface AccountRepository extends PagingAndSortingRepository<Account, U
     Object findByIBAN(String iban);
     //List<Accounts> findByUU
 
-    List<Account> findByUserId(UUID userid);
+    List<Account> findByUsersId(UUID userid);
 }

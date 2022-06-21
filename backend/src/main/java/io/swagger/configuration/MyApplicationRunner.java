@@ -41,37 +41,37 @@ public class MyApplicationRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
-        User testUser = new User();
-        testUser.setUsername("test");
-        testUser.setPincode("1234");
-        testUser.setPassword(passwordEncoder.encode("test"));
-        testUser.setEmail("test@test.nl");
-        testUser.setFirstName("test");
-        testUser.setLastName("test");
-        testUser.setStreet("test");
-        testUser.setCity("test");
-        testUser.setZipcode("test");
-        testUser.setUserstatus(UserStatus.ACTIVE);
-        testUser.setDayLimit(new BigDecimal(1000));
-        testUser.setTransactionLimit(new BigDecimal(500));
-        testUser.setRoles(new ArrayList<>(List.of(Role.ROLE_USER)));
+        Users testUsers = new Users();
+        testUsers.setUsername("test");
+        testUsers.setPincode("1234");
+        testUsers.setPassword(passwordEncoder.encode("test"));
+        testUsers.setEmail("test@test.nl");
+        testUsers.setFirstName("test");
+        testUsers.setLastName("test");
+        testUsers.setStreet("test");
+        testUsers.setCity("test");
+        testUsers.setZipcode("test");
+        testUsers.setUserstatus(UserStatus.ACTIVE);
+        testUsers.setDayLimit(new BigDecimal(1000));
+        testUsers.setTransactionLimit(new BigDecimal(500));
+        testUsers.setRoles(new ArrayList<>(List.of(Role.ROLE_USER)));
 
-        User testUser2 = new User();
-        testUser2.setUsername("test2");
-        testUser2.setPincode("1234");
-        testUser2.setPassword(passwordEncoder.encode("test2"));
-        testUser2.setEmail("test2@test2.nl");
-        testUser2.setFirstName("test2");
-        testUser2.setLastName("test2");
-        testUser2.setStreet("test2");
-        testUser2.setCity("test2");
-        testUser2.setZipcode("test2");
-        testUser2.setUserstatus(UserStatus.DISABLED);
-        testUser2.setDayLimit(new BigDecimal(10000));
-        testUser2.setTransactionLimit(new BigDecimal(500));
-        testUser2.setRoles(new ArrayList<>(List.of(Role.ROLE_USER)));
+        Users testUsers2 = new Users();
+        testUsers2.setUsername("test2");
+        testUsers2.setPincode("1234");
+        testUsers2.setPassword(passwordEncoder.encode("test2"));
+        testUsers2.setEmail("test2@test2.nl");
+        testUsers2.setFirstName("test2");
+        testUsers2.setLastName("test2");
+        testUsers2.setStreet("test2");
+        testUsers2.setCity("test2");
+        testUsers2.setZipcode("test2");
+        testUsers2.setUserstatus(UserStatus.DISABLED);
+        testUsers2.setDayLimit(new BigDecimal(10000));
+        testUsers2.setTransactionLimit(new BigDecimal(500));
+        testUsers2.setRoles(new ArrayList<>(List.of(Role.ROLE_USER)));
 
-        User Bank = new User();
+        Users Bank = new Users();
         Bank.setUsername("Bank");
         Bank.setPincode("1234");
         Bank.setPassword(passwordEncoder.encode("Bank"));
@@ -124,19 +124,19 @@ public class MyApplicationRunner implements ApplicationRunner {
         accountRepo.save(testAccount2);
         accountRepo.save(testAccountForTest);
 
-        BankAccount.setUser(Bank);
-        testAccount.setUser(testUser);
-        testAccount2.setUser(testUser2);
-        testAccountForTest.setUser(testUser);
+        BankAccount.setUsers(Bank);
+        testAccount.setUsers(testUsers);
+        testAccount2.setUsers(testUsers2);
+        testAccountForTest.setUsers(testUsers);
 
         Bank.setAccounts(new ArrayList<>(List.of(BankAccount)));
-        testUser.setAccounts(new ArrayList<>());
-        testUser.getAccounts().add(testAccount);
-        testUser.getAccounts().add(testAccountForTest);
-        testUser2.setAccounts(new ArrayList<>(List.of(testAccount2)));
+        testUsers.setAccounts(new ArrayList<>());
+        testUsers.getAccounts().add(testAccount);
+        testUsers.getAccounts().add(testAccountForTest);
+        testUsers2.setAccounts(new ArrayList<>(List.of(testAccount2)));
 
-        userRepository.save(testUser);
-        userRepository.save(testUser2);
+        userRepository.save(testUsers);
+        userRepository.save(testUsers2);
         userRepository.save(Bank);
 
 
