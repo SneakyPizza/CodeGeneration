@@ -27,27 +27,39 @@ public class AccountRepositoryTest {
     UserRepository userRepository;
 
     Account testAccount;
+    List<Account> accounts;
+
+    Pageable pageable = PageRequest.of(0, 10);
 
     @BeforeEach
     void setup() {
-        Pageable pageable = PageRequest.of(0, 10);
-        List<User> users = userRepository.findAll(pageable).getContent();
-        UUID id = users.get(0).getId();
-
-        List<Account> accounts = accountRepository.findByUserId(id);
+        accounts = accountRepository.findAll(pageable).getContent();
         testAccount = accounts.get(0);
     }
 
     @Test
-    void findByIBAN() {
-        Pageable pageable = PageRequest.of(0, 10);
-        List<User> users = userRepository.findAll(pageable).getContent();
-        UUID id = users.get(0).getId();
-
-        List<Account> accounts = accountRepository.findByUserId(id);
-        Account account = accounts.get(0);
-
+    void save() {
+        Account account = accountRepository.save(testAccount);
         assertAccount(account);
+    }
+
+    @Test
+    void findAll() {
+        Pageable pageable = PageRequest.of(0, 1);
+        List<Account> accounts = accountRepository.findAll(pageable).getContent();
+        assertAccount(accounts.get(0));
+    }
+
+    @Test
+    void findByIBAN() {
+        Account accountToFind = (Account) accountRepository.findByIBAN(accounts.get(0).getIBAN());
+        assertAccount(accountToFind);
+    }
+
+    @Test
+    void findByUserId() {
+        List<Account> accountToFind = accountRepository.findByUserId(accounts.get(0).getUser().getId());
+        assertAccount(accountToFind.get(0));
     }
 
     void assertAccount(Account account) {
