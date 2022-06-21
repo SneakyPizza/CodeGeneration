@@ -123,9 +123,12 @@ public class UserService {
             throw new NotFoundException(USER_NOT_FOUND);
         }
         else {
+            User correctionUser = userRepository.findById(id).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
             User user = new User();
             user = user.setPropertiesFromPostUserDTO(postUserDTO);
             user.setId(id);
+            user.setPincode(correctionUser.getPincode());
+            user.setAccounts(correctionUser.getAccounts());
 
             // checks if password is the same as the old one
             User compareUser = userRepository.findById(id).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
