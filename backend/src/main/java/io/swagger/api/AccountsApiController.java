@@ -24,10 +24,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.*;
 import javax.validation.Valid;
@@ -36,11 +34,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-04T11:04:07.506Z[GMT]")
 @RestController
+@CrossOrigin(origins = "*")
 @Api(tags = {"Accounts"}, description = "the account API")
 @Log
 public class AccountsApiController implements AccountsApi {
@@ -80,6 +77,7 @@ public class AccountsApiController implements AccountsApi {
     }
 
     public ResponseEntity<? extends Object> addAccount(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody PostAccountDTO body) {
+        /*
         String accept = request.getHeader("Content-Type");
         if (accept != null && accept.contains("application/json")) {
             try{
@@ -96,10 +94,15 @@ public class AccountsApiController implements AccountsApi {
             }
         }
         return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Accept header is invalid", 415, "UNSUPPORTED_MEDIA_TYPE"), HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+        */
+
+        User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        PostAccountDTO dto = accountservice.addAccount(body, user);
+        return new ResponseEntity<PostAccountDTO>(dto, HttpStatus.CREATED);
     }
 
     public ResponseEntity<? extends Object> getAccount(@Parameter(in = ParameterIn.PATH, description = "Gets the account of the IBAN", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN) {
-
+        /*
         try {
             if(accountservice.validateIban(IBAN)){
                 User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -118,18 +121,19 @@ public class AccountsApiController implements AccountsApi {
         } catch (Exception e) {
             log.error("Couldn't serialize response for content type application/json", e);
             return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Couldn't serialize response for content type application/json", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
+        }*/
         //return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Accept header is invalid", 403, "FORBIDDEN"), HttpStatus.FORBIDDEN);
+
+        User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        AccountDTO dto = accountservice.getAccountDTOWithIBAN(IBAN, user);
+        return new ResponseEntity<AccountDTO>(dto, HttpStatus.OK);
     }
 
-    //@GetMapping
-    public ResponseEntity<List<AccountDTO>> getAllAccounts(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the result set." ,schema=@Schema(allowableValues={  }
+    public ResponseEntity<? extends Object> getAllAccounts(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the result set." ,schema=@Schema(allowableValues={  }
 )) @Valid @RequestParam(value = "offset", required = false) Integer offset,@Min(1) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return." ,schema=@Schema(allowableValues={  }, minimum="1", maximum="50"
 , defaultValue="20")) @Valid @RequestParam(value = "limit", required = false, defaultValue="20") Integer limit) {
-        String accept = request.getHeader("Accept");
-
-
+        //String accept = request.getHeader("Accept");
+        /*
         if (accept != null && accept.contains("application/json")) {
             
             try {
@@ -157,14 +161,18 @@ public class AccountsApiController implements AccountsApi {
             }
         }
         return new ResponseEntity<List<AccountDTO>>(HttpStatus.CONFLICT);
+        */
+        User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        //AccountDTO dto = accountservice.getAccountDTOWithIBAN(IBAN, user);
+        List<AccountDTO> dto = accountservice.getAllAccounts(user);
+        return new ResponseEntity<List<AccountDTO>>(dto, HttpStatus.OK);
     }
 
     public ResponseEntity<? extends Object> searchAccount(@NotNull @Parameter(in = ParameterIn.QUERY, description = "" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "fullName", required = true) String fullName,@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the result set." ,schema=@Schema(allowableValues={  }
 )) @Valid @RequestParam(value = "offset", required = false) Integer offset,@Min(1) @Max(50) @Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return." ,schema=@Schema(allowableValues={  }, minimum="1", maximum="50"
-, defaultValue="20")) @Valid @RequestParam(value = "limit", required = false, defaultValue="20") Integer limit) {
-        String accept = request.getHeader("Search");
-
-            try {
+, defaultValue="20")) @Valid @RequestParam(value = "limit", required = false, defaultValue="20") Integer limit) {       
+    /*        
+    try {
                 User logged_user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
                 if(logged_user.getRoles().contains(Role.ROLE_ADMIN) || logged_user.getRoles().contains(Role.ROLE_USER)){
                     List<User> users = new ArrayList<User>();
@@ -207,11 +215,14 @@ public class AccountsApiController implements AccountsApi {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Couldn't serialize response for content type application/json", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
             }
-
+        */
+        User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        List<NameSearchAccountDTO> dtos = accountservice.searchAccountDTOs(fullName, limit, offset, user);
+        return new ResponseEntity<List<NameSearchAccountDTO>>(dtos, HttpStatus.OK);
     }
 
     public ResponseEntity<? extends Object> updateAccountStatus(@Parameter(in = ParameterIn.PATH, description = "Gets the account of the IBAN", required=true, schema=@Schema()) @PathVariable("IBAN") String IBAN,@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody AccountDTO body) {
-
+        /*
             try {
                 User logged_user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
                 if(logged_user.getRoles().contains(Role.ROLE_ADMIN)){
@@ -228,14 +239,10 @@ public class AccountsApiController implements AccountsApi {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<ErrorDTO>(new ErrorDTO(LocalDateTime.now().toString(), "Couldn't serialize response for content type application/json", 500, "INTERNAL_SERVER_ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
             }
+        */
+
+        User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        AccountDTO dto = accountservice.updateAccount(IBAN, body, user);
+        return new ResponseEntity<AccountDTO>(dto, HttpStatus.CREATED);
     }
-
-    private void checkBody(Object body){
-        if (body == null) {
-        throw new NullPointerException("A application/json value is required");
-        }
-    }
-
-
-
 }

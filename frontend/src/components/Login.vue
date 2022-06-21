@@ -59,9 +59,6 @@ export default {
     };
   },
   methods: {
-    data() {
-
-    },
     // login through a store action
     async login() {
       try{

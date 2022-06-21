@@ -63,12 +63,6 @@ public class TransactionService {
         return transactionRepository.existsById(id);
     }
 
-    //Get today's transactions from a user
-    public List<Transaction> getTodaysTransactions(Transaction transaction) {
-        LocalDateTime now = LocalDateTime.now();
-        return (List<Transaction>) transactionRepository.findByIBANAndTimestamp(transaction.getIBAN(), now);
-    }
-
     //findByIBANAndTimestampBetween()
     public List<Transaction> findByIBANAndTimestampBetween(String iban, LocalDateTime startDate, LocalDateTime endDate){
         return (List<Transaction>) transactionRepository.findByIBANAndTimestampBetween(iban, startDate, endDate);
@@ -81,7 +75,8 @@ public class TransactionService {
         List<Transaction> target = (List<Transaction>) transactionRepository.findByTargetId(acc.getId());
 
         origin.addAll(target);
-        origin.sort((t1, t2) -> t1.getTimestamp().compareTo(t2.getTimestamp()));
+        //sort and reverse
+        origin.sort((t1, t2) -> t2.getTimestamp().compareTo(t1.getTimestamp()));
         return origin;
     }
 
@@ -92,7 +87,7 @@ public class TransactionService {
         List<Transaction> target = (List<Transaction>) transactionRepository.findByTargetIdAndTimestampBetween(acc.getId(), startDate, endDate);
 
         origin.addAll(target);
-        origin.sort((t1, t2) -> t1.getTimestamp().compareTo(t2.getTimestamp()));
+        origin.sort((t1, t2) -> t2.getTimestamp().compareTo(t1.getTimestamp()));
         return origin;
     }
 
@@ -164,15 +159,19 @@ public class TransactionService {
             //if performer owns origin
             return true;
         }
-        //get all transactions from origin
-        List<Transaction> transactions = getTodaysTransactions(transaction);
+
+        LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
+        LocalDateTime tomorrow = LocalDateTime.now().plusDays(1);
+        List<Transaction> transactions = getAllTransactionsByAccount(transaction.getOrigin(), yesterday, tomorrow);
         if(transactions.isEmpty()){
             return true;
         }
         //get sum of all transactions
         BigDecimal sum = BigDecimal.ZERO;
         for(Transaction t : transactions){
-            sum = sum.add(t.getAmount());
+            if(t.getOrigin().getIBAN().equals(transaction.getOrigin().getIBAN())){
+                sum = sum.add(t.getAmount());
+            }
         }
         //check if sum is greater than day limit
         return sum.add(transaction.getAmount()).doubleValue() <= transaction.getPerformer().getDayLimit().doubleValue();
@@ -311,7 +310,10 @@ public class TransactionService {
         User user = getUserFromSecurityContext();
         //check if user is owner of the account or is admin
         validateAccessToAccount(iban, user);
-        if (getTransactions(iban).isEmpty()) {
+        //get account from iban
+        Account account = (Account) accountService.findByIBAN(iban);
+        //get all transactions from account
+        if ( account == null || getAllTransactionsByAccount(account).isEmpty()) {
             throw new NotFoundException("Account has no transactions");
         }
     }
