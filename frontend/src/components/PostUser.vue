@@ -178,7 +178,7 @@ export default {
         console.log(user);
         const response = await LoginService.postUser(user);
         if (response.data() != null) {
-          await this.$router.push('/login')
+          await this.$router.push('/UserOverview');
         }
       }
       catch (error) {
