@@ -295,9 +295,8 @@ class TransactionServiceTest {
     void getHistoryForTestUser() {
         when(securityContext.getAuthentication().getName()).thenReturn("test");
         String iban = testAccount.getIBAN();
-        Assertions.assertThrows(NotFoundException.class, () -> {
-            List<GetTransactionDTO> t = transactionService.getHistory(iban);
-        });
+        List<GetTransactionDTO> t = transactionService.getHistory(iban);
+        Assertions.assertEquals(1, t.size());
     }
 
     @Test
