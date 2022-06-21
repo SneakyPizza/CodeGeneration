@@ -3,16 +3,11 @@ package io.swagger.cucumber.steps.Account;
 import io.cucumber.java8.En;
 import io.swagger.cucumber.steps.BaseStepDefinitions;
 import io.swagger.model.AccountDTO;
-import io.swagger.model.GetUserDTO;
-import io.swagger.model.UserDTO;
+import io.swagger.model.dto.GetUserDTO;
 
 import java.util.List;
-import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.cucumber.java8.En;
-import io.swagger.cucumber.steps.BaseStepDefinitions;
-import io.swagger.model.dto.ErrorDTO;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;

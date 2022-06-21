@@ -29,7 +29,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/h2-console/**/**",
             //swagger uls
             // -- Swagger UI v3 (OpenAPI)
-            "/Transactions/{IBAN}**",
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/swagger-ui.html",
@@ -38,12 +37,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/swagger-resources/**",
             "/configuration/**",
             "/webjars/**",
+            "/signup",
     };
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        
-        http.csrf().disable();    // no CSRF protection needed
+        http.cors().and()
+        .csrf().disable();    // no CSRF protection needed
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);  // no sessions needed
 
         http.authorizeRequests()

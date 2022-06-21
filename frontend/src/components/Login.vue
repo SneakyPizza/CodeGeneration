@@ -34,6 +34,7 @@
                   <button type="button" @click="login()" class="btn btn-primary">
                     Login
                   </button>
+                  <router-link :to="{name: 'signup'}" class="blue nav-link" active-class="active">Sign Up</router-link>
                 </form>
               </div>
 
@@ -59,9 +60,6 @@ export default {
     };
   },
   methods: {
-    data() {
-
-    },
     // login through a store action
     async login() {
       try{
@@ -81,6 +79,7 @@ export default {
 
         await this.$router.push('/UserOverview')
       } catch(error) {
+        console.log(error);
         // login was not successful
         // set the error message
         this.errorMessage = error.response.data.message;

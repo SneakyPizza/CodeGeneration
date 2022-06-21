@@ -1,4 +1,4 @@
-package io.swagger.exeption.custom;
+package io.swagger.exception.custom;
 
 public class TransactionDeniedException extends RuntimeException {
     public TransactionDeniedException(String message) {

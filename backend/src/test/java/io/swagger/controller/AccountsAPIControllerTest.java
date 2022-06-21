@@ -1,31 +1,32 @@
 package io.swagger.controller;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.junit.Test;
+import io.swagger.model.entities.*;
+import io.swagger.services.TransactionService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import io.swagger.api.AccountsApiController;
-import io.swagger.model.entities.Account;
-import io.swagger.model.entities.Role;
-import io.swagger.model.entities.User;
 import io.swagger.repositories.AccountRepository;
 import io.swagger.repositories.UserRepository;
-import io.swagger.services.accountService;
+import io.swagger.services.AccountService;
 
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -35,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AccountsApiController.class)
-public class AccountsAPIControllerTest {
+class AccountsAPIControllerTest {
 
     @Autowired
     private WebApplicationContext context;
@@ -44,7 +45,10 @@ public class AccountsAPIControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private accountService accountService;
+    private TransactionService transactionService;
+
+    @MockBean
+    private AccountService accountService;
 
     @MockBean
     private AccountRepository accountRepository;
@@ -63,13 +67,10 @@ public class AccountsAPIControllerTest {
 
     private Account BankAccount;
 
+    private Transaction transaction;
+
     @BeforeEach
     void setup(){
-        /*
-        mockMvc = MockMvcBuilders.webAppContextSetup(context)
-        .apply(springSecurity())
-        .build();
-        */
 
         testUser = new User();
         testUser.setUsername("test");
@@ -115,20 +116,65 @@ public class AccountsAPIControllerTest {
 
         testUser.setAccounts(new ArrayList<>(List.of(testAccount)));
         Bank.setAccounts(new ArrayList<>(List.of(BankAccount)));
+
+        transaction = new Transaction();
+        transaction.setAmount(new BigDecimal(100));
+        transaction.setTimestamp(LocalDateTime.now());
+        transaction.setTarget(testAccount);
+        transaction.setOrigin(BankAccount);
+        transaction.setPincode("1234");
+        transaction.setPerformer(Bank);
+        transaction.setIBAN(BankAccount.getIBAN());
+        transaction.setType(TransactionType.DEPOSIT);
+        transaction.execute();
     }
 
-    /*
     @Test
-    public void getAllAccounts() throws Exception {
-        List<Account> accounts = List.of(testAccount);
-        when(accountService.getAllAccounts()).thenReturn(accounts);
+    @WithMockUser(username="test", password = "test" ,roles={"USER"})
+    void postDeposit() throws Exception {
+        when(transactionService.doTransaction(any(), any())).thenReturn(transaction);
 
-        mockMvc.perform(get("/Accounts/Search?fullName=test-test&offset=1&limit=20")
-        .accept(MediaType.APPLICATION_JSON))
-        .andDo(print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(2)));
+        String post ="{\n" +
+                "  \"amount\": 100,\n" +
+                "  \"pincode\": \"1234\",\n" +
+                "  \"toIBAN\": \"NL01INHO0000000002\"\n" +
+                "}";
+
+        mockMvc.perform(post("/Accounts/Deposit")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(post))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.amount").value(transaction.getAmount().toString()))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
+                .andExpect(jsonPath("$.toIBAN").value(transaction.getTarget().getIBAN()))
+                .andExpect(jsonPath("$.fromIBAN").value(transaction.getOrigin().getIBAN()))
+                .andExpect(jsonPath("$.fromUserId").value(transaction.getOrigin().getUser().getId()))
+                .andExpect(jsonPath("$.type").value(transaction.getType().toString()));
     }
-    */
+
+    @Test
+    @WithMockUser(username="test", password = "test" ,roles={"USER"})
+    void postWithdraw() throws Exception {
+        when(transactionService.doTransaction(any(), any())).thenReturn(transaction);
+
+        String post ="{\n" +
+                "  \"amount\": 100,\n" +
+                "  \"pincode\": \"1234\",\n" +
+                "  \"fromIBAN\": \"NL01INHO0000000002\"\n" +
+                "}";
+
+        mockMvc.perform(post("/Accounts/Withdraw")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(post))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.amount").value(transaction.getAmount().toString()))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
+                .andExpect(jsonPath("$.toIBAN").value(transaction.getTarget().getIBAN()))
+                .andExpect(jsonPath("$.fromIBAN").value(transaction.getOrigin().getIBAN()))
+                .andExpect(jsonPath("$.fromUserId").value(transaction.getOrigin().getUser().getId()))
+                .andExpect(jsonPath("$.type").value(transaction.getType().toString()));
+    }
 
 }

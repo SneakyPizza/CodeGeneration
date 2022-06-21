@@ -6,6 +6,7 @@ import io.swagger.model.dto.ErrorDTO;
 import io.swagger.model.dto.GetTransactionDTO;
 import io.swagger.model.dto.PostTransactionDTO;
 import io.swagger.model.entities.*;
+import io.swagger.services.AccountService;
 import io.swagger.services.TransactionService;
 import io.swagger.services.UserService;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,10 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +30,7 @@ import java.util.List;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-05-28T11:30:29.125Z[GMT]")
 @RestController
+@CrossOrigin(origins = "*")
 @Api(tags = {"Transactions"}, description = "the transaction API")
 public class TransactionsApiController implements TransactionsApi {
 
@@ -48,7 +47,7 @@ public class TransactionsApiController implements TransactionsApi {
     UserService userService;
 
     @Autowired
-    io.swagger.services.accountService accountService;
+    AccountService accountService;
 
     @org.springframework.beans.factory.annotation.Autowired
     public TransactionsApiController(ObjectMapper objectMapper, HttpServletRequest request) {

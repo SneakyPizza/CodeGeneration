@@ -2,7 +2,6 @@ import Vuex from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
 import Axios from 'axios';
 
-
 const getDefaultState = () => {
     return {
         token: '',
