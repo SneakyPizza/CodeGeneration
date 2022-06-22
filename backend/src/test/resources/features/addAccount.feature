@@ -5,7 +5,8 @@ Feature: Add a account to the database
        And 'add-account' My account object is valid
        And 'add-account' My accept header is valid
        When 'add-account' I perform a add account operation
-       Then I should see a add account status code of 201    
+       Then I should see a add account status code of 201
+       And I should receive the add account added to the database
 
        Scenario: Adding a new account to the database
        Given 'add-account' I provide invalid admin credentials

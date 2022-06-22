@@ -6,6 +6,7 @@ Feature: search on name and return NameSearchAccountDTO
        And 'search-account' My accept header is valid
        When 'search-account' I perform a search account operation
        Then I should see a search account status code of 200
+       And I should receive a list of namesearchdtos from the database
 
        Scenario: searching on a fullname of a user
        Given 'search-account' I provide invalid user credentials

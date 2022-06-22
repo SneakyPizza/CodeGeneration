@@ -5,6 +5,7 @@ import io.swagger.cucumber.steps.BaseStepDefinitions;
 import io.swagger.model.AccountDTO;
 import io.swagger.model.dto.ErrorDTO;
 import io.swagger.model.dto.GetUserDTO;
+import io.swagger.model.dto.PostAccountDTO;
 
 import java.util.List;
 
@@ -50,6 +51,7 @@ public class AddAccountDefinitions extends BaseStepDefinitions implements En {
     private Integer status;
     private List<GetUserDTO> users;
     private ErrorDTO errorDTO;
+    private PostAccountDTO postAccountDTO;
     
     public AddAccountDefinitions(){
 
@@ -101,6 +103,14 @@ public class AddAccountDefinitions extends BaseStepDefinitions implements En {
             Assertions.assertNotNull(errorDTO.getTimestamp());
             Assertions.assertNotNull(errorDTO.getStatus());
             Assertions.assertNotNull(errorDTO.getError());
+        });
+
+        And("^I should receive the add account added to the database", () -> {
+            postAccountDTO = mapper.readValue(response.getBody(), PostAccountDTO.class);
+            assertNotNull(postAccountDTO.getAbsoluteLimit());
+            assertNotNull(postAccountDTO.getAccountType());
+            assertNotNull(postAccountDTO.getActive());
+            assertNotNull(postAccountDTO.getUserid());
         });
 
         And("^'add-account' My account object is invalid", () -> {

@@ -3,9 +3,11 @@ package io.swagger.cucumber.steps.Account;
 import io.cucumber.java8.En;
 import io.swagger.cucumber.steps.BaseStepDefinitions;
 import io.swagger.model.dto.ErrorDTO;
+import io.swagger.model.dto.NameSearchAccountDTO;
+
+import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -38,6 +40,7 @@ public class SearchAccountDefinitions extends BaseStepDefinitions implements En 
     private String header;
     private String fullname;
     private ErrorDTO errorDTO;
+    private List<NameSearchAccountDTO> listNameSearchDTOs;
 
     public SearchAccountDefinitions(){
         Given("^'search-account' I provide valid user credentials", () -> {
@@ -73,6 +76,16 @@ public class SearchAccountDefinitions extends BaseStepDefinitions implements En 
             Assertions.assertNotNull(errorDTO.getTimestamp());
             Assertions.assertNotNull(errorDTO.getStatus());
             Assertions.assertNotNull(errorDTO.getError());
+        });
+
+        And("^I should receive a list of namesearchdtos from the database", () -> {
+            listNameSearchDTOs = mapper.readValue(response.getBody(), mapper.getTypeFactory().constructCollectionType(List.class, NameSearchAccountDTO.class));
+
+            for (NameSearchAccountDTO dto : listNameSearchDTOs) {
+                Assertions.assertNotNull(dto.getFirstName());
+                Assertions.assertNotNull(dto.getIBAN());
+                Assertions.assertNotNull(dto.getLastName());
+            }
         });
 
         Given("^'search-account' I provide invalid user credentials", () -> {
