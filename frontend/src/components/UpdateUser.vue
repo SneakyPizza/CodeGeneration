@@ -225,6 +225,7 @@ export default {
       }
       catch (error) {
         this.errorMessage = error.response.data.message;
+        console.log(error);
       }
     },
   },
