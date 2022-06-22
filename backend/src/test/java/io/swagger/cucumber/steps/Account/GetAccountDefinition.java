@@ -2,6 +2,11 @@ package io.swagger.cucumber.steps.Account;
 
 import io.cucumber.java8.En;
 import io.swagger.cucumber.steps.BaseStepDefinitions;
+import io.swagger.model.AccountDTO;
+import io.swagger.model.dto.ErrorDTO;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -9,6 +14,9 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class GetAccountDefinition extends BaseStepDefinitions implements En {
 
@@ -23,7 +31,7 @@ public class GetAccountDefinition extends BaseStepDefinitions implements En {
 
     private static final String VALID_IBAN = "NL01INHO0000000001";
     private static final String INVALID_IBAN = "DE01INHO0000000001";
-
+    private final ObjectMapper mapper = new ObjectMapper();
     private final HttpHeaders httpHeaders = new HttpHeaders();
     private final TestRestTemplate restTemplate = new TestRestTemplate();
 
@@ -34,6 +42,8 @@ public class GetAccountDefinition extends BaseStepDefinitions implements En {
     private String token;
     private String header;
     private String iban;
+    private ErrorDTO errorDTO;
+    private AccountDTO dto;
 
 
     public GetAccountDefinition(){
@@ -67,6 +77,24 @@ public class GetAccountDefinition extends BaseStepDefinitions implements En {
 
         And("^'get-account' My accept header is invalid", () -> {
             header = INVALID_HEADER;
+        });
+
+        And("^I should receive an get account error message with \"([^\"]*)\"$", (String arg0) -> {
+            errorDTO =  mapper.readValue(response.getBody(), ErrorDTO.class);
+            Assertions.assertEquals(arg0, errorDTO.getMessage());
+            Assertions.assertNotNull(errorDTO.getTimestamp());
+            Assertions.assertNotNull(errorDTO.getStatus());
+            Assertions.assertNotNull(errorDTO.getError());
+        });
+
+        And("^'get-account' I should receive the account", () -> {
+            dto = mapper.readValue(response.getBody(), AccountDTO.class);
+            assertNotNull(dto.getAbsoluteLimit());
+            assertNotNull(dto.getAccountType());
+            assertNotNull(dto.getActive());
+            assertNotNull(dto.getBalance());
+            assertNotNull(dto.getIBAN());
+            assertNotNull(dto.getUserid());
         });
 
         And("^'get-account' My iban is invalid", () -> {
