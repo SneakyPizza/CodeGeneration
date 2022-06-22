@@ -13,7 +13,7 @@ public class ibanGenerator {
         s.append(r.nextInt(10));
         s.append(r.nextInt(10));
         s.append("INHO0");
-        for(int i = 0; i < 10;i++){
+        for(int i = 0; i < 9;i++){
             s.append(r.nextInt(10));
         }
         return s.toString();
