@@ -80,7 +80,7 @@ public class UserService {
         }
     }
 
-    public User createUser(PostAsUserDTO postAsUserDTO) {
+    public Users createUser(PostAsUserDTO postAsUserDTO) {
         if (validateUserFieldsNullOrEmptyAsUser(postAsUserDTO)) {
             throw new IllegalArgumentException(WRONG_FIELDS_MESSAGE);
         }
@@ -123,15 +123,15 @@ public class UserService {
             throw new NotFoundException(USER_NOT_FOUND);
         }
         else {
-            User correctionUser = userRepository.findById(id).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
-            User user = new User();
+            Users correctionUser = userRepository.findById(id).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+            Users user = new Users();
             user = user.setPropertiesFromPostUserDTO(postUserDTO);
             user.setId(id);
             user.setPincode(correctionUser.getPincode());
             user.setAccounts(correctionUser.getAccounts());
 
             // checks if password is the same as the old one
-            User compareUser = userRepository.findById(id).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+            Users compareUser = userRepository.findById(id).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
             if (!validateIfPasswordIsTheSame(postUserDTO.getPassword(), compareUser.getPassword())) {
                 user.setPassword(passwordEncoder.encode(postUserDTO.getPassword()));
             }
@@ -186,7 +186,7 @@ public class UserService {
     private boolean validateIfAdmin() {
         // gets user from security context
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUsername(name).orElseThrow(() -> new UnauthorizedException(UNAUTHORIZED));
+        Users user = userRepository.findByUsername(name).orElseThrow(() -> new UnauthorizedException(UNAUTHORIZED));
         return user.getRoles().get(0).equals(Role.ROLE_ADMIN);
     }
 
@@ -203,8 +203,8 @@ public class UserService {
         return postUserDTO.getFirstName() == null || postUserDTO.getLastName() == null || postUserDTO.getUsername() == null || postUserDTO.getPassword() == null || postUserDTO.getEmail() == null || postUserDTO.getStreet() == null || postUserDTO.getCity() == null || postUserDTO.getZipcode() == null || postUserDTO.getDayLimit() == null || postUserDTO.getTransactionLimit() == null || postUserDTO.getRoles() == null || postUserDTO.getUserstatus() == null || Objects.equals(postUserDTO.getFirstName(), "") || Objects.equals(postUserDTO.getLastName(), "") || Objects.equals(postUserDTO.getUsername(), "") || Objects.equals(postUserDTO.getPassword(), "") || Objects.equals(postUserDTO.getEmail(), "") || Objects.equals(postUserDTO.getStreet(), "") || Objects.equals(postUserDTO.getCity(), "") || Objects.equals(postUserDTO.getZipcode(), "");
     }
 
-    private User convertPostAsUserDTOtoUser(PostAsUserDTO postAsUserDTO) {
-        User user = new User();
+    private Users convertPostAsUserDTOtoUser(PostAsUserDTO postAsUserDTO) {
+        Users user = new Users();
         user.setUsername(postAsUserDTO.getUsername());
         user.setPassword(postAsUserDTO.getPassword());
         user.setEmail(postAsUserDTO.getEmail());
@@ -216,11 +216,11 @@ public class UserService {
         user.setDayLimit(postAsUserDTO.getDayLimit());
         user.setTransactionLimit(postAsUserDTO.getTransactionLimit());
 
-        users.setPincode(pincodeGenerator.generatePincode());
-        users.setPassword(passwordEncoder.encode(users.getPassword()));
-        users.setUserstatus(UserStatus.DISABLED);
-        users.setRoles(Collections.singletonList(Role.ROLE_USER));
-        return users;
+        user.setPincode(pincodeGenerator.generatePincode());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setUserstatus(UserStatus.DISABLED);
+        user.setRoles(Collections.singletonList(Role.ROLE_USER));
+        return user;
     }
 
     private boolean validateOffset(Integer offset) {
@@ -236,9 +236,9 @@ public class UserService {
         return jwtDTO;
     }
 
-    private List<GetUserDTO> getUserDTOs(List<User> users) {
+    private List<GetUserDTO> getUserDTOs(List<Users> users) {
         List<GetUserDTO> getUserDTOs = new ArrayList<>();
-        for (User user : users) {
+        for (Users user : users) {
             getUserDTOs.add(user.getGetUserDTO());
         }
         return getUserDTOs;
