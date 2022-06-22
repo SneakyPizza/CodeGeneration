@@ -12,10 +12,11 @@ import PostUser from "@/components/PostUser";
 import Signup from "@/components/Signup";
  import AdminManageUsers from "@/components/AdminManageUsers";
  import UpdateUser from "@/components/UpdateUser";
+ import AddAccount from "@/components/AddAccount";
 
 
 axios.defaults.headers.common['Authorization'] = `Bearer ${store.state.token}`;
-axios.defaults.baseURL = "http://localhost:8080/";
+axios.defaults.baseURL = "http://localhost:8080";
 
 const routes = [
     { path: '/UserOverview', component: UserOverview, meta: {reqToken: true, adminOnly: false, }},
@@ -23,6 +24,7 @@ const routes = [
     { path: '/History/:iban', name: 'History', component: TransactionHistory, meta: {reqToken: true, adminOnly: false, params: true}},
     { path: '/Transaction/:iban', name: 'Transaction', component: DoTransaction, meta: {reqToken: true, adminOnly: false, params: true}},
     { path: '/UpdateUser/:id', name: 'UpdateUser', component: UpdateUser, meta: {reqToken: true, adminOnly: true, params: true}},
+    { path: '/AddAccount/:id', name: 'AddAccount', component: AddAccount, meta: {reqToken: true, adminOnly: true, params: true}},
     { path: '/PostUser', name: 'PostUser', component: PostUser, meta: {reqToken: true, adminOnly: true, params: true}},
     { path: '/signup', name: 'signup', component: Signup, meta: {reqToken: false, adminOnly: false, params: true}},
     { path: '/AdminManageUsers', name: 'AdminManageUsers', component: AdminManageUsers, meta: {reqToken: true, adminOnly: true, params: true}},

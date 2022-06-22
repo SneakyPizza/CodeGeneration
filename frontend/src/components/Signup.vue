@@ -1,6 +1,5 @@
 <template>
   <section>
-
     <div class="container-lg mt-5">
       <h1 class="blue heading mt-3 mt-lg-3">Inholland bank</h1>
       <div class="row">

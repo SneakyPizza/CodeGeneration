@@ -29,6 +29,7 @@
                 </div>
                 <div class="col">
                   <button class="btn btn-primary" @click="updateUser(user.userid)">Edit</button>
+                  <button class="btn btn-primary" @click="addAccount(user.userid)">Add account</button>
                 </div>
               </div>
             </div>
@@ -70,6 +71,9 @@ export default {
       },
       async updateUser(id) {
         await this.$router.push({name: 'UpdateUser', params: {id: id}});
+      },
+      async addAccount(id) {
+        await this.$router.push({name: 'AddAccount', params: {id: id}});
       },
     },
   async created() {
