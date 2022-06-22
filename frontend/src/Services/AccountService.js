@@ -7,5 +7,12 @@ export default {
         return axios
             .get(url + 'Accounts/' + iban)
             .then(response => response);
+    },
+    addAccount(data, token) {
+        //create Authorization header from token
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        return axios
+            .post(url + 'Accounts', data)
+            .then(response => response);
     }
 }
