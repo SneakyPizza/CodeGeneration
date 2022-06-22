@@ -1,5 +1,5 @@
 import axios from 'axios';
-const url = 'https://api-inholland-bank.herokuapp.com'
+const url = 'https://api-inholland-bank.herokuapp.com/'
 export default {
     getHistory(iban, token) {
         //create Authorization header from token
@@ -11,14 +11,14 @@ export default {
         date2.setDate(date2.getDate() +1);
 
         return axios
-            .get(url + '/Transactions/' + iban + "?dateONE=" + date1 + "dateTWO=" + date2)
+            .get(url + 'Transactions/' + iban + "?dateONE=" + date1 + "dateTWO=" + date2)
             .then(response => response);
     },
     doTransaction(data, token) {
         //create Authorization header from token
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         return axios
-            .post(url + '/Transactions', data)
+            .post(url + 'Transactions', data)
             .then(response => response);
 
     },
