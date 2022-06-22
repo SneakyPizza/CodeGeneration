@@ -2,6 +2,9 @@ package io.swagger.cucumber.steps.Account;
 
 import io.cucumber.java8.En;
 import io.swagger.cucumber.steps.BaseStepDefinitions;
+
+import java.util.List;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.model.AccountDTO;
@@ -23,7 +26,7 @@ public class GetAllAccountsDefinitions extends BaseStepDefinitions implements En
     @Value("${io.swagger.api.token_USER}")
     private String INVALID_TOKEN;
 
-    private static final String VALID_HEADER = "Accept";
+    private static final String VALID_HEADER = "Content-Type";
     private static final String INVALID_HEADER = "Invalid";
 
     private final HttpHeaders httpHeaders = new HttpHeaders();
@@ -37,7 +40,7 @@ public class GetAllAccountsDefinitions extends BaseStepDefinitions implements En
     private String token;
     private String header;
     private ErrorDTO errorDTO;
-    private AccountDTO dto;
+    private List<AccountDTO> dtos;
 
     public GetAllAccountsDefinitions(){
         Given("^'getall-account' I provide valid admin credentials", () -> {
@@ -52,8 +55,8 @@ public class GetAllAccountsDefinitions extends BaseStepDefinitions implements En
             httpHeaders.clear();
             httpHeaders.add("Authorization", "Bearer " + token);
             httpHeaders.add(header, "application/json");
-            request = new HttpEntity<>(header, httpHeaders);
-            response = restTemplate.exchange(getBaseUrl() + "/Accounts?offset=1&limit=20", HttpMethod.GET, request, String.class);
+            request = new HttpEntity<>(null, httpHeaders);
+            response = restTemplate.exchange(getBaseUrl() + "/Accounts?offset=1&limit=2", HttpMethod.GET, request, String.class);
             status = response.getStatusCode().value();
         });
 
@@ -69,6 +72,19 @@ public class GetAllAccountsDefinitions extends BaseStepDefinitions implements En
             Assertions.assertNotNull(errorDTO.getTimestamp());
             Assertions.assertNotNull(errorDTO.getStatus());
             Assertions.assertNotNull(errorDTO.getError());
+        });
+
+        And("^I should receive a list of accountdtos from the database", () -> {
+            dtos = mapper.readValue(response.getBody(), mapper.getTypeFactory().constructCollectionType(List.class, AccountDTO.class));
+
+            for (AccountDTO dto : dtos) {
+                Assertions.assertNotNull(dto.getAbsoluteLimit());
+                Assertions.assertNotNull(dto.getIBAN());
+                Assertions.assertNotNull(dto.getAccountType());
+                Assertions.assertNotNull(dto.getActive());
+                Assertions.assertNotNull(dto.getBalance());
+                Assertions.assertNotNull(dto.getUserid());
+            }
         });
 
         And("^'getall-account' I provide invalid admin credentials", () -> {
