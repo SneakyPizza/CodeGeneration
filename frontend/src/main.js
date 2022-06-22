@@ -15,7 +15,7 @@ import Signup from "@/components/Signup";
 
 
 axios.defaults.headers.common['Authorization'] = `Bearer ${store.state.token}`;
-axios.defaults.baseURL = "http://localhost:8080";
+axios.defaults.baseURL = "http://localhost:8080/";
 
 const routes = [
     { path: '/UserOverview', component: UserOverview, meta: {reqToken: true, adminOnly: false, }},
