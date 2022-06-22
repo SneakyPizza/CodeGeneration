@@ -81,9 +81,8 @@ export default {
         }
         console.log(account);
         const response = await AccountService.addAccount(account);
-        if (response.data != null) {
-          await this.$router.push("/UserOverview");
-        }
+        console.log(response);
+        // await this.$router.push("/UserOverview");
       }
       catch (error) {
         this.errorMessage = error.response.data.message;

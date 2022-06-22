@@ -16,7 +16,7 @@ import Signup from "@/components/Signup";
 
 
 axios.defaults.headers.common['Authorization'] = `Bearer ${store.state.token}`;
-axios.defaults.baseURL = 'https://api-inholland-bank.herokuapp.com/';
+axios.defaults.baseURL = 'https://api-inholland-bank.herokuapp.com';
 
 const routes = [
     { path: '/UserOverview', component: UserOverview, meta: {reqToken: true, adminOnly: false, }},
