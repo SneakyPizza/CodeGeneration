@@ -9,7 +9,7 @@ Feature: Login
   Scenario: Post request to /login with invalid user object
     Given I have an invalid user object
     When I call the login endpoint
-    Then I receive a status of 400
+    Then I receive a status of 404
 
   Scenario: Post request to /login with invalid user object
     Given My password is invalid
